@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>References - Web Technologies & BCI Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .reference-container {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .slide-title {
+            font-size: 3rem;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 4px solid #ecf0f1;
+            position: relative;
+        }
+
+        .slide-title::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .slide-title-icon {
+            font-size: 3.5rem;
+            margin-right: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .references-list {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-left: 6px solid #667eea;
+        }
+
+        .reference-item {
+            margin: 25px 0;
+            padding: 25px;
+            border-left: 4px solid #3498db;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .reference-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-left-color: #667eea;
+        }
+
+        .reference-item:nth-child(1) { border-left-color: #e74c3c; }
+        .reference-item:nth-child(2) { border-left-color: #3498db; }
+        .reference-item:nth-child(3) { border-left-color: #f39c12; }
+        .reference-item:nth-child(4) { border-left-color: #2ecc71; }
+
+        .reference-number {
+            font-weight: bold;
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            float: left;
+        }
+
+        .reference-content {
+            margin-left: 60px;
+        }
+
+        .reference-text {
+            color: #555;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+
+        .reference-text em {
+            font-style: italic;
+            color: #2c3e50;
+        }
+
+        .reference-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .reference-link:hover {
+            color: #667eea;
+            text-decoration: none;
+            border-bottom-color: #667eea;
+            transform: translateY(-1px);
+        }
+
+        .reference-link:active {
+            transform: translateY(0);
+        }
+
+        .source-type {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .additional-info {
+            background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);
+            border-left: 5px solid #4caf50;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+
+        .additional-info h3 {
+            color: #2e7d32;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .additional-info h3::before {
+            content: "📖";
+            font-size: 1.8rem;
+            margin-right: 10px;
+        }
+
+        .additional-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .additional-info li {
+            margin: 12px 0;
+            padding-left: 25px;
+            position: relative;
+            color: #2e7d32;
+            font-weight: 500;
+        }
+
+        .additional-info li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4caf50;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .citation-format {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .citation-format h4 {
+            color: #856404;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .citation-format p {
+            color: #856404;
+            font-size: 0.95rem;
+            margin: 5px 0;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #ecf0f1;
+            color: #7f8c8d;
+            font-style: italic;
+            font-size: 1rem;
+        }
+
+        .footer-note strong {
+            color: #667eea;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .reference-container {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+
+            .slide-title {
+                font-size: 2rem;
+            }
+
+            .slide-title-icon {
+                font-size: 2.5rem;
+                margin-right: 10px;
+            }
+
+            .reference-item {
+                padding: 20px 15px;
+            }
+
+            .reference-content {
+                margin-left: 0;
+                margin-top: 15px;
+            }
+
+            .reference-number {
+                float: none;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .reference-text {
+                font-size: 1rem;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+
+            .reference-container {
+                background: white;
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+
+            .reference-link {
+                color: #0066cc;
+                text-decoration: underline;
+            }
+
+            .slide-title::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="reference-container">
+        <h1 class="slide-title">
+            <span class="slide-title-icon">📚</span>References
+        </h1>
+        
+        <div class="references-list">
+            <div class="reference-item">
+                <div class="reference-number">1</div>
+                <div class="reference-content">
+                    <div class="source-type">Technical Article</div>
+                    <div class="reference-text">
+                        Built In. (n.d.). <em>What is brain-computer interface (BCI)?</em>. Retrieved from 
+                        <a href="https://builtin.com/hardware/brain-computer-interface-bci" class="reference-link" target="_blank" rel="noopener noreferrer">
+                            https://builtin.com/hardware/brain-computer-interface-bci
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reference-item">
+                <div class="reference-number">2</div>
+                <div class="reference-content">
+                    <div class="source-type">AI Software Platform</div>
+                    <div class="reference-text">
+                        Anthropic. (n.d.). <em>Claude AI</em> [Artificial intelligence software]. Retrieved from 
+                        <a href="https://claude.ai" class="reference-link" target="_blank" rel="noopener noreferrer">
+                            https://claude.ai
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reference-item">
+                <div class="reference-number">3</div>
+                <div class="reference-content">
+                    <div class="source-type">AI Software Platform</div>
+                    <div class="reference-text">
+                        DeepSeek. (n.d.). <em>DeepSeek</em> [Artificial intelligence software]. Retrieved from 
+                        <a href="https://deepseek.com" class="reference-link" target="_blank" rel="noopener noreferrer">
+                            https://deepseek.com
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reference-item">
+                <div class="reference-number">4</div>
+                <div class="reference-content">
+                    <div class="source-type">Large Language Model</div>
+                    <div class="reference-text">
+                        OpenAI. (n.d.). <em>ChatGPT</em> (version GPT-4) [Large language model]. Retrieved from 
+                        <a href="https://chat.openai.com" class="reference-link" target="_blank" rel="noopener noreferrer">
+                            https://chat.openai.com
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="citation-format">
+            <h4>📝 Citation Format</h4>
+            <p><strong>Style:</strong> APA (American Psychological Association) 7th Edition</p>
+            <p><strong>Access Date:</strong> All online sources were accessed in 2024</p>
+            <p><strong>Note:</strong> AI software and platforms are cited as software references per APA guidelines</p>
+        </div>
+
+        <div class="additional-info">
+            <h3>Additional Learning Resources</h3>
+            <ul>
+                <li><strong>Academic Journals:</strong> Nature Neuroscience, IEEE Transactions on Neural Systems</li>
+                <li><strong>Industry Standards:</strong> W3C Web Standards, IEEE Computer Society Guidelines</li>
+                <li><strong>Research Organizations:</strong> BCI Society, Internet Society (ISOC)</li>
+                <li><strong>Educational Platforms:</strong> MIT OpenCourseWare, Stanford Online</li>
+                <li><strong>News & Analysis:</strong> MIT Technology Review, IEEE Spectrum, Wired</li>
+                <li><strong>Official Documentation:</strong> MDN Web Docs, RFC Documents</li>
+            </ul>
+        </div>
+
+        <div class="footer-note">
+            <strong>Presentation Topic:</strong> Comprehensive Web Technologies & Brain-Computer Interfaces<br>
+            This reference slide supports educational content covering Internet infrastructure, 
+            web evolution, and emerging neural computing technologies.
+        </div>
+    </div>
+</body>
+</html>

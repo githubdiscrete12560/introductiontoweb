@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web 3.0 vs 4.0: Evolution Explained | เว็บ 3.0 vs 4.0: วิวัฒนาการที่แตกต่าง</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Sarabun', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .presentation-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 2.3rem;
+            background: linear-gradient(45deg, #3498db, #8e44ad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-counter {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            margin-top: 10px;
+        }
+
+        .slide-container {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        /* Custom sharp-edged scrollbar */
+        .slide-container::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        .slide-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 0;
+        }
+
+        .slide-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 0;
+            border: 2px solid #f1f1f1;
+        }
+
+        .slide-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        .slide {
+            display: none;
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-title {
+            font-size: 2.2rem;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #ecf0f1;
+            position: relative;
+        }
+
+        .slide-title::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .bilingual-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            min-height: 400px;
+        }
+
+        .language-section {
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .english {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 5px solid #2196f3;
+        }
+
+        .thai {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            border-left: 5px solid #9c27b0;
+        }
+
+        .language-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .english .language-header {
+            background: #2196f3;
+            color: white;
+        }
+
+        .thai .language-header {
+            background: #9c27b0;
+            color: white;
+        }
+
+        .comparison-section {
+            margin: 25px 0;
+        }
+
+        .comparison-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .comparison-icon {
+            font-size: 1.8rem;
+            margin-right: 10px;
+        }
+
+        .version-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .version-card {
+            padding: 20px;
+            border-radius: 12px;
+            position: relative;
+            border: 2px solid;
+        }
+
+        .web3-card {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border-color: #ff9800;
+        }
+
+        .web4-card {
+            background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+            border-color: #9c27b0;
+        }
+
+        .version-header {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            margin: 8px 0;
+            padding-left: 20px;
+            position: relative;
+            font-size: 0.95rem;
+        }
+
+        .feature-list li::before {
+            content: '•';
+            color: #3498db;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .evolution-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            font-size: 2rem;
+            color: #3498db;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        .example-showcase {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .example-header {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .example-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #667eea;
+        }
+
+        .example-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+
+        .example-aspects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .aspect-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #3498db;
+        }
+
+        .aspect-label {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+
+        .aspect-description {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        .interactive-demo {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .demo-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        .demo-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .demo-button:hover, .demo-button.active {
+            background: white;
+            color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .demo-output {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+            min-height: 150px;
+            backdrop-filter: blur(10px);
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .slide-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .indicator-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator-dot.active {
+            background: white;
+            transform: scale(1.2);
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .bilingual-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .version-comparison {
+                grid-template-columns: 1fr;
+            }
+            
+            .presentation-container {
+                padding: 10px;
+            }
+            
+            .slide-container {
+                padding: 20px;
+            }
+
+            .slide-title {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="header">
+            <h1>🌐 Web 3.0 vs 4.0: Evolution Explained<br>เว็บ 3.0 vs 4.0: วิวัฒนาการที่แตกต่าง</h1>
+            <p>Understanding the Next Generation of Web Technology | ทำความเข้าใจเทคโนโลยีเว็บรุ่นใหม่</p>
+            <div class="slide-counter">Slide <span id="current-slide">1</span> of <span id="total-slides">8</span></div>
+        </div>
+
+        <div class="slide-container">
+            <!-- Slide 1: Overview -->
+            <div class="slide active">
+                <h2 class="slide-title">🔄 Overview: Web 3.0 vs Web 4.0</h2>
+                
+                <div class="bilingual-content">
+                    <div class="language-section english">
+                        <div class="language-header">🇺🇸 English</div>
+                        
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🎯</span>
+                                Key Differences
+                            </h3>
+                            
+                            <div class="version-comparison">
+                                <div class="version-card web3-card">
+                                    <div class="version-header">🧠 Web 3.0: Semantic Web</div>
+                                    <ul class="feature-list">
+                                        <li><strong>User Role:</strong> Creator</li>
+                                        <li><strong>Content:</strong> Semantic</li>
+                                        <li><strong>Interaction:</strong> Personalized</li>
+                                        <li><strong>Technology:</strong> AI + Blockchain</li>
+                                        <li><strong>Relationship:</strong> Human uses AI tools</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="version-card web4-card">
+                                    <div class="version-header">🤝 Web 4.0: Symbiotic Web</div>
+                                    <ul class="feature-list">
+                                        <li><strong>User Role:</strong> Collaborator</li>
+                                        <li><strong>Content:</strong> Intelligent</li>
+                                        <li><strong>Interaction:</strong> Symbiotic</li>
+                                        <li><strong>Technology:</strong> Neural + Quantum</li>
+                                        <li><strong>Relationship:</strong> Human-AI partnership</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="highlight-box">
+                            <h4>🔍 Fundamental Shift</h4>
+                            <p><strong>Web 3.0:</strong> "Human + AI Tools" - humans control AI</p>
+                            <p><strong>Web 4.0:</strong> "Human ⇄ AI Partnership" - mutual adaptation</p>
+                        </div>
+                    </div>
+
+                    <div class="language-section thai">
+                        <div class="language-header">🇹🇭 ไทย</div>
+                        
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🎯</span>
+                                ความแตกต่างหลัก
+                            </h3>
+                            
+                            <div class="version-comparison">
+                                <div class="version-card web3-card">
+                                    <div class="version-header">🧠 เว็บ 3.0: เว็บความหมาย</div>
+                                    <ul class="feature-list">
+                                        <li><strong>บทบาทผู้ใช้:</strong> ผู้สร้าง</li>
+                                        <li><strong>เนื้อหา:</strong> ความหมาย</li>
+                                        <li><strong>การโต้ตอบ:</strong> เฉพาะบุคคล</li>
+                                        <li><strong>เทคโนโลยี:</strong> AI + บล็อกเชน</li>
+                                        <li><strong>ความสัมพันธ์:</strong> มนุษย์ใช้เครื่องมือ AI</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="version-card web4-card">
+                                    <div class="version-header">🤝 เว็บ 4.0: เว็บร่วมมือ</div>
+                                    <ul class="feature-list">
+                                        <li><strong>บทบาทผู้ใช้:</strong> ผู้ร่วมมือ</li>
+                                        <li><strong>เนื้อหา:</strong> อัจฉริยะ</li>
+                                        <li><strong>การโต้ตอบ:</strong> ร่วมมือกัน</li>
+                                        <li><strong>เทคโนโลยี:</strong> ระบบประสาท + ควอนตัม</li>
+                                        <li><strong>ความสัมพันธ์:</strong> ความร่วมมือมนุษย์-AI</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="highlight-box">
+                            <h4>🔍 การเปลี่ยนแปลงพื้นฐาน</h4>
+                            <p><strong>เว็บ 3.0:</strong> "มนุษย์ + เครื่องมือ AI" - มนุษย์ควบคุม AI</p>
+                            <p><strong>เว็บ 4.0:</strong> "มนุษย์ ⇄ ความร่วมมือ AI" - การปรับตัวร่วมกัน</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 2: User Role Evolution -->
+            <div class="slide">
+                <h2 class="slide-title">👥 User Role Evolution | วิวัฒนาการบทบาทผู้ใช้</h2>
+                
+                <div class="bilingual-content">
+                    <div class="language-section english">
+                        <div class="language-header">🇺🇸 English</div>
+                        
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🎨</span>
+                                Web 3.0: Creator
+                            </h3>
+                            <ul class="feature-list">
+                                <li>Users create original content and own digital assets</li>
+                                <li>AI serves as advanced tools (ChatGPT, Midjourney)</li>
+                                <li>Users control their personal data and digital assets</li>
+                                <li>Monetize through NFTs, cryptocurrencies, creator economy</li>
+                                <li>Human creativity enhanced by AI capabilities</li>
+                            </ul>
+                        </div>
+
+                        <div class="evolution-arrow">↓</div>
+
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🤝</span>
+                                Web 4.0: Collaborator
+                            </h3>
+                            <ul class="feature-list">
+                                <li>Users work symbiotically with AI as equal partners</li>
+                                <li>Continuous mutual learning and adaptation</li>
+                                <li>AI becomes extension of self, not external tool</li>
+                                <li>Combined human creativity + AI produces superior outcomes</li>
+                                <li>Seamless human-AI collaboration in all tasks</li>
+                            </ul>
+                        </div>
+
+                        <div class="example-showcase">
+                            <div class="example-header">Real-World Examples</div>
+                            <p><strong>Web 3.0:</strong> Artist uses Midjourney to create NFT art</p>
+                            <p><strong>Web 4.0:</strong> Artist's neural interface collaborates with AI in real-time during creative process</p>
+                        </div>
+                    </div>
+
+                    <div class="language-section thai">
+                        <div class="language-header">🇹🇭 ไทย</div>
+                        
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🎨</span>
+                                เว็บ 3.0: ผู้สร้าง
+                            </h3>
+                            <ul class="feature-list">
+                                <li>ผู้ใช้สร้างเนื้อหาต้นฉบับและเป็นเจ้าของสินทรัพย์ดิจิทัล</li>
+                                <li>AI ทำหน้าที่เป็นเครื่องมือขั้นสูง (ChatGPT, Midjourney)</li>
+                                <li>ผู้ใช้ควบคุมข้อมูลส่วนตัวและสินทรัพย์ดิจิทัล</li>
+                                <li>สร้างรายได้ผ่าน NFTs, สกุลเงินดิจิทัล, เศรษฐกิจผู้สร้าง</li>
+                                <li>ความคิดสร้างสรรค์ของมนุษย์เสริมด้วยความสามารถของ AI</li>
+                            </ul>
+                        </div>
+
+                        <div class="evolution-arrow">↓</div>
+
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🤝</span>
+                                เว็บ 4.0: ผู้ร่วมมือ
+                            </h3>
+                            <ul class="feature-list">
+                                <li>ผู้ใช้ทำงานร่วมกับ AI อย่างผูกพันเป็นหุ้นส่วนเท่าเทียม</li>
+                                <li>การเรียนรู้และปรับตัวร่วมกันอย่างต่อเนื่อง</li>
+                                <li>AI กลายเป็นส่วนขยายของตัวเอง ไม่ใช่เครื่องมือภายนอก</li>
+                                <li>ความคิดสร้างสรรค์ของมนุษย์ + AI สร้างผลลัพธ์ที่เหนือกว่า</li>
+                                <li>การร่วมมือมนุษย์-AI ที่ราบรื่นในงานทุกประเภท</li>
+                            </ul>
+                        </div>
+
+                        <div class="example-showcase">
+                            <div class="example-header">ตัวอย่างในโลกจริง</div>
+                            <p><strong>เว็บ 3.0:</strong> ศิลปินใช้ Midjourney สร้างงานศิลปะ NFT</p>
+                            <p><strong>เว็บ 4.0:</strong> อินเทอร์เฟซระบบประสาทของศิลปินร่วมมือกับ AI แบบเรียลไทม์ในกระบวนการสร้างสรรค์</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: Content Evolution -->
+            <div class="slide">
+                <h2 class="slide-title">📄 Content Evolution | วิวัฒนาการเนื้อหา</h2>
+                
+                <div class="bilingual-content">
+                    <div class="language-section english">
+                        <div class="language-header">🇺🇸 English</div>
+                        
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🧠</span>
+                                Web 3.0: Semantic Content
+                            </h3>
+                            <ul class="feature-list">
+                                <li>Machine-readable with defined relationships</li>
+                                <li>Human-created with AI assistance</li>
+                                <li>AI can interpret meaning and context</li>
+                                <li>Knowledge graphs and linked information</li>
+                                <li>Structured data with semantic markup</li>
+                            </ul>
+                        </div>
+
+                        <div class="evolution-arrow">↓</div>
+
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🧬</span>
+                                Web 4.0: Intelligent Content
+                            </h3>
+                            <ul class="feature-list">
+                                <li>Self-generating and autonomous content creation</li>
+                                <li>AI creates content independently, then collaborates</li>
+                                <li>Content evolves based on usage patterns and feedback</li>
+                                <li>Predictive content that anticipates needs</li>
+                                <li>Content that rewrites and improves itself</li>
+                            </ul>
+                        </div>
+
+                        <div class="example-showcase">
+                            <div class="example-header">Content Examples</div>
+                            <p><strong>Web 3.0:</strong> Google Knowledge Panel showing structured information about entities</p>
+                            <p><strong>Web 4.0:</strong> News article that rewrites itself based on reader's comprehension level and interests</p>
+                        </div>
+                    </div>
+
+                    <div class="language-section thai">
+                        <div class="language-header">🇹🇭 ไทย</div>
+                        
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🧠</span>
+                                เว็บ 3.0: เนื้อหาความหมาย
+                            </h3>
+                            <ul class="feature-list">
+                                <li>เครื่องอ่านได้ด้วยความสัมพันธ์ที่กำหนดไว้</li>
+                                <li>สร้างโดยมนุษย์ด้วยความช่วยเหลือจาก AI</li>
+                                <li>AI สามารถตีความความหมายและบริบทได้</li>
+                                <li>กราฟความรู้และข้อมูลที่เชื่อมโยง</li>
+                                <li>ข้อมูลที่มีโครงสร้างพร้อมมาร์กอัปความหมาย</li>
+                            </ul>
+                        </div>
+
+                        <div class="evolution-arrow">↓</div>
+
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🧬</span>
+                                เว็บ 4.0: เนื้อหาอัจฉริยะ
+                            </h3>
+                            <ul class="feature-list">
+                                <li>การสร้างเนื้อหาที่ผลิตเองและอัตโนมัติ</li>
+                                <li>AI สร้างเนื้อหาอิสระ แล้วมาร่วมมือ</li>
+                                <li>เนื้อหาพัฒนาตามรูปแบบการใช้งานและข้อเสนอแนะ</li>
+                                <li>เนื้อหาที่คาดการณ์ความต้องการล่วงหน้า</li>
+                                <li>เนื้อหาที่เขียนใหม่และปรับปรุงตัวเอง</li>
+                            </ul>
+                        </div>
+
+                        <div class="example-showcase">
+                            <div class="example-header">ตัวอย่างเนื้อหา</div>
+                            <p><strong>เว็บ 3.0:</strong> Google Knowledge Panel แสดงข้อมูลที่มีโครงสร้างเกี่ยวกับสิ่งต่างๆ</p>
+                            <p><strong>เว็บ 4.0:</strong> บทความข่าวที่เขียนใหม่ตามระดับความเข้าใจและความสนใจของผู้อ่าน</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4: Interaction Evolution -->
+            <div class="slide">
+                <h2 class="slide-title">🔄 Interaction Evolution | วิวัฒนาการการโต้ตอบ</h2>
+                
+                <div class="bilingual-content">
+                    <div class="language-section english">
+                        <div class="language-header">🇺🇸 English</div>
+                        
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🎯</span>
+                                Web 3.0: Personalized Interaction
+                            </h3>
+                            <ul class="feature-list">
+                                <li>AI tailors experiences to individual preferences</li>
+                                <li>Learning from user behavior patterns</li>
+                                <li>Voice, touch, traditional inputs with AI enhancement</li>
+                                <li>Context-aware responses based on user data</li>
+                                <li>Recommendation systems and personalized content</li>
+                            </ul>
+                        </div>
+
+                        <div class="evolution-arrow">↓</div>
+
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🔗</span>
+                                Web 4.0: Symbiotic Interaction
+                            </h3>
+                            <ul class="feature-list">
+                                <li>Continuous mutual adaptation between human and AI</li>
+                                <li>Both human and AI evolve together in real-time</li>
+                                <li>Neural interfaces, thought-based control</li>
+                                <li>Emotion-responsive and intuitive communication</li>
+                                <li>Ambient computing that anticipates needs</li>
+                            </ul>
+                        </div>
+
+                        <div class="example-showcase">
+                            <div class="example-header">Interaction Examples</div>
+                            <p><strong>Web 3.0:</strong> Spotify suggests music based on listening history</p>
+                            <p><strong>Web 4.0:</strong> Music system reads emotional state and plays mood-appropriate songs automatically</p>
+                        </div>
+                    </div>
+
+                    <div class="language-section thai">
+                        <div class="language-header">🇹🇭 ไทย</div>
+                        
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🎯</span>
+                                เว็บ 3.0: การโต้ตอบเฉพาะบุคคล
+                            </h3>
+                            <ul class="feature-list">
+                                <li>AI ปรับแต่งประสบการณ์ตามความชอบส่วนบุคคล</li>
+                                <li>เรียนรู้จากรูปแบบพฤติกรรมของผู้ใช้</li>
+                                <li>เสียง สัมผัส การป้อนข้อมูลแบบดั้งเดิมที่เสริมด้วย AI</li>
+                                <li>การตอบสนองที่รับรู้บริบทจากข้อมูลผู้ใช้</li>
+                                <li>ระบบแนะนำและเนื้อหาเฉพาะบุคคล</li>
+                            </ul>
+                        </div>
+
+                        <div class="evolution-arrow">↓</div>
+
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🔗</span>
+                                เว็บ 4.0: การโต้ตอบร่วมมือ
+                            </h3>
+                            <ul class="feature-list">
+                                <li>การปรับตัวร่วมกันอย่างต่อเนื่องระหว่างมนุษย์และ AI</li>
+                                <li>ทั้งมนุษย์และ AI พัฒนาไปด้วยกันแบบเรียลไทม์</li>
+                                <li>อินเทอร์เฟซระบบประสาท การควบคุมด้วยความคิด</li>
+                                <li>การสื่อสารที่ตอบสนองอารมณ์และใช้ง่าย</li>
+                                <li>คอมพิวติ้งแวดล้อมที่คาดการณ์ความต้องการ</li>
+                            </ul>
+                        </div>
+
+                        <div class="example-showcase">
+                            <div class="example-header">ตัวอย่างการโต้ตอบ</div>
+                            <p><strong>เว็บ 3.0:</strong> Spotify แนะนำเพลงตามประวัติการฟัง</p>
+                            <p><strong>เว็บ 4.0:</strong> ระบบเพลงอ่านสภาวะอารมณ์และเล่นเพลงที่เหมาะกับอารมณ์โดยอัตโนมัติ</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: Technology Evolution -->
+            <div class="slide">
+                <h2 class="slide-title">⚙️ Technology Evolution | วิวัฒนาการเทคโนโลยี</h2>
+                
+                <div class="bilingual-content">
+                    <div class="language-section english">
+                        <div class="language-header">🇺🇸 English</div>
+                        
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🤖</span>
+                                Web 3.0: AI + Blockchain
+                            </h3>
+                            <ul class="feature-list">
+                                <li>Machine learning and natural language processing</li>
+                                <li>Decentralized systems and smart contracts</li>
+                                <li>Cloud computing and edge processing</li>
+                                <li>IoT integration and AR/VR technologies</li>
+                                <li>Examples: ChatGPT, Ethereum, DAOs</li>
+                            </ul>
+                        </div>
+
+                        <div class="evolution-arrow">↓</div>
+
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🧠</span>
+                                Web 4.0: Neural + Quantum
+                            </h3>
+                            <ul class="feature-list">
+                                <li>Brain-computer interfaces and neuromorphic chips</li>
+                                <li>Quantum computing with exponential processing power</li>
+                                <li>Artificial General Intelligence (AGI)</li>
+                                <li>6G networks and ultra-fast communication</li>
+                                <li>Examples: Neural implants, quantum-enhanced AI</li>
+                            </ul>
+                        </div>
+
+                        <div class="example-showcase">
+                            <div class="example-header">Technology Comparison</div>
+                            <p><strong>Web 3.0:</strong> Uses GPU clusters for AI training and processing</p>
+                            <p><strong>Web 4.0:</strong> Uses quantum processors for instant complex problem solving</p>
+                        </div>
+                    </div>
+
+                    <div class="language-section thai">
+                        <div class="language-header">🇹🇭 ไทย</div>
+                        
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🤖</span>
+                                เว็บ 3.0: AI + บล็อกเชน
+                            </h3>
+                            <ul class="feature-list">
+                                <li>การเรียนรู้ของเครื่องและการประมวลผลภาษาธรรมชาติ</li>
+                                <li>ระบบกระจายอำนาจและสัญญาอัจฉริยะ</li>
+                                <li>คลาวด์คอมพิวติ้งและการประมวลผลที่ขอบ</li>
+                                <li>การผสานรวม IoT และเทคโนโลยี AR/VR</li>
+                                <li>ตัวอย่าง: ChatGPT, Ethereum, DAOs</li>
+                            </ul>
+                        </div>
+
+                        <div class="evolution-arrow">↓</div>
+
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">🧠</span>
+                                เว็บ 4.0: ระบบประสาท + ควอนตัม
+                            </h3>
+                            <ul class="feature-list">
+                                <li>อินเทอร์เฟซสมอง-คอมพิวเตอร์และชิประบบประสาท</li>
+                                <li>ควอนตัมคอมพิวติ้งด้วยพลังประมวลผลเชิงเลขยกกำลัง</li>
+                                <li>ปัญญาประดิษฐ์ทั่วไป (AGI)</li>
+                                <li>เครือข่าย 6G และการสื่อสารความเร็วสูง</li>
+                                <li>ตัวอย่าง: อุปกรณ์ฝังระบบประสาท, AI ที่เสริมด้วยควอนตัม</li>
+                            </ul>
+                        </div>
+
+                        <div class="example-showcase">
+                            <div class="example-header">เปรียบเทียบเทคโนโลยี</div>
+                            <p><strong>เว็บ 3.0:</strong> ใช้คลัสเตอร์ GPU สำหรับการฝึกและประมวลผล AI</p>
+                            <p><strong>เว็บ 4.0:</strong> ใช้โปรเซสเซอร์ควอนตัมสำหรับการแก้ปัญหาซับซ้อนแบบทันที</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: Web 4.0 Application Example 1 -->
+            <div class="slide">
+                <h2 class="slide-title">🚀 Web 4.0 Example: NeuroLearn | ตัวอย่างเว็บ 4.0: NeuroLearn</h2>
+                
+                <div class="bilingual-content">
+                    <div class="language-section english">
+                        <div class="language-header">🇺🇸 English</div>
+                        
+                        <div class="example-card">
+                            <div class="example-title">🧠 NeuroLearn: Symbiotic Education Platform</div>
+                            <p>A revolutionary learning system that creates a symbiotic relationship between student, AI, and knowledge.</p>
+                        </div>
+
+                        <div class="example-aspects">
+                            <div class="aspect-item">
+                                <div class="aspect-label">👥 User Role (Collaborator)</div>
+                                <div class="aspect-description">
+                                    • Student's brain activity monitored via neural interface<br>
+                                    • AI partner adapts teaching methods in real-time<br>
+                                    • Human and AI co-create personalized learning paths
+                                </div>
+                            </div>
+
+                            <div class="aspect-item">
+                                <div class="aspect-label">🧬 Content (Intelligent)</div>
+                                <div class="aspect-description">
+                                    • Educational content auto-adjusts complexity<br>
+                                    • Materials evolve based on learning outcomes<br>
+                                    • Predicts knowledge gaps before student realizes
+                                </div>
+                            </div>
+
+                            <div class="aspect-item">
+                                <div class="aspect-label">🔗 Interaction (Symbiotic)</div>
+                                <div class="aspect-description">
+                                    • Think about concept → system provides information<br>
+                                    • AI detects confusion through neural signals<br>
+                                    • Continuous feedback improves both parties
+                                </div>
+                            </div>
+
+                            <div class="aspect-item">
+                                <div class="aspect-label">🧠 Technology (Neural + Quantum)</div>
+                                <div class="aspect-description">
+                                    • Quantum-enhanced pattern recognition<br>
+                                    • Neural interface for thought-based navigation<br>
+                                    • AGI tutor understanding human psychology
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="language-section thai">
+                        <div class="language-header">🇹🇭 ไทย</div>
+                        
+                        <div class="example-card">
+                            <div class="example-title">🧠 NeuroLearn: แพลตฟอร์มการศึกษาแบบร่วมมือ</div>
+                            <p>ระบบการเรียนรู้ที่ปฏิวัติวงการที่สร้างความสัมพันธ์ร่วมมือระหว่างนักเรียน AI และความรู้</p>
+                        </div>
+
+                        <div class="example-aspects">
+                            <div class="aspect-item">
+                                <div class="aspect-label">👥 บทบาทผู้ใช้ (ผู้ร่วมมือ)</div>
+                                <div class="aspect-description">
+                                    • ติดตามกิจกรรมสมองของนักเรียนผ่านอินเทอร์เฟซระบบประสาท<br>
+                                    • AI หุ้นส่วนปรับวิธีการสอนแบบเรียลไทม์<br>
+                                    • มนุษย์และ AI ร่วมสร้างเส้นทางการเรียนรู้เฉพาะบุคคล
+                                </div>
+                            </div>
+
+                            <div class="aspect-item">
+                                <div class="aspect-label">🧬 เนื้อหา (อัจฉริยะ)</div>
+                                <div class="aspect-description">
+                                    • เนื้อหาการศึกษาปรับความซับซ้อนอัตโนมัติ<br>
+                                    • วัสดุพัฒนาตามผลการเรียนรู้<br>
+                                    • คาดการณ์ช่องว่างความรู้ก่อนนักเรียนจะรู้ตัว
+                                </div>
+                            </div>
+
+                            <div class="aspect-item">
+                                <div class="aspect-label">🔗 การโต้ตอบ (ร่วมมือ)</div>
+                                <div class="aspect-description">
+                                    • คิดเกี่ยวกับแนวคิด → ระบบให้ข้อมูล<br>
+                                    • AI ตรวจจับความสับสนผ่านสัญญาณประสาท<br>
+                                    • ข้อเสนอแนะต่อเนื่องปรับปรุงทั้งสองฝ่าย
+                                </div>
+                            </div>
+
+                            <div class="aspect-item">
+                                <div class="aspect-label">🧠 เทคโนโลยี (ระบบประสาท + ควอนตัม)</div>
+                                <div class="aspect-description">
+                                    • การรู้จำรูปแบบที่เสริมด้วยควอนตัม<br>
+                                    • อินเทอร์เฟซระบบประสาทสำหรับการนำทางด้วยความคิด<br>
+                                    • ครู AGI ที่เข้าใจจิตวิทยามนุษย์
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7: Web 4.0 Application Example 2 -->
+            <div class="slide">
+                <h2 class="slide-title">🔗 Web 4.0 Example: MindMesh | ตัวอย่างเว็บ 4.0: MindMesh</h2>
+                
+                <div class="bilingual-content">
+                    <div class="language-section english">
+                        <div class="language-header">🇺🇸 English</div>
+                        
+                        <div class="example-card">
+                            <div class="example-title">🌐 MindMesh: Collaborative Problem-Solving Network</div>
+                            <p>A global network where multiple minds and AI systems collaborate to solve complex problems through direct neural connection.</p>
+                        </div>
+
+                        <div class="example-aspects">
+                            <div class="aspect-item">
+                                <div class="aspect-label">👥 User Role (Collaborator)</div>
+                                <div class="aspect-description">
+                                    • Multiple humans connect via brain-computer interfaces<br>
+                                    • AI facilitates and enhances collective intelligence<br>
+                                    • Human creativity + AI processing = superior solutions
+                                </div>
+                            </div>
+
+                            <div class="aspect-item">
+                                <div class="aspect-label">🧬 Content (Intelligent)</div>
+                                <div class="aspect-description">
+                                    • Problems and solutions evolve from collective insights<br>
+                                    • Knowledge base grows from each session<br>
+                                    • Pre-generates solution frameworks automatically
+                                </div>
+                            </div>
+
+                            <div class="aspect-item">
+                                <div class="aspect-label">🔗 Interaction (Symbiotic)</div>
+                                <div class="aspect-description">
+                                    • Direct thought sharing between participants and AI<br>
+                                    • Emotions and intuition factor into logical solving<br>
+                                    • AI amplifies human cognitive abilities
+                                </div>
+                            </div>
+
+                            <div class="aspect-item">
+                                <div class="aspect-label">🧠 Technology (Neural + Quantum)</div>
+                                <div class="aspect-description">
+                                    • Quantum computing for real-time complex processing<br>
+                                    • Neural networks facilitate thought communication<br>
+                                    • Distributed quantum-AI system coordination
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <h3>🎯 How MindMesh Works</h3>
+                            <div class="demo-output">
+                                <h4>Collaboration Process:</h4>
+                                <p>1. Scientists connect neural interfaces to tackle climate change</p>
+                                <p>2. AI synthesizes diverse expertise in real-time</p>
+                                <p>3. Collective human intuition guides AI analysis</p>
+                                <p>4. Breakthrough solutions emerge from human-AI symbiosis</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="language-section thai">
+                        <div class="language-header">🇹🇭 ไทย</div>
+                        
+                        <div class="example-card">
+                            <div class="example-title">🌐 MindMesh: เครือข่ายการแก้ปัญหาร่วมกัน</div>
+                            <p>เครือข่ายโลกที่จิตใจหลายดวงและระบบ AI ร่วมมือแก้ปัญหาซับซ้อนผ่านการเชื่อมต่อระบบประสาทโดยตรง</p>
+                        </div>
+
+                        <div class="example-aspects">
+                            <div class="aspect-item">
+                                <div class="aspect-label">👥 บทบาทผู้ใช้ (ผู้ร่วมมือ)</div>
+                                <div class="aspect-description">
+                                    • มนุษย์หลายคนเชื่อมต่อผ่านอินเทอร์เฟซสมอง-คอมพิวเตอร์<br>
+                                    • AI อำนวยความสะดวกและเสริมสร้างปัญญาร่วม<br>
+                                    • ความคิดสร้างสรรค์ของมนุษย์ + การประมวลผล AI = โซลูชันที่เหนือกว่า
+                                </div>
+                            </div>
+
+                            <div class="aspect-item">
+                                <div class="aspect-label">🧬 เนื้อหา (อัจฉริยะ)</div>
+                                <div class="aspect-description">
+                                    • ปัญหาและโซลูชันพัฒนาจากข้อมูลเชิงลึกร่วม<br>
+                                    • ฐานความรู้เติบโตจากแต่ละเซสชัน<br>
+                                    • สร้างกรอบโซลูชันล่วงหน้าโดยอัตโนมัติ
+                                </div>
+                            </div>
+
+                            <div class="aspect-item">
+                                <div class="aspect-label">🔗 การโต้ตอบ (ร่วมมือ)</div>
+                                <div class="aspect-description">
+                                    • แบ่งปันความคิดโดยตรงระหว่างผู้เข้าร่วมและ AI<br>
+                                    • อารมณ์และสัญชาตญาณเป็นปัจจัยในการแก้ปัญหาเชิงตรรกะ<br>
+                                    • AI ขยายความสามารถทางปัญญาของมนุษย์
+                                </div>
+                            </div>
+
+                            <div class="aspect-item">
+                                <div class="aspect-label">🧠 เทคโนโลยี (ระบบประสาท + ควอนตัม)</div>
+                                <div class="aspect-description">
+                                    • ควอนตัมคอมพิวติ้งสำหรับการประมวลผลซับซ้อนแบบเรียลไทม์<br>
+                                    • เครือข่ายประสาทเชื่อมต่อการสื่อสารความคิด<br>
+                                    • การประสานงานระบบควอนตัม-AI แบบกระจาย
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <h3>🎯 MindMesh ทำงานอย่างไร</h3>
+                            <div class="demo-output">
+                                <h4>กระบวนการความร่วมมือ:</h4>
+                                <p>1. นักวิทยาศาสตร์เชื่อมต่ออินเทอร์เฟซระบบประสาทเพื่อแก้ไขการเปลี่ยนแปลงสภาพภูมิอากาศ</p>
+                                <p>2. AI ผสมผสานความเชี่ยวชาญที่หลากหลายแบบเรียลไทม์</p>
+                                <p>3. สัญชาตญาณร่วมของมนุษย์นำทางการวิเคราะห์ของ AI</p>
+                                <p>4. โซลูชันที่ก้าวล้ำเกิดขึ้นจากความร่วมมือมนุษย์-AI</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 8: Summary & Future Outlook -->
+            <div class="slide">
+                <h2 class="slide-title">🎯 Summary & Future Outlook | สรุปและมุมมองอนาคต</h2>
+                
+                <div class="bilingual-content">
+                    <div class="language-section english">
+                        <div class="language-header">🇺🇸 English</div>
+                        
+                        <div class="highlight-box">
+                            <h4>🔍 Key Differences Summary</h4>
+                            <p><strong>Web 3.0:</strong> Human + AI Tools (User controls AI)</p>
+                            <p><strong>Web 4.0:</strong> Human ⇄ AI Partnership (Mutual evolution)</p>
+                        </div>
+
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">📈</span>
+                                Evolution Pattern
+                            </h3>
+                            
+                            <div class="version-comparison">
+                                <div class="version-card web3-card">
+                                    <div class="version-header">🧠 Web 3.0 Characteristics</div>
+                                    <ul class="feature-list">
+                                        <li>AI as sophisticated tools</li>
+                                        <li>Human creativity enhanced by AI</li>
+                                        <li>Personalized user experiences</li>
+                                        <li>Semantic understanding of content</li>
+                                        <li>Blockchain-based ownership</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="version-card web4-card">
+                                    <div class="version-header">🤝 Web 4.0 Vision</div>
+                                    <ul class="feature-list">
+                                        <li>AI as collaborative partners</li>
+                                        <li>Symbiotic human-AI evolution</li>
+                                        <li>Neural-based interactions</li>
+                                        <li>Self-generating intelligent content</li>
+                                        <li>Quantum-enhanced processing</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="example-showcase">
+                            <div class="example-header">Future Predictions</div>
+                            <p><strong>2025-2027:</strong> Web 3.0 mainstream adoption with AI assistants</p>
+                            <p><strong>2028-2032:</strong> Early Web 4.0 experiments with neural interfaces</p>
+                            <p><strong>2033-2040:</strong> Widespread human-AI symbiotic collaboration</p>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <h3>🚀 The Journey Ahead</h3>
+                            <div class="demo-output">
+                                <h4>Preparing for Web 4.0:</h4>
+                                <p>• Learn to collaborate with AI effectively</p>
+                                <p>• Develop understanding of neural interfaces</p>
+                                <p>• Practice human-AI creative partnerships</p>
+                                <p>• Stay informed about quantum computing advances</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="language-section thai">
+                        <div class="language-header">🇹🇭 ไทย</div>
+                        
+                        <div class="highlight-box">
+                            <h4>🔍 สรุปความแตกต่างหลัก</h4>
+                            <p><strong>เว็บ 3.0:</strong> มนุษย์ + เครื่องมือ AI (ผู้ใช้ควบคุม AI)</p>
+                            <p><strong>เว็บ 4.0:</strong> มนุษย์ ⇄ ความร่วมมือ AI (วิวัฒนาการร่วมกัน)</p>
+                        </div>
+
+                        <div class="comparison-section">
+                            <h3 class="comparison-title">
+                                <span class="comparison-icon">📈</span>
+                                รูปแบบวิวัฒนาการ
+                            </h3>
+                            
+                            <div class="version-comparison">
+                                <div class="version-card web3-card">
+                                    <div class="version-header">🧠 ลักษณะเว็บ 3.0</div>
+                                    <ul class="feature-list">
+                                        <li>AI เป็นเครื่องมือที่ซับซ้อน</li>
+                                        <li>ความคิดสร้างสรรค์ของมนุษย์เสริมด้วย AI</li>
+                                        <li>ประสบการณ์ผู้ใช้เฉพาะบุคคล</li>
+                                        <li>ความเข้าใจความหมายของเนื้อหา</li>
+                                        <li>ความเป็นเจ้าของที่ใช้บล็อกเชน</li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="version-card web4-card">
+                                    <div class="version-header">🤝 วิสัยทัศน์เว็บ 4.0</div>
+                                    <ul class="feature-list">
+                                        <li>AI เป็นหุ้นส่วนความร่วมมือ</li>
+                                        <li>วิวัฒนาการมนุษย์-AI แบบร่วมมือ</li>
+                                        <li>การโต้ตอบที่ใช้ระบบประสาท</li>
+                                        <li>เนื้อหาอัจฉริยะที่สร้างตัวเอง</li>
+                                        <li>การประมวลผลที่เสริมด้วยควอนตัม</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="example-showcase">
+                            <div class="example-header">การคาดการณ์อนาคต</div>
+                            <p><strong>2025-2027:</strong> การใช้งานหลักเว็บ 3.0 ด้วยผู้ช่วย AI</p>
+                            <p><strong>2028-2032:</strong> การทดลองเว็บ 4.0 ในช่วงแรกด้วยอินเทอร์เฟซระบบประสาท</p>
+                            <p><strong>2033-2040:</strong> ความร่วมมือมนุษย์-AI แบบร่วมมือกันอย่างแพร่หลาย</p>
+                        </div>
+
+                        <div class="interactive-demo">
+                            <h3>🚀 เส้นทางข้างหน้า</h3>
+                            <div class="demo-output">
+                                <h4>เตรียมตัวสำหรับเว็บ 4.0:</h4>
+                                <p>• เรียนรู้การร่วมมือกับ AI อย่างมีประสิทธิภาพ</p>
+                                <p>• พัฒนาความเข้าใจเกี่ยวกับอินเทอร์เฟซระบบประสาท</p>
+                                <p>• ฝึกฝนความร่วมมือสร้างสรรค์มนุษย์-AI</p>
+                                <p>• ติดตามความก้าวหน้าของควอนตัมคอมพิวติ้ง</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">⬅️ Previous</button>
+            <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Next ➡️</button>
+        </div>
+
+        <div class="slide-indicator" id="slideIndicator">
+            <!-- Dots will be generated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        // Initialize presentation
+        function initPresentation() {
+            document.getElementById('total-slides').textContent = totalSlides;
+            createIndicatorDots();
+            updateSlideDisplay();
+        }
+
+        // Create indicator dots
+        function createIndicatorDots() {
+            const indicator = document.getElementById('slideIndicator');
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'indicator-dot';
+                dot.onclick = () => goToSlide(i);
+                indicator.appendChild(dot);
+            }
+        }
+
+        // Change slide function
+        function changeSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide >= totalSlides) currentSlide = 0;
+            if (currentSlide < 0) currentSlide = totalSlides - 1;
+            updateSlideDisplay();
+        }
+
+        // Go to specific slide
+        function goToSlide(slideNumber) {
+            currentSlide = slideNumber;
+            updateSlideDisplay();
+        }
+
+        // Update slide display
+        function updateSlideDisplay() {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[currentSlide].classList.add('active');
+            
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            
+            const dots = document.querySelectorAll('.indicator-dot');
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'Home') goToSlide(0);
+            if (e.key === 'End') goToSlide(totalSlides - 1);
+        });
+
+        // Initialize when page loads
+        window.addEventListener('load', initPresentation);
+    </script>
+</body>
+</html>
