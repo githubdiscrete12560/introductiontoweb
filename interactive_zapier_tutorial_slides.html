@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Your First Zap: Gmail to Google Sheets</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ff6b6b 0%, #4ecdc4 50%, #45b7d1 100%);
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .presentation-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            display: none;
+            width: 95%;
+            max-width: 1100px;
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            text-align: center;
+            animation: slideIn 0.8s ease-out;
+            min-height: 650px;
+            position: relative;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        h2 {
+            color: #34495e;
+            font-size: 2em;
+            margin-bottom: 25px;
+        }
+
+        h3 {
+            color: #e74c3c;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+        }
+
+        h4 {
+            color: #3498db;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        p, li {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #2c3e50;
+            margin-bottom: 12px;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #ff6b6b, #e74c3c);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(255,255,255,0.95);
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            color: #2c3e50;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+            transition: width 0.4s ease;
+            z-index: 1000;
+        }
+
+        .interactive-element {
+            display: inline-block;
+            padding: 12px 25px;
+            margin: 10px;
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        .interactive-element:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 20px rgba(68, 160, 141, 0.4);
+        }
+
+        .step-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .step-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: left;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+        }
+
+        .step-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent, rgba(255,255,255,0.1));
+            pointer-events: none;
+        }
+
+        .step-number {
+            background: rgba(255,255,255,0.2);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        .workflow-diagram {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 40px 0;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .workflow-item {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            min-width: 150px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .workflow-item:hover {
+            transform: scale(1.08);
+            box-shadow: 0 10px 25px rgba(245, 87, 108, 0.5);
+        }
+
+        .arrow {
+            font-size: 2em;
+            color: #3498db;
+            margin: 0 10px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            color: #2c3e50;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(168, 237, 234, 0.4);
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+
+        .slide-title {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            font-size: 1em;
+            color: #7f8c8d;
+            font-weight: normal;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            text-align: left;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: '💻';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.2em;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #ff9a56, #ff6b6b);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #e74c3c;
+        }
+
+        .success-box {
+            background: linear-gradient(135deg, #56ab2f, #a8e6cf);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #27ae60;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #3498db;
+        }
+
+        ul {
+            text-align: left;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .reference-section {
+            margin-top: 40px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(155, 89, 182, 0.1));
+            border-radius: 15px;
+            border-left: 5px solid #3498db;
+            text-align: left;
+        }
+
+        .quiz-container {
+            background: #ecf0f1;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .quiz-option {
+            display: block;
+            background: white;
+            margin: 12px 0;
+            padding: 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-align: left;
+        }
+
+        .quiz-option:hover {
+            background: #3498db;
+            color: white;
+            border-color: #2980b9;
+            transform: translateX(5px);
+        }
+
+        .quiz-option.correct {
+            background: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        .quiz-option.incorrect {
+            background: #e74c3c;
+            color: white;
+            border-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="slide-counter" id="slideCounter">1 / 16</div>
+    
+    <div class="presentation-container">
+        
+        <!-- Slide 1: Title with References -->
+        <div class="slide active">
+            <div class="slide-title">Tutorial Introduction</div>
+            <h1>Create Your First Zap</h1>
+            <h2 style="color: #e74c3c;">Gmail to Google Sheets Automation</h2>
+            <p style="font-size: 1.3em; margin: 30px 0;">Step-by-step tutorial for building your first Zapier automation</p>
+            <p style="font-size: 1.1em; color: #7f8c8d;">Automatically save email details to a spreadsheet</p>
+            
+            <div class="interactive-element" onclick="showAlert('Welcome to your Zapier automation journey! 🚀')">
+                🎯 Start Your Automation Journey
+            </div>
+            
+            <!-- Reference Section -->
+            <div class="reference-section">
+                <h4 style="color: #2c3e50; margin-bottom: 15px;">📚 References & Attribution</h4>
+                <p style="font-weight: 600; color: #e74c3c; margin-bottom: 10px;">
+                    ✨ Interactive tutorial created by <strong>Claude.ai</strong>
+                </p>
+                <p style="font-size: 0.95em; color: #7f8c8d; margin-bottom: 20px;">
+                    AI-powered step-by-step automation tutorial
+                </p>
+                
+                <div style="font-size: 0.9em; color: #34495e; line-height: 1.5;">
+                    <p style="font-weight: 500; margin-bottom: 10px;">📋 Additional References:</p>
+                    <p>• <strong>Zapier Official Documentation</strong> - zapier.com/help</p>
+                    <p>• <strong>Gmail API Documentation</strong> - developers.google.com/gmail</p>
+                    <p>• <strong>Google Sheets API Guide</strong> - developers.google.com/sheets</p>
+                    <p>• <strong>Zapier University</strong> - zapier.com/learn</p>
+                    <p>• <strong>Google Workspace Learning Center</strong> - workspace.google.com/learning</p>
+                    <p>• <strong>Automation Best Practices</strong> - zapier.com/blog/workflow-automation</p>
+                    <p>• <strong>IFTTT vs Zapier Comparison</strong> - zapier.com/blog/ifttt-vs-zapier</p>
+                    <p>• <strong>Workflow Automation Research</strong> - MIT Technology Review</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Introduction to Zapier -->
+        <div class="slide">
+            <div class="slide-title">Platform Overview</div>
+            <h2>What is Zapier?</h2>
+            <p style="font-size: 1.3em; margin-bottom: 30px;">The automation platform that connects your favorite apps</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card" onclick="showZapierFeature('automation')">
+                    <div class="feature-icon">⚡</div>
+                    <h4>Automation Platform</h4>
+                    <p>Connect 5,000+ apps without coding</p>
+                </div>
+                <div class="feature-card" onclick="showZapierFeature('nocode')">
+                    <div class="feature-icon">🛠️</div>
+                    <h4>No-Code Solution</h4>
+                    <p>Build workflows with simple drag & drop</p>
+                </div>
+                <div class="feature-card" onclick="showZapierFeature('triggers')">
+                    <div class="feature-icon">🎯</div>
+                    <h4>Triggers & Actions</h4>
+                    <p>When this happens, do that automatically</p>
+                </div>
+                <div class="feature-card" onclick="showZapierFeature('integration')">
+                    <div class="feature-icon">🔗</div>
+                    <h4>App Integration</h4>
+                    <p>Gmail, Slack, Sheets, Salesforce & more</p>
+                </div>
+            </div>
+            
+            <div class="workflow-diagram">
+                <div class="workflow-item" onclick="showZapierConcept('trigger')">
+                    📧 TRIGGER<br><small>Something happens</small>
+                </div>
+                <div class="arrow">→</div>
+                <div class="workflow-item" onclick="showZapierConcept('action')">
+                    ⚡ ACTION<br><small>Zapier responds</small>
+                </div>
+                <div class="arrow">→</div>
+                <div class="workflow-item" onclick="showZapierConcept('result')">
+                    ✅ RESULT<br><small>Task completed</small>
+                </div>
+            </div>
+            
+            <div class="success-box">
+                <h4>🚀 Why Zapier?</h4>
+                <p>• <strong>Save Time:</strong> Eliminate repetitive manual tasks</p>
+                <p>• <strong>Reduce Errors:</strong> Automated processes are more reliable</p>
+                <p>• <strong>Scale Efficiency:</strong> Handle more work without more effort</p>
+                <p>• <strong>Focus on Value:</strong> Spend time on important work, not busywork</p>
+            </div>
+            
+            <div id="zapier-feature-info" style="margin-top: 20px; padding: 20px; background: #e74c3c; color: white; border-radius: 10px; display: none;"></div>
+        </div>
+
+        <!-- Slide 3: What is Workflow Automation (PaaS) -->
+        <div class="slide">
+            <div class="slide-title">Automation Concepts</div>
+            <h2>What is Workflow Automation?</h2>
+            <p style="font-size: 1.3em; margin-bottom: 30px;">Platform as a Service (PaaS) for business process automation</p>
+            
+            <div class="step-container">
+                <div class="step-card" onclick="showAutomationConcept('traditional')">
+                    <div class="step-number">❌</div>
+                    <h4>Traditional Way</h4>
+                    <p>Manual, repetitive tasks<br>Copy-paste between apps<br>Human errors & delays</p>
+                </div>
+                <div class="step-card" onclick="showAutomationConcept('automated')">
+                    <div class="step-number">✅</div>
+                    <h4>Automated Way</h4>
+                    <p>Smart, triggered workflows<br>Seamless app connections<br>Reliable & instant</p>
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 40px;">🏗️ Platform as a Service (PaaS) Model</h3>
+            <div class="feature-grid">
+                <div class="feature-card" onclick="showPaaSFeature('infrastructure')">
+                    <div class="feature-icon">🏗️</div>
+                    <h4>Infrastructure</h4>
+                    <p>Zapier provides servers & hosting</p>
+                </div>
+                <div class="feature-card" onclick="showPaaSFeature('platform')">
+                    <div class="feature-icon">🛠️</div>
+                    <h4>Platform Tools</h4>
+                    <p>Pre-built connectors & workflows</p>
+                </div>
+                <div class="feature-card" onclick="showPaaSFeature('applications')">
+                    <div class="feature-icon">📱</div>
+                    <h4>Your Applications</h4>
+                    <p>Focus on business logic, not tech</p>
+                </div>
+                <div class="feature-card" onclick="showPaaSFeature('benefits')">
+                    <div class="feature-icon">⚡</div>
+                    <h4>PaaS Benefits</h4>
+                    <p>No coding, fast deployment</p>
+                </div>
+            </div>
+            
+            <div class="tip-box">
+                <h4>🧠 Workflow Automation Examples:</h4>
+                <p><strong>Email Management:</strong> New email → Save to spreadsheet → Notify team</p>
+                <p><strong>Lead Generation:</strong> Form submission → Add to CRM → Send welcome email</p>
+                <p><strong>Social Media:</strong> New Instagram post → Share to Twitter → Log analytics</p>
+                <p><strong>Project Management:</strong> New task → Assign team → Set calendar reminder</p>
+            </div>
+            
+            <div class="interactive-element" onclick="showAutomationStats()">
+                📊 See Automation Impact Statistics
+            </div>
+            
+            <div id="automation-concept-info" style="margin-top: 20px; padding: 20px; background: #9b59b6; color: white; border-radius: 10px; display: none;"></div>
+        </div>
+
+        <!-- Slide 4: What You'll Build -->
+        <div class="slide">
+            <div class="slide-title">Overview</div>
+            <h2>What You'll Build</h2>
+            <div class="workflow-diagram">
+                <div class="workflow-item" onclick="showWorkflowInfo('Gmail', 'Your Gmail account receives new emails')">
+                    📧 Gmail<br><small>New Email Arrives</small>
+                </div>
+                <div class="arrow">→</div>
+                <div class="workflow-item" onclick="showWorkflowInfo('Zapier', 'Zapier detects the new email and extracts data')">
+                    ⚡ Zapier<br><small>Processes Data</small>
+                </div>
+                <div class="arrow">→</div>
+                <div class="workflow-item" onclick="showWorkflowInfo('Sheets', 'Google Sheets receives the email data in a new row')">
+                    📊 Google Sheets<br><small>Saves Data</small>
+                </div>
+            </div>
+            
+            <div class="success-box">
+                <h4>🎯 What You'll Accomplish:</h4>
+                <p>• Automatically capture email date, sender, and subject</p>
+                <p>• Save data to Google Sheets without manual work</p>
+                <p>• Learn fundamental automation concepts</p>
+                <p>• Build foundation for more complex workflows</p>
+            </div>
+            
+            <div id="workflow-info" style="margin-top: 20px; padding: 20px; background: #3498db; color: white; border-radius: 10px; display: none;"></div>
+        </div>
+
+        <!-- Slide 3: Prerequisites -->
+        <div class="slide">
+            <div class="slide-title">Requirements</div>
+            <h2>Before We Start</h2>
+            <div class="feature-grid">
+                <div class="feature-card" onclick="toggleCheck(this)">
+                    <div class="feature-icon">📧</div>
+                    <h4>Gmail Account</h4>
+                    <p>Active Gmail account with some emails to test</p>
+                </div>
+                <div class="feature-card" onclick="toggleCheck(this)">
+                    <div class="feature-icon">📊</div>
+                    <h4>Google Account</h4>
+                    <p>Access to Google Sheets for data storage</p>
+                </div>
+                <div class="feature-card" onclick="toggleCheck(this)">
+                    <div class="feature-icon">⚡</div>
+                    <h4>Zapier Account</h4>
+                    <p>Free Zapier account (100 tasks/month)</p>
+                </div>
+                <div class="feature-card" onclick="toggleCheck(this)">
+                    <div class="feature-icon">⏱️</div>
+                    <h4>15-20 Minutes</h4>
+                    <p>Time to complete the tutorial</p>
+                </div>
+            </div>
+            
+            <div class="tip-box">
+                <h4>💡 Pro Tip:</h4>
+                <p>Have both Gmail and Google Sheets open in separate tabs for easy switching during setup!</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: Set Up Google Sheet -->
+        <div class="slide">
+            <div class="slide-title">Step 1</div>
+            <h2>Set Up Your Google Sheet</h2>
+            <div class="step-container">
+                <div class="step-card" onclick="showStepDetails(1, 'Create Sheet', 'Go to sheets.google.com and click Create or + button')">
+                    <div class="step-number">1</div>
+                    <h4>Create New Sheet</h4>
+                    <p>Go to sheets.google.com and create a new spreadsheet</p>
+                </div>
+                <div class="step-card" onclick="showStepDetails(2, 'Name Sheet', 'Give your sheet a descriptive name like Email Tracker')">
+                    <div class="step-number">2</div>
+                    <h4>Name Your Sheet</h4>
+                    <p>Call it "Email Tracker" or similar</p>
+                </div>
+                <div class="step-card" onclick="showStepDetails(3, 'Add Headers', 'Create column headers: Date, Sender, Subject in row 1')">
+                    <div class="step-number">3</div>
+                    <h4>Add Column Headers</h4>
+                    <p>A1: Date, B1: Sender, C1: Subject</p>
+                </div>
+            </div>
+            
+            <div class="code-block">
+                Column Setup:
+                A1: Date
+                B1: Sender  
+                C1: Subject
+            </div>
+            
+            <div class="warning-box">
+                <h4>⚠️ Important:</h4>
+                <p>Make sure your headers are in the exact cells shown. Zapier will map data to these specific columns.</p>
+            </div>
+            
+            <div id="step-details" style="margin-top: 20px; padding: 20px; background: #9b59b6; color: white; border-radius: 10px; display: none;"></div>
+        </div>
+
+        <!-- Slide 5: Create Zapier Account -->
+        <div class="slide">
+            <div class="slide-title">Step 2</div>
+            <h2>Create Your Zapier Account</h2>
+            <div class="workflow-diagram">
+                <div class="workflow-item" onclick="showZapierStep('signup')">
+                    1. Sign Up<br><small>zapier.com</small>
+                </div>
+                <div class="arrow">→</div>
+                <div class="workflow-item" onclick="showZapierStep('verify')">
+                    2. Verify Email<br><small>Check inbox</small>
+                </div>
+                <div class="arrow">→</div>
+                <div class="workflow-item" onclick="showZapierStep('create')">
+                    3. Create Zap<br><small>Big orange button</small>
+                </div>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🆓</div>
+                    <h4>Free Tier</h4>
+                    <p>100 tasks per month<br>Perfect for learning</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h4>Easy Sign Up</h4>
+                    <p>Use email or Google<br>Quick verification</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h4>Instant Start</h4>
+                    <p>Create first Zap<br>immediately</p>
+                </div>
+            </div>
+            
+            <div id="zapier-step-info" style="margin-top: 20px; padding: 20px; background: #e74c3c; color: white; border-radius: 10px; display: none;"></div>
+        </div>
+
+        <!-- Slide 6: Gmail Trigger Setup -->
+        <div class="slide">
+            <div class="slide-title">Step 3</div>
+            <h2>Set Up Gmail Trigger</h2>
+            <div class="step-container">
+                <div class="step-card" onclick="showTriggerStep('choose')">
+                    <div class="step-number">1</div>
+                    <h4>Choose Gmail</h4>
+                    <p>Select Gmail as your trigger app</p>
+                </div>
+                <div class="step-card" onclick="showTriggerStep('event')">
+                    <div class="step-number">2</div>
+                    <h4>Select Event</h4>
+                    <p>Choose "New Email" trigger</p>
+                </div>
+                <div class="step-card" onclick="showTriggerStep('connect')">
+                    <div class="step-number">3</div>
+                    <h4>Connect Account</h4>
+                    <p>Authenticate your Gmail</p>
+                </div>
+                <div class="step-card" onclick="showTriggerStep('configure')">
+                    <div class="step-number">4</div>
+                    <h4>Configure Settings</h4>
+                    <p>Set up email filters (optional)</p>
+                </div>
+            </div>
+            
+            <div class="tip-box">
+                <h4>🔧 Configuration Options:</h4>
+                <p><strong>Label:</strong> Leave blank for all emails</p>
+                <p><strong>Search String:</strong> Use filters like "is:unread" or "from:specific@email.com"</p>
+                <p><strong>For beginners:</strong> Leave both fields blank to capture all new emails</p>
+            </div>
+            
+            <div id="trigger-step-info" style="margin-top: 20px; padding: 20px; background: #1abc9c; color: white; border-radius: 10px; display: none;"></div>
+        </div>
+
+        <!-- Slide 7: Google Sheets Action -->
+        <div class="slide">
+            <div class="slide-title">Step 4</div>
+            <h2>Set Up Google Sheets Action</h2>
+            <div class="workflow-diagram">
+                <div class="workflow-item" onclick="showActionStep('choose')">
+                    Choose App<br><small>Google Sheets</small>
+                </div>
+                <div class="arrow">→</div>
+                <div class="workflow-item" onclick="showActionStep('event')">
+                    Select Event<br><small>Create Row</small>
+                </div>
+                <div class="arrow">→</div>
+                <div class="workflow-item" onclick="showActionStep('connect')">
+                    Connect Account<br><small>Authenticate</small>
+                </div>
+                <div class="arrow">→</div>
+                <div class="workflow-item" onclick="showActionStep('configure')">
+                    Configure<br><small>Select Sheet</small>
+                </div>
+            </div>
+            
+            <div class="success-box">
+                <h4>✅ Action Configuration:</h4>
+                <p>• <strong>Action:</strong> "Create Spreadsheet Row"</p>
+                <p>• <strong>Spreadsheet:</strong> Your "Email Tracker" sheet</p>
+                <p>• <strong>Worksheet:</strong> "Sheet1" (default)</p>
+            </div>
+            
+            <div id="action-step-info" style="margin-top: 20px; padding: 20px; background: #f39c12; color: white; border-radius: 10px; display: none;"></div>
+        </div>
+
+        <!-- Slide 8: Data Mapping -->
+        <div class="slide">
+            <div class="slide-title">Step 5</div>
+            <h2>Map Your Data Fields</h2>
+            <div class="feature-grid">
+                <div class="feature-card" onclick="showMapping('date')">
+                    <div class="feature-icon">📅</div>
+                    <h4>Date Column</h4>
+                    <p>Gmail "Date" → Sheet Column A</p>
+                </div>
+                <div class="feature-card" onclick="showMapping('sender')">
+                    <div class="feature-icon">👤</div>
+                    <h4>Sender Column</h4>
+                    <p>Gmail "From Email" → Sheet Column B</p>
+                </div>
+                <div class="feature-card" onclick="showMapping('subject')">
+                    <div class="feature-icon">📝</div>
+                    <h4>Subject Column</h4>
+                    <p>Gmail "Subject" → Sheet Column C</p>
+                </div>
+            </div>
+            
+            <div class="code-block">
+                Data Mapping Example:
+                Date: {{125798543__date}}
+                Sender: {{125798543__from__email}}
+                Subject: {{125798543__subject}}
+            </div>
+            
+            <div class="warning-box">
+                <h4>🎯 Mapping Tips:</h4>
+                <p>• Click in each field and select the corresponding Gmail data</p>
+                <p>• Use "From Email" for email address or "From Name" for display name</p>
+                <p>• Each field should show a reference like {{data_field}}</p>
+            </div>
+            
+            <div id="mapping-info" style="margin-top: 20px; padding: 20px; background: #8e44ad; color: white; border-radius: 10px; display: none;"></div>
+        </div>
+
+        <!-- Slide 9: Test Your Zap -->
+        <div class="slide">
+            <div class="slide-title">Step 6</div>
+            <h2>Test Your Zap</h2>
+            <div class="step-container">
+                <div class="step-card" onclick="showTestStep('run')">
+                    <div class="step-number">1</div>
+                    <h4>Run Test</h4>
+                    <p>Click "Test & Continue"</p>
+                </div>
+                <div class="step-card" onclick="showTestStep('verify')">
+                    <div class="step-number">2</div>
+                    <h4>Verify Results</h4>
+                    <p>Check your Google Sheet</p>
+                </div>
+                <div class="step-card" onclick="showTestStep('troubleshoot')">
+                    <div class="step-number">3</div>
+                    <h4>Troubleshoot</h4>
+                    <p>Fix any issues found</p>
+                </div>
+            </div>
+            
+            <div class="quiz-container">
+                <h3>❓ What should you see after testing?</h3>
+                <div class="quiz-option" onclick="selectAnswer(this, false)">A) Nothing happens</div>
+                <div class="quiz-option" onclick="selectAnswer(this, true)">B) A new row appears in your Google Sheet with email data</div>
+                <div class="quiz-option" onclick="selectAnswer(this, false)">C) Your Gmail account gets deleted</div>
+                <div class="quiz-option" onclick="selectAnswer(this, false)">D) Zapier sends you an email</div>
+                <div id="quiz-result" style="margin-top: 15px; padding: 15px; border-radius: 10px; display: none;"></div>
+            </div>
+            
+            <div id="test-step-info" style="margin-top: 20px; padding: 20px; background: #27ae60; color: white; border-radius: 10px; display: none;"></div>
+        </div>
+
+        <!-- Slide 10: Activate Your Zap -->
+        <div class="slide">
+            <div class="slide-title">Step 7</div>
+            <h2>Activate Your Zap</h2>
+            <div class="workflow-diagram">
+                <div class="workflow-item" onclick="showActivation('name')">
+                    1. Name Your Zap<br><small>Descriptive title</small>
+                </div>
+                <div class="arrow">→</div>
+                <div class="workflow-item" onclick="showActivation('publish')">
+                    2. Publish Zap<br><small>Turn it on</small>
+                </div>
+                <div class="arrow">→</div>
+                <div class="workflow-item" onclick="showActivation('monitor')">
+                    3. Monitor<br><small>Check task usage</small>
+                </div>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📝</div>
+                    <h4>Naming</h4>
+                    <p>"Gmail to Email Tracker"<br>Clear and descriptive</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🟢</div>
+                    <h4>Status</h4>
+                    <p>Zap shows as "On"<br>Ready to work</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h4>Limits</h4>
+                    <p>100 tasks/month<br>Track your usage</p>
+                </div>
+            </div>
+            
+            <div id="activation-info" style="margin-top: 20px; padding: 20px; background: #2980b9; color: white; border-radius: 10px; display: none;"></div>
+        </div>
+
+        <!-- Slide 11: Real Email Test -->
+        <div class="slide">
+            <div class="slide-title">Step 8</div>
+            <h2>Test with Real Emails</h2>
+            <div class="step-container">
+                <div class="step-card" onclick="showRealTest('send')">
+                    <div class="step-number">1</div>
+                    <h4>Send Test Email</h4>
+                    <p>Email yourself from another account</p>
+                </div>
+                <div class="step-card" onclick="showRealTest('wait')">
+                    <div class="step-number">2</div>
+                    <h4>Wait 1-5 Minutes</h4>
+                    <p>Zapier processes new emails</p>
+                </div>
+                <div class="step-card" onclick="showRealTest('check')">
+                    <div class="step-number">3</div>
+                    <h4>Check Results</h4>
+                    <p>Verify new row in your sheet</p>
+                </div>
+                <div class="step-card" onclick="showRealTest('monitor')">
+                    <div class="step-number">4</div>
+                    <h4>Monitor Performance</h4>
+                    <p>View task history in Zapier</p>
+                </div>
+            </div>
+            
+            <div class="success-box">
+                <h4>🎉 Success Indicators:</h4>
+                <p>• New row appears in Google Sheet within 5 minutes</p>
+                <p>• All three columns (Date, Sender, Subject) are populated</p>
+                <p>• Task appears in Zapier's task history</p>
+                <p>• No error messages in Zapier dashboard</p>
+            </div>
+            
+            <div id="real-test-info" style="margin-top: 20px; padding: 20px; background: #16a085; color: white; border-radius: 10px; display: none;"></div>
+        </div>
+
+        <!-- Slide 12: Troubleshooting -->
+        <div class="slide">
+            <div class="slide-title">Troubleshooting</div>
+            <h2>Common Issues & Solutions</h2>
+            <div class="feature-grid">
+                <div class="feature-card" onclick="showTrouble('not-triggering')">
+                    <div class="feature-icon">❌</div>
+                    <h4>Zap Not Triggering</h4>
+                    <p>Gmail connection issues</p>
+                </div>
+                <div class="feature-card" onclick="showTrouble('no-data')">
+                    <div class="feature-icon">📭</div>
+                    <h4>No Data in Sheet</h4>
+                    <p>Permission or mapping problems</p>
+                </div>
+                <div class="feature-card" onclick="showTrouble('wrong-data')">
+                    <div class="feature-icon">🔄</div>
+                    <h4>Wrong Data Format</h4>
+                    <p>Field mapping issues</p>
+                </div>
+                <div class="feature-card" onclick="showTrouble('task-limits')">
+                    <div class="feature-icon">⚠️</div>
+                    <h4>Task Limit Reached</h4>
+                    <p>Free tier limitations</p>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <h4>🔧 Quick Fixes:</h4>
+                <p><strong>Connection Issues:</strong> Reconnect your Gmail/Google accounts</p>
+                <p><strong>Permission Denied:</strong> Check Google Sheet sharing settings</p>
+                <p><strong>No New Emails:</strong> Zap only processes emails received AFTER activation</p>
+                <p><strong>Wrong Sheet:</strong> Verify you selected the correct spreadsheet and worksheet</p>
+            </div>
+            
+            <div id="trouble-info" style="margin-top: 20px; padding: 20px; background: #c0392b; color: white; border-radius: 10px; display: none;"></div>
+        </div>
+
+        <!-- Slide 13: Advanced Features -->
+        <div class="slide">
+            <div class="slide-title">Next Level</div>
+            <h2>Advanced Customizations</h2>
+            <div class="step-container">
+                <div class="step-card" onclick="showAdvanced('filters')">
+                    <div class="step-number">🔍</div>
+                    <h4>Email Filters</h4>
+                    <p>Only track important emails</p>
+                </div>
+                <div class="step-card" onclick="showAdvanced('fields')">
+                    <div class="step-number">➕</div>
+                    <h4>More Data Fields</h4>
+                    <p>Add body, attachments, labels</p>
+                </div>
+                <div class="step-card" onclick="showAdvanced('formatting')">
+                    <div class="step-number">🎨</div>
+                    <h4>Data Formatting</h4>
+                    <p>Format dates, clean text</p>
+                </div>
+                <div class="step-card" onclick="showAdvanced('multiple')">
+                    <div class="step-number">📊</div>
+                    <h4>Multiple Sheets</h4>
+                    <p>Separate work and personal</p>
+                </div>
+            </div>
+            
+            <div class="tip-box">
+                <h4>💡 Pro Tips for Advanced Users:</h4>
+                <p>• Use Formatter by Zapier to clean and format data</p>
+                <p>• Add Filter steps to process only specific emails</p>
+                <p>• Create multiple Zaps for different email categories</p>
+                <p>• Use Paths to route emails to different sheets</p>
+            </div>
+            
+            <div id="advanced-info" style="margin-top: 20px; padding: 20px; background: #8e44ad; color: white; border-radius: 10px; display: none;"></div>
+        </div>
+
+        <!-- Slide 14: Conclusion & Next Steps -->
+        <div class="slide">
+            <div class="slide-title">Completion</div>
+            <h2>Congratulations! 🎉</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">✅</div>
+                    <h4>You've Built</h4>
+                    <p>Your first Zapier automation</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📧</div>
+                    <h4>Automatic Tracking</h4>
+                    <p>Emails saved to spreadsheet</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h4>Foundation Skills</h4>
+                    <p>Ready for complex workflows</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h4>Next Level</h4>
+                    <p>Build more automations</p>
+                </div>
+            </div>
+            
+            <h3>🎯 Next Steps:</h3>
+            <div class="workflow-diagram">
+                <div class="workflow-item">📅 Calendar Integration</div>
+                <div class="workflow-item">📋 Task Management</div>
+                <div class="workflow-item">💬 Slack Notifications</div>
+                <div class="workflow-item">📊 CRM Updates</div>
+            </div>
+            
+            <div class="success-box">
+                <h4>🎊 You're Now Ready To:</h4>
+                <p>• Build more complex multi-step automations</p>
+                <p>• Connect different apps and services</p>
+                <p>• Save time with workflow automation</p>
+                <p>• Explore advanced Zapier features</p>
+            </div>
+            
+            <div class="interactive-element" onclick="showAlert('Congratulations on completing your first Zap! 🎉 You are now ready to automate your digital workflows.')">
+                🚀 Celebrate Your Success!
+            </div>
+        </div>
+
+    </div>
+
+    <div class="controls">
+        <button class="btn" id="prevBtn" onclick="changeSlide(-1)">← Previous</button>
+        <button class="btn" id="nextBtn" onclick="changeSlide(1)">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        function updateSlideCounter() {
+            document.getElementById('slideCounter').textContent = `${currentSlide + 1} / ${totalSlides}`;
+            document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+        }
+
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+            
+            updateSlideCounter();
+        }
+
+        function changeSlide(direction) {
+            if (direction === 1 && currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            } else if (direction === -1 && currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        // Interactive functions
+        function showAlert(message) {
+            alert(message);
+        }
+
+        function showZapierFeature(feature) {
+            const features = {
+                'automation': 'Zapier automates workflows between 5,000+ apps including Gmail, Slack, Salesforce, Trello, and more. No coding required!',
+                'nocode': 'Build complex workflows with simple point-and-click interface. Anyone can create automations without technical knowledge.',
+                'triggers': 'Triggers detect when something happens (new email, form submission). Actions are what happens next (save to sheet, send notification).',
+                'integration': 'Connect popular business apps seamlessly. Zapier handles all the technical integration work behind the scenes.'
+            };
+            const display = document.getElementById('zapier-feature-info');
+            display.innerHTML = `<h4>Zapier Feature</h4><p>${features[feature]}</p>`;
+            display.style.display = 'block';
+        }
+
+        function showZapierConcept(concept) {
+            const concepts = {
+                'trigger': 'A trigger is an event that starts your automation. Examples: new email arrives, form is submitted, file is uploaded.',
+                'action': 'An action is what happens when the trigger fires. Examples: create spreadsheet row, send Slack message, add calendar event.',
+                'result': 'The end result is your automated task completion. Work gets done automatically without manual intervention.'
+            };
+            const display = document.getElementById('zapier-feature-info');
+            display.innerHTML = `<h4>Zapier Concept: ${concept.toUpperCase()}</h4><p>${concepts[concept]}</p>`;
+            display.style.display = 'block';
+        }
+
+        function showAutomationConcept(type) {
+            const concepts = {
+                'traditional': 'Traditional workflows require manual work: checking emails, copying data, switching between apps, prone to human error and delays.',
+                'automated': 'Automated workflows run 24/7: instant data transfer, error-free processing, seamless app connections, focus on high-value work.'
+            };
+            const display = document.getElementById('automation-concept-info');
+            display.innerHTML = `<h4>${type === 'traditional' ? 'Traditional Workflow' : 'Automated Workflow'}</h4><p>${concepts[type]}</p>`;
+            display.style.display = 'block';
+        }
+
+        function showPaaSFeature(feature) {
+            const features = {
+                'infrastructure': 'Zapier manages all servers, databases, and hosting. You never worry about technical infrastructure or maintenance.',
+                'platform': 'Pre-built connectors, templates, and tools. Zapier provides the platform layer so you can focus on business workflows.',
+                'applications': 'You define the business logic and workflows. Zapier handles the technical implementation and app connections.',
+                'benefits': 'Platform as a Service benefits: faster deployment, no coding required, automatic scaling, reduced IT costs.'
+            };
+            const display = document.getElementById('automation-concept-info');
+            display.innerHTML = `<h4>PaaS: ${feature.charAt(0).toUpperCase() + feature.slice(1)}</h4><p>${features[feature]}</p>`;
+            display.style.display = 'block';
+        }
+
+        function showAutomationStats() {
+            const display = document.getElementById('automation-concept-info');
+            display.innerHTML = `<h4>📊 Automation Impact</h4>
+                <p>• <strong>67%</strong> of workers say automation helps them be more productive</p>
+                <p>• <strong>2.5 hours</strong> average time saved per day with workflow automation</p>
+                <p>• <strong>90%</strong> reduction in manual data entry errors</p>
+                <p>• <strong>3x faster</strong> task completion with automated workflows</p>
+                <p><em>Sources: Zapier State of Business Automation Report 2024</em></p>`;
+            display.style.display = 'block';
+        }
+
+        function showWorkflowInfo(component, description) {
+            const display = document.getElementById('workflow-info');
+            display.innerHTML = `<h4>${component}</h4><p>${description}</p>`;
+            display.style.display = 'block';
+        }
+
+        function toggleCheck(element) {
+            element.style.background = element.style.background.includes('2ecc71') ? 
+                'linear-gradient(135deg, #a8edea, #fed6e3)' : 
+                'linear-gradient(135deg, #2ecc71, #27ae60)';
+            element.style.color = element.style.background.includes('2ecc71') ? 'white' : '#2c3e50';
+        }
+
+        function showStepDetails(step, title, description) {
+            const display = document.getElementById('step-details');
+            display.innerHTML = `<h4>Step ${step}: ${title}</h4><p>${description}</p>`;
+            display.style.display = 'block';
+        }
+
+        function showZapierStep(step) {
+            const steps = {
+                'signup': 'Go to zapier.com and click "Sign up free". You can use email or sign in with Google.',
+                'verify': 'Check your email inbox for a verification message from Zapier and click the confirmation link.',
+                'create': 'Once logged in, look for the big orange "Create Zap" button on your dashboard and click it.'
+            };
+            const display = document.getElementById('zapier-step-info');
+            display.innerHTML = `<h4>Zapier Setup</h4><p>${steps[step]}</p>`;
+            display.style.display = 'block';
+        }
+
+        function showTriggerStep(step) {
+            const steps = {
+                'choose': 'In the Trigger section, click "Choose App" and search for Gmail. Select it from the app directory.',
+                'event': 'Choose "New Email" as your trigger event. This will monitor your Gmail for incoming emails.',
+                'connect': 'Click "Sign in to Gmail" and authenticate your account. Grant Zapier permission to read your emails.',
+                'configure': 'Set optional filters like labels or search strings. For beginners, leave blank to capture all emails.'
+            };
+            const display = document.getElementById('trigger-step-info');
+            display.innerHTML = `<h4>Gmail Trigger Setup</h4><p>${steps[step]}</p>`;
+            display.style.display = 'block';
+        }
+
+        function showActionStep(step) {
+            const steps = {
+                'choose': 'In the Action section, click "Choose App" and search for Google Sheets.',
+                'event': 'Select "Create Spreadsheet Row" to add new rows for each email.',
+                'connect': 'Authenticate your Google account and grant Zapier permission to edit your sheets.',
+                'configure': 'Select your "Email Tracker" spreadsheet and choose "Sheet1" as the worksheet.'
+            };
+            const display = document.getElementById('action-step-info');
+            display.innerHTML = `<h4>Google Sheets Action</h4><p>${steps[step]}</p>`;
+            display.style.display = 'block';
+        }
+
+        function showMapping(field) {
+            const mappings = {
+                'date': 'Click in the Date field and select "Date" from the Gmail data dropdown. This captures when the email was received.',
+                'sender': 'Click in the Sender field and choose "From Email" to get the sender\'s email address, or "From Name" for display name.',
+                'subject': 'Click in the Subject field and select "Subject" from the Gmail data to capture the email subject line.'
+            };
+            const display = document.getElementById('mapping-info');
+            display.innerHTML = `<h4>Data Mapping</h4><p>${mappings[field]}</p>`;
+            display.style.display = 'block';
+        }
+
+        function selectAnswer(element, isCorrect) {
+            const options = document.querySelectorAll('.quiz-option');
+            const result = document.getElementById('quiz-result');
+            
+            options.forEach(option => {
+                option.classList.remove('correct', 'incorrect');
+                if (option === element) {
+                    option.classList.add(isCorrect ? 'correct' : 'incorrect');
+                }
+            });
+            
+            if (isCorrect) {
+                result.innerHTML = '✅ Correct! After testing, you should see a new row in your Google Sheet with the email data.';
+                result.style.background = '#2ecc71';
+            } else {
+                result.innerHTML = '❌ Not quite. The test should create a new row in your Google Sheet with the sample email data.';
+                result.style.background = '#e74c3c';
+            }
+            result.style.color = 'white';
+            result.style.display = 'block';
+        }
+
+        function showTestStep(step) {
+            const steps = {
+                'run': 'Click "Test & Continue" in Zapier. This will process a sample email and create a test row in your sheet.',
+                'verify': 'Go to your Google Sheet and check that a new row was added with email data in the correct columns.',
+                'troubleshoot': 'If the test fails, check permissions, sheet name, and data mapping. Try reconnecting your accounts if needed.'
+            };
+            const display = document.getElementById('test-step-info');
+            display.innerHTML = `<h4>Testing Your Zap</h4><p>${steps[step]}</p>`;
+            display.style.display = 'block';
+        }
+
+        function showActivation(step) {
+            const steps = {
+                'name': 'Give your Zap a descriptive name like "Gmail to Email Tracker Sheet" to identify it later.',
+                'publish': 'Click "Publish Zap" to turn it on. Your Zap will now run automatically for new emails.',
+                'monitor': 'Check your task usage in the Zapier dashboard. Free accounts get 100 tasks per month.'
+            };
+            const display = document.getElementById('activation-info');
+            display.innerHTML = `<h4>Zap Activation</h4><p>${steps[step]}</p>`;
+            display.style.display = 'block';
+        }
+
+        function showRealTest(step) {
+            const steps = {
+                'send': 'Send yourself an email from another account or ask someone to email you. Make the subject clear for testing.',
+                'wait': 'Zapier checks for new emails every few minutes. Be patient - it can take 1-5 minutes to process.',
+                'check': 'Refresh your Google Sheet and look for the new email data in a new row.',
+                'monitor': 'In Zapier, go to "My Zaps" and click on your Zap to view the task history and see successful runs.'
+            };
+            const display = document.getElementById('real-test-info');
+            display.innerHTML = `<h4>Real Email Testing</h4><p>${steps[step]}</p>`;
+            display.style.display = 'block';
+        }
+
+        function showTrouble(issue) {
+            const solutions = {
+                'not-triggering': 'Check if Gmail connection is active. Try disconnecting and reconnecting your Gmail account in Zapier.',
+                'no-data': 'Verify Google Sheet permissions. Make sure Zapier can edit your sheet and you selected the correct spreadsheet.',
+                'wrong-data': 'Edit your Zap and check the data mapping. Ensure Gmail fields are correctly mapped to sheet columns.',
+                'task-limits': 'You\'ve used all 100 free tasks. Upgrade to a paid plan or wait until next month for the reset.'
+            };
+            const display = document.getElementById('trouble-info');
+            display.innerHTML = `<h4>Troubleshooting</h4><p>${solutions[issue]}</p>`;
+            display.style.display = 'block';
+        }
+
+        function showAdvanced(feature) {
+            const features = {
+                'filters': 'Add a Filter step to only process emails with specific criteria like "Subject contains Important" or "From contains @yourcompany.com".',
+                'fields': 'Add more columns to track email body preview, attachment count, labels, or thread ID for comprehensive email tracking.',
+                'formatting': 'Use Formatter by Zapier to clean text, format dates properly, or extract specific parts of email content.',
+                'multiple': 'Create separate sheets for work and personal emails, or route different types of emails to different worksheets.'
+            };
+            const display = document.getElementById('advanced-info');
+            display.innerHTML = `<h4>Advanced Feature</h4><p>${features[feature]}</p>`;
+            display.style.display = 'block';
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>
