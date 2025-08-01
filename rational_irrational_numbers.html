@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rational vs Irrational Numbers</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: #34495e;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .definitions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .definition-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 6px solid #28a745;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .definition-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .definition-card.irrational {
+            border-left-color: #dc3545;
+        }
+
+        .definition-card h3 {
+            color: #2c3e50;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            font-size: 1.5em;
+        }
+
+        .rational-icon {
+            color: #28a745;
+        }
+
+        .irrational-icon {
+            color: #dc3545;
+        }
+
+        .numbers-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .numbers-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: bold;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.1em;
+            letter-spacing: 0.5px;
+        }
+
+        .numbers-table td {
+            padding: 18px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+            font-size: 1.05em;
+            transition: all 0.3s ease;
+        }
+
+        .numbers-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .numbers-table tr:hover {
+            background: #e3f2fd;
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .number-cell {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #2c3e50;
+        }
+
+        .yes-cell {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .no-cell {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .fraction-cell {
+            font-family: 'Courier New', monospace;
+            background: rgba(255, 193, 7, 0.1);
+            color: #856404;
+            font-weight: bold;
+        }
+
+        .decimal-cell {
+            font-family: 'Courier New', monospace;
+            background: rgba(23, 162, 184, 0.1);
+            color: #0c5460;
+            font-weight: bold;
+        }
+
+        .interactive-section {
+            background: linear-gradient(135deg, #e8f5e8, #d4edda);
+            border: 2px solid #28a745;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .interactive-section h3 {
+            color: #155724;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .number-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .example-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .example-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .example-card.rational {
+            border-color: #28a745;
+        }
+
+        .example-card.irrational {
+            border-color: #dc3545;
+        }
+
+        .example-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .example-type {
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .rational .example-type {
+            color: #28a745;
+        }
+
+        .irrational .example-type {
+            color: #dc3545;
+        }
+
+        .key-points {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 2px solid #ffc107;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .key-points h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+
+        .key-points ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .key-points li {
+            margin-bottom: 10px;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .key-points li::before {
+            content: "💡";
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .quiz-section {
+            background: linear-gradient(135deg, #e1f5fe, #b3e5fc);
+            border: 2px solid #03a9f4;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .quiz-section h3 {
+            color: #01579b;
+            margin-bottom: 20px;
+        }
+
+        .quiz-item {
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-item:hover {
+            background: #f0f8ff;
+            transform: scale(1.02);
+        }
+
+        .math-symbol {
+            font-size: 1.3em;
+            color: #667eea;
+            font-weight: bold;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e9ecef;
+            color: #7f8c8d;
+        }
+
+        @media (max-width: 768px) {
+            .definitions {
+                grid-template-columns: 1fr;
+            }
+            
+            .numbers-table {
+                font-size: 0.9em;
+            }
+            
+            .numbers-table th,
+            .numbers-table td {
+                padding: 12px 8px;
+            }
+        }
+
+        .tooltip {
+            position: relative;
+            cursor: help;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c3e50;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+
+        .highlight-animation {
+            animation: highlight 2s ease-in-out;
+        }
+
+        @keyframes highlight {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(255, 235, 59, 0.5); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Rational vs Irrational Numbers</h1>
+        <p class="subtitle">Understanding the fundamental difference between rational and irrational numbers</p>
+
+        <div class="section">
+            <h2>📚 Definitions</h2>
+            <div class="definitions">
+                <div class="definition-card rational">
+                    <h3><span class="icon rational-icon">✅</span> Rational Numbers</h3>
+                    <p><strong>Definition:</strong> Numbers that can be expressed as a fraction <span class="math-symbol">a/b</span> where <em>a</em> and <em>b</em> are integers and <em>b ≠ 0</em>.</p>
+                    <br>
+                    <p><strong>Decimal Pattern:</strong> Either terminates (ends) or repeats infinitely.</p>
+                    <br>
+                    <p><strong>Examples:</strong> 1/2, 0.75, 5, 0.333..., -7</p>
+                </div>
+                <div class="definition-card irrational">
+                    <h3><span class="icon irrational-icon">❌</span> Irrational Numbers</h3>
+                    <p><strong>Definition:</strong> Numbers that <strong>cannot</strong> be expressed as a fraction of integers.</p>
+                    <br>
+                    <p><strong>Decimal Pattern:</strong> Never-ending, non-repeating decimal expansion.</p>
+                    <br>
+                    <p><strong>Examples:</strong> π, √2, √3, e, φ (golden ratio)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📊 Number Analysis Table</h2>
+            <table class="numbers-table">
+                <thead>
+                    <tr>
+                        <th>Number</th>
+                        <th class="tooltip" data-tooltip="Can be written as a/b where a,b are integers">Rational?</th>
+                        <th class="tooltip" data-tooltip="Cannot be written as a fraction">Irrational?</th>
+                        <th class="tooltip" data-tooltip="Fraction representation">Fraction Form</th>
+                        <th class="tooltip" data-tooltip="Decimal behavior pattern">Decimal Pattern</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr onclick="highlightRow(this)">
+                        <td class="number-cell">3/4</td>
+                        <td class="yes-cell">Yes</td>
+                        <td class="no-cell">No</td>
+                        <td class="fraction-cell">3/4</td>
+                        <td class="decimal-cell">0.75 (terminates)</td>
+                    </tr>
+                    <tr onclick="highlightRow(this)">
+                        <td class="number-cell">0.333...</td>
+                        <td class="yes-cell">Yes</td>
+                        <td class="no-cell">No</td>
+                        <td class="fraction-cell">1/3</td>
+                        <td class="decimal-cell">0.333... (repeats)</td>
+                    </tr>
+                    <tr onclick="highlightRow(this)">
+                        <td class="number-cell">√2</td>
+                        <td class="no-cell">No</td>
+                        <td class="yes-cell">Yes</td>
+                        <td class="fraction-cell">Not possible</td>
+                        <td class="decimal-cell">1.41421... (no pattern)</td>
+                    </tr>
+                    <tr onclick="highlightRow(this)">
+                        <td class="number-cell">π</td>
+                        <td class="no-cell">No</td>
+                        <td class="yes-cell">Yes</td>
+                        <td class="fraction-cell">Not possible</td>
+                        <td class="decimal-cell">3.14159... (no pattern)</td>
+                    </tr>
+                    <tr onclick="highlightRow(this)">
+                        <td class="number-cell">5</td>
+                        <td class="yes-cell">Yes</td>
+                        <td class="no-cell">No</td>
+                        <td class="fraction-cell">5/1</td>
+                        <td class="decimal-cell">5.0 (terminates)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Interactive Examples</h2>
+            <div class="number-examples">
+                <div class="example-card rational" onclick="showInfo('rational', '3/4')">
+                    <div class="example-number">3/4</div>
+                    <div class="example-type">Rational</div>
+                    <div>= 0.75</div>
+                </div>
+                <div class="example-card rational" onclick="showInfo('rational', '1/3')">
+                    <div class="example-number">1/3</div>
+                    <div class="example-type">Rational</div>
+                    <div>= 0.333...</div>
+                </div>
+                <div class="example-card irrational" onclick="showInfo('irrational', '√2')">
+                    <div class="example-number">√2</div>
+                    <div class="example-type">Irrational</div>
+                    <div>≈ 1.41421...</div>
+                </div>
+                <div class="example-card irrational" onclick="showInfo('irrational', 'π')">
+                    <div class="example-number">π</div>
+                    <div class="example-type">Irrational</div>
+                    <div>≈ 3.14159...</div>
+                </div>
+                <div class="example-card rational" onclick="showInfo('rational', '5')">
+                    <div class="example-number">5</div>
+                    <div class="example-type">Rational</div>
+                    <div>= 5.0</div>
+                </div>
+                <div class="example-card irrational" onclick="showInfo('irrational', 'e')">
+                    <div class="example-number">e</div>
+                    <div class="example-type">Irrational</div>
+                    <div>≈ 2.71828...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="key-points">
+            <h3>🔑 Key Points to Remember</h3>
+            <ul>
+                <li><strong>All integers are rational</strong> because they can be written as n/1</li>
+                <li><strong>Terminating decimals are rational</strong> (like 0.75 = 3/4)</li>
+                <li><strong>Repeating decimals are rational</strong> (like 0.333... = 1/3)</li>
+                <li><strong>Square roots of non-perfect squares are irrational</strong> (like √2, √3, √5)</li>
+                <li><strong>Famous constants like π and e are irrational</strong></li>
+                <li><strong>The sum of rational and irrational is always irrational</strong></li>
+            </ul>
+        </div>
+
+        <div class="interactive-section">
+            <h3>🧮 How to Identify:</h3>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h4 style="color: #28a745; margin-bottom: 10px;">✅ It's Rational if:</h4>
+                    <ul>
+                        <li>You can write it as a/b (fraction)</li>
+                        <li>Decimal ends (like 0.75)</li>
+                        <li>Decimal repeats (like 0.333...)</li>
+                        <li>It's a whole number</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color: #dc3545; margin-bottom: 10px;">❌ It's Irrational if:</h4>
+                    <ul>
+                        <li>Cannot be written as a fraction</li>
+                        <li>Decimal never ends and never repeats</li>
+                        <li>It's √(non-perfect square)</li>
+                        <li>It's π, e, or similar constants</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="quiz-section">
+            <h3>🤔 Quick Quiz - Click to reveal answers!</h3>
+            <div class="quiz-item" onclick="toggleAnswer(this, 'Rational! 0.25 = 1/4')">
+                <strong>Question 1:</strong> Is 0.25 rational or irrational?
+                <div class="answer" style="display: none; margin-top: 10px; color: #28a745; font-weight: bold;"></div>
+            </div>
+            <div class="quiz-item" onclick="toggleAnswer(this, 'Irrational! √7 cannot be expressed as a fraction')">
+                <strong>Question 2:</strong> Is √7 rational or irrational?
+                <div class="answer" style="display: none; margin-top: 10px; color: #dc3545; font-weight: bold;"></div>
+            </div>
+            <div class="quiz-item" onclick="toggleAnswer(this, 'Rational! -8 = -8/1')">
+                <strong>Question 3:</strong> Is -8 rational or irrational?
+                <div class="answer" style="display: none; margin-top: 10px; color: #28a745; font-weight: bold;"></div>
+            </div>
+            <div class="quiz-item" onclick="toggleAnswer(this, 'Rational! 0.151515... = 15/99 = 5/33')">
+                <strong>Question 4:</strong> Is 0.151515... rational or irrational?
+                <div class="answer" style="display: none; margin-top: 10px; color: #28a745; font-weight: bold;"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>🎓 <strong>Remember:</strong> The set of real numbers is composed of rational and irrational numbers together!</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Click on table rows and example cards to interact • Hover over column headers for tooltips</p>
+        </div>
+    </div>
+
+    <script>
+        function highlightRow(row) {
+            // Remove previous highlights
+            document.querySelectorAll('.numbers-table tr').forEach(r => {
+                r.classList.remove('highlight-animation');
+            });
+            
+            // Add highlight to clicked row
+            row.classList.add('highlight-animation');
+            
+            // Show info about the number
+            const number = row.cells[0].textContent;
+            const isRational = row.cells[1].textContent === 'Yes';
+            const fraction = row.cells[3].textContent;
+            const decimal = row.cells[4].textContent;
+            
+            setTimeout(() => {
+                alert(`📊 Analysis of ${number}:\n\n` +
+                      `Type: ${isRational ? 'Rational' : 'Irrational'}\n` +
+                      `Fraction: ${fraction}\n` +
+                      `Decimal: ${decimal}\n\n` +
+                      `${isRational ? 
+                        '✅ This number can be expressed as a fraction of integers.' : 
+                        '❌ This number cannot be expressed as a fraction of integers.'}`);
+            }, 100);
+        }
+
+        function showInfo(type, number) {
+            const info = {
+                'rational': {
+                    '3/4': 'This fraction equals exactly 0.75. Since it can be written as a ratio of integers (3 and 4), it\'s rational.',
+                    '1/3': 'This equals 0.333... The 3 repeats forever, but since it\'s a repeating pattern, it\'s still rational.',
+                    '5': 'Any integer is rational because it can be written as itself over 1 (5/1).'
+                },
+                'irrational': {
+                    '√2': 'The square root of 2 is approximately 1.41421356... The decimal goes on forever without repeating, making it irrational.',
+                    'π': 'Pi is approximately 3.14159265... It\'s the ratio of circumference to diameter of any circle, and it\'s irrational.',
+                    'e': 'Euler\'s number (e ≈ 2.71828...) is the base of natural logarithms and is irrational.'
+                }
+            };
+            
+            const message = info[type][number] || `${number} is ${type}.`;
+            const icon = type === 'rational' ? '✅' : '❌';
+            
+            alert(`${icon} ${number} is ${type.toUpperCase()}\n\n${message}`);
+        }
+
+        function toggleAnswer(element, answer) {
+            const answerDiv = element.querySelector('.answer');
+            if (answerDiv.style.display === 'none' || answerDiv.style.display === '') {
+                answerDiv.textContent = answer;
+                answerDiv.style.display = 'block';
+                element.style.background = '#f0f8ff';
+            } else {
+                answerDiv.style.display = 'none';
+                element.style.background = 'white';
+            }
+        }
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate table rows on load
+            const rows = document.querySelectorAll('.numbers-table tbody tr');
+            rows.forEach((row, index) => {
+                setTimeout(() => {
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateY(20px)';
+                    row.style.transition = 'all 0.5s ease';
+                    
+                    setTimeout(() => {
+                        row.style.opacity = '1';
+                        row.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 200);
+            });
+
+            // Add hover effects to example cards
+            document.querySelectorAll('.example-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.05)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'r' || event.key === 'R') {
+                alert('🔄 Refreshing highlights...');
+                document.querySelectorAll('.highlight-animation').forEach(element => {
+                    element.classList.remove('highlight-animation');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
