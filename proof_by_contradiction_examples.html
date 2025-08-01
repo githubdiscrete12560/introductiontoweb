@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proof by Contradiction - 3 Classic Examples</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #667eea 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #1e3c72, #667eea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 1.3rem;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+
+        h2 {
+            color: #34495e;
+            font-size: 2rem;
+            margin: 40px 0 20px 0;
+            border-bottom: 4px solid #667eea;
+            padding-bottom: 15px;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #e74c3c, #f39c12);
+            animation: underlineGrow 2s ease-out forwards;
+        }
+
+        @keyframes underlineGrow {
+            to { width: 100%; }
+        }
+
+        .method-explanation {
+            background: linear-gradient(135deg, #e8f5e8, #d4edda);
+            border: 2px solid #28a745;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .method-explanation::before {
+            content: '🎯 METHOD';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #28a745;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .steps-overview {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 2px solid #ffc107;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .steps-overview::before {
+            content: '📋 STEPS';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #ffc107;
+            color: #212529;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .proof-container {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-left: 6px solid #667eea;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .proof-container::before {
+            content: '📝 PROOF';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .proof-steps {
+            counter-reset: step-counter;
+        }
+
+        .proof-steps li {
+            counter-increment: step-counter;
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 20px;
+            list-style: none;
+        }
+
+        .proof-steps li::before {
+            content: counter(step-counter);
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .math-expression {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            text-align: center;
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .contradiction-highlight {
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+            border: 2px solid #f44336;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .contradiction-highlight::before {
+            content: '⚠️ CONTRADICTION';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #f44336;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .example-nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .nav-button:hover, .nav-button.active {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .example {
+            display: none;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .example.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .theorem-statement {
+            background: linear-gradient(135deg, #e1f5fe, #b3e5fc);
+            border: 2px solid #03a9f4;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .theorem-statement::before {
+            content: '🎯 THEOREM';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #03a9f4;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .theorem-statement h3 {
+            color: #01579b;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+
+        .interactive-step {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .interactive-step:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #667eea;
+            transform: translateX(10px);
+        }
+
+        .step-explanation {
+            display: none;
+            background: #f8f9fa;
+            padding: 15px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .step-explanation.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 200px;
+            }
+        }
+
+        .key-insight {
+            background: linear-gradient(135deg, #fff8e1, #ffecb3);
+            border: 2px solid #ff9800;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            position: relative;
+        }
+
+        .key-insight::before {
+            content: '💡 KEY INSIGHT';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #ff9800;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 33.33%;
+            transition: width 0.3s ease;
+            border-radius: 3px;
+        }
+
+        .footer-note {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .nav-button {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .proof-steps li {
+                padding-left: 40px;
+            }
+        }
+
+        .highlight-animation {
+            animation: highlight 2s ease-in-out;
+        }
+
+        @keyframes highlight {
+            0%, 100% { background-color: transparent; }
+            50% { background-color: rgba(255, 235, 59, 0.3); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Proof by Contradiction</h1>
+        <p class="subtitle">Three Classic Examples of Mathematical Reasoning</p>
+
+        <div class="method-explanation">
+            <h3>What is Proof by Contradiction?</h3>
+            <p><strong>Proof by contradiction</strong> (also called <em>reductio ad absurdum</em>) is a powerful mathematical technique where we:</p>
+            <ul style="margin: 15px 0; padding-left: 25px;">
+                <li>Assume the <strong>opposite</strong> of what we want to prove</li>
+                <li>Use logical reasoning to derive consequences</li>
+                <li>Arrive at a <strong>contradiction</strong> (something impossible)</li>
+                <li>Conclude that our assumption must be false</li>
+                <li>Therefore, the original statement must be true</li>
+            </ul>
+        </div>
+
+        <div class="steps-overview">
+            <h3>General Strategy</h3>
+            <ol style="padding-left: 25px;">
+                <li><strong>Assume ¬P</strong> (the negation of what you want to prove)</li>
+                <li><strong>Apply logical reasoning</strong> and known facts</li>
+                <li><strong>Derive a contradiction</strong> (something both true and false)</li>
+                <li><strong>Conclude ¬P is false</strong>, so P must be true</li>
+            </ol>
+        </div>
+
+        <div class="example-nav">
+            <button class="nav-button active" onclick="showExample(1)">Example 1: √2 is Irrational</button>
+            <button class="nav-button" onclick="showExample(2)">Example 2: Infinitely Many Primes</button>
+            <button class="nav-button" onclick="showExample(3)">Example 3: √3 is Irrational</button>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+
+        <!-- Example 1: √2 is Irrational -->
+        <div class="example active" id="example1">
+            <h2>Example 1: √2 is Irrational</h2>
+            
+            <div class="theorem-statement">
+                <h3>Theorem</h3>
+                <p>The square root of 2 is an irrational number.</p>
+                <p style="margin-top: 10px; font-style: italic;">In other words: √2 cannot be expressed as a fraction of two integers.</p>
+            </div>
+
+            <div class="key-insight">
+                <p><strong>Why this matters:</strong> This was one of the first discoveries that not all numbers can be written as fractions! It shocked ancient Greek mathematicians and led to the discovery of irrational numbers.</p>
+            </div>
+
+            <div class="proof-container">
+                <h3>Proof by Contradiction</h3>
+                <ol class="proof-steps">
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        <strong>Assume the opposite:</strong> Suppose √2 is rational.
+                        <div class="step-explanation">
+                            <strong>What this means:</strong> If √2 is rational, then it can be written as a fraction a/b where a and b are integers with no common factors (lowest terms).
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Then √2 = a/b where a, b are integers and gcd(a,b) = 1
+                        <div class="step-explanation">
+                            <strong>Key point:</strong> gcd(a,b) = 1 means a and b share no common factors other than 1. Every rational number can be written this way.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Squaring both sides: 2 = a²/b²
+                        <div class="math-expression">2 = a²/b²</div>
+                        <div class="step-explanation">
+                            <strong>Algebraic manipulation:</strong> We square both sides to eliminate the square root and work with integers.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Multiplying by b²: 2b² = a²
+                        <div class="math-expression">2b² = a²</div>
+                        <div class="step-explanation">
+                            <strong>Rearranging:</strong> This tells us that a² is even (since it equals 2 times something).
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Since a² is even, a must be even. Let a = 2k for some integer k.
+                        <div class="step-explanation">
+                            <strong>Important fact:</strong> If a² is even, then a is even. This is because odd² = odd, so only even numbers have even squares.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Substituting: 2b² = (2k)² = 4k²
+                        <div class="math-expression">2b² = 4k²</div>
+                        <div class="step-explanation">
+                            <strong>Substitution:</strong> We replace a with 2k and square it.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Dividing by 2: b² = 2k²
+                        <div class="math-expression">b² = 2k²</div>
+                        <div class="step-explanation">
+                            <strong>Simplification:</strong> Now we see that b² is also even, which means b is even too!
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Therefore b is even, so both a and b are even.
+                        <div class="step-explanation">
+                            <strong>Conclusion so far:</strong> We've shown that both a and b must be even numbers.
+                        </div>
+                    </li>
+                </ol>
+
+                <div class="contradiction-highlight">
+                    <h4>The Contradiction!</h4>
+                    <p>If both a and b are even, then they have a common factor of 2.</p>
+                    <p>But this contradicts our assumption that gcd(a,b) = 1!</p>
+                    <p><strong>Since we reached a contradiction, our original assumption must be false.</strong></p>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px; padding: 20px; background: #28a745; color: white; border-radius: 10px;">
+                    <h4>Therefore: √2 is irrational! ∎</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- Example 2: Infinitely Many Primes -->
+        <div class="example" id="example2">
+            <h2>Example 2: There are Infinitely Many Prime Numbers</h2>
+            
+            <div class="theorem-statement">
+                <h3>Theorem (Euclid's Theorem)</h3>
+                <p>There are infinitely many prime numbers.</p>
+                <p style="margin-top: 10px; font-style: italic;">No matter how many primes you list, there's always another one!</p>
+            </div>
+
+            <div class="key-insight">
+                <p><strong>Historical note:</strong> This elegant proof was discovered by Euclid around 300 BCE. It's considered one of the most beautiful proofs in mathematics!</p>
+            </div>
+
+            <div class="proof-container">
+                <h3>Proof by Contradiction</h3>
+                <ol class="proof-steps">
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        <strong>Assume the opposite:</strong> Suppose there are only finitely many prime numbers.
+                        <div class="step-explanation">
+                            <strong>What this means:</strong> If there are finitely many primes, we can list them all: p₁, p₂, p₃, ..., pₙ for some finite number n.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Let p₁, p₂, p₃, ..., pₙ be ALL the prime numbers.
+                        <div class="step-explanation">
+                            <strong>Complete list:</strong> By our assumption, this list contains every single prime number that exists.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Consider the number N = (p₁ × p₂ × p₃ × ... × pₙ) + 1
+                        <div class="math-expression">N = (p₁ × p₂ × p₃ × ... × pₙ) + 1</div>
+                        <div class="step-explanation">
+                            <strong>Euclid's clever construction:</strong> We take the product of ALL primes and add 1. This creates a very special number!
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        N is either prime or composite.
+                        <div class="step-explanation">
+                            <strong>Fundamental fact:</strong> Every integer greater than 1 is either prime or can be factored into primes.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        <strong>Case 1:</strong> If N is prime, then we've found a new prime not in our list!
+                        <div class="step-explanation">
+                            <strong>Why N isn't in our list:</strong> N is much larger than any of p₁, p₂, ..., pₙ, so it can't be one of them.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        <strong>Case 2:</strong> If N is composite, it must have a prime factor p.
+                        <div class="step-explanation">
+                            <strong>Every composite number:</strong> Has at least one prime factor by the Fundamental Theorem of Arithmetic.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        This prime factor p must be one of p₁, p₂, ..., pₙ (our complete list).
+                        <div class="step-explanation">
+                            <strong>By our assumption:</strong> Since we assumed our list contains ALL primes, p must be in the list.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        But then p divides both N and (p₁ × p₂ × ... × pₙ).
+                        <div class="step-explanation">
+                            <strong>Two divisibility facts:</strong> p divides N (since p is a factor of N), and p divides the product (since p is one of the factors).
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Therefore p must divide N - (p₁ × p₂ × ... × pₙ) = 1.
+                        <div class="step-explanation">
+                            <strong>Key property:</strong> If a number divides both A and B, it must also divide their difference A - B.
+                        </div>
+                    </li>
+                </ol>
+
+                <div class="contradiction-highlight">
+                    <h4>The Contradiction!</h4>
+                    <p>No prime number can divide 1!</p>
+                    <p>The only positive divisors of 1 are... just 1 itself.</p>
+                    <p><strong>This contradicts the fact that p is prime (p > 1).</strong></p>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px; padding: 20px; background: #28a745; color: white; border-radius: 10px;">
+                    <h4>Therefore: There are infinitely many primes! ∎</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- Example 3: √3 is Irrational -->
+        <div class="example" id="example3">
+            <h2>Example 3: √3 is Irrational</h2>
+            
+            <div class="theorem-statement">
+                <h3>Theorem</h3>
+                <p>The square root of 3 is an irrational number.</p>
+                <p style="margin-top: 10px; font-style: italic;">Similar to √2, but with a twist involving divisibility by 3!</p>
+            </div>
+
+            <div class="key-insight">
+                <p><strong>Pattern recognition:</strong> This proof follows the same structure as the √2 proof, but uses properties of numbers divisible by 3. It shows that the technique generalizes!</p>
+            </div>
+
+            <div class="proof-container">
+                <h3>Proof by Contradiction</h3>
+                <ol class="proof-steps">
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        <strong>Assume the opposite:</strong> Suppose √3 is rational.
+                        <div class="step-explanation">
+                            <strong>Starting assumption:</strong> If √3 is rational, it can be written as a fraction in lowest terms.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Then √3 = a/b where a, b are integers and gcd(a,b) = 1
+                        <div class="step-explanation">
+                            <strong>Lowest terms:</strong> We can always reduce a fraction so that the numerator and denominator have no common factors.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Squaring both sides: 3 = a²/b²
+                        <div class="math-expression">3 = a²/b²</div>
+                        <div class="step-explanation">
+                            <strong>Eliminating the square root:</strong> We square both sides to work with integers.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Multiplying by b²: 3b² = a²
+                        <div class="math-expression">3b² = a²</div>
+                        <div class="step-explanation">
+                            <strong>Key observation:</strong> This means a² is divisible by 3.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Since 3 divides a², we know 3 divides a. Let a = 3k for some integer k.
+                        <div class="step-explanation">
+                            <strong>Important lemma:</strong> If a prime p divides n², then p divides n. Since 3 is prime and 3|a², we get 3|a.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Substituting: 3b² = (3k)² = 9k²
+                        <div class="math-expression">3b² = 9k²</div>
+                        <div class="step-explanation">
+                            <strong>Substitution:</strong> We replace a with 3k and expand.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Dividing by 3: b² = 3k²
+                        <div class="math-expression">b² = 3k²</div>
+                        <div class="step-explanation">
+                            <strong>New equation:</strong> Now we see that b² is also divisible by 3!
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Since 3 divides b², we know 3 divides b.
+                        <div class="step-explanation">
+                            <strong>Same reasoning:</strong> Using the same lemma as before, if 3|b² then 3|b.
+                        </div>
+                    </li>
+                    
+                    <li class="interactive-step" onclick="toggleExplanation(this)">
+                        Therefore both a and b are divisible by 3.
+                        <div class="step-explanation">
+                            <strong>Both multiples of 3:</strong> We can write a = 3m and b = 3n for some integers m, n.
+                        </div>
+                    </li>
+                </ol>
+
+                <div class="contradiction-highlight">
+                    <h4>The Contradiction!</h4>
+                    <p>If both a and b are divisible by 3, then gcd(a,b) ≥ 3.</p>
+                    <p>But this contradicts our assumption that gcd(a,b) = 1!</p>
+                    <p><strong>Our assumption that √3 is rational leads to a contradiction.</strong></p>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px; padding: 20px; background: #28a745; color: white; border-radius: 10px;">
+                    <h4>Therefore: √3 is irrational! ∎</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            <h3>🎓 Why Proof by Contradiction Works</h3>
+            <p>These proofs work because of the <strong>Law of Excluded Middle</strong>: every mathematical statement is either true or false. If assuming "false" leads to a contradiction, then "true" must be correct!</p>
+            <p style="margin-top: 15px;"><strong>Click on any proof step above to see detailed explanations!</strong></p>
+        </div>
+    </div>
+
+    <script>
+        let currentExample = 1;
+        
+        function showExample(exampleNum) {
+            // Hide all examples
+            const examples = document.querySelectorAll('.example');
+            examples.forEach(example => {
+                example.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.nav-button');
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected example
+            document.getElementById(`example${exampleNum}`).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Update progress bar
+            const progressFill = document.getElementById('progress');
+            progressFill.style.width = `${(exampleNum / 3) * 100}%`;
+            
+            currentExample = exampleNum;
+            
+            // Reset any open explanations
+            const explanations = document.querySelectorAll('.step-explanation');
+            explanations.forEach(exp => {
+                exp.classList.remove('show');
+            });
+        }
+        
+        function toggleExplanation(stepElement) {
+            const explanation = stepElement.querySelector('.step-explanation');
+            
+            if (explanation) {
+                // Close other explanations in the same proof
+                const allExplanations = stepElement.closest('.proof-container').querySelectorAll('.step-explanation');
+                allExplanations.forEach(exp => {
+                    if (exp !== explanation) {
+                        exp.classList.remove('show');
+                    }
+                });
+                
+                // Toggle this explanation
+                explanation.classList.toggle('show');
+                
+                // Add highlight animation to the step
+                stepElement.classList.add('highlight-animation');
+                setTimeout(() => {
+                    stepElement.classList.remove('highlight-animation');
+                }, 2000);
+            }
+        }
+        
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft' && currentExample > 1) {
+                showExample(currentExample - 1);
+                document.querySelectorAll('.nav-button')[currentExample - 1].classList.add('active');
+            } else if (event.key === 'ArrowRight' && currentExample < 3) {
+                showExample(currentExample + 1);
+                document.querySelectorAll('.nav-button')[currentExample - 1].classList.add('active');
+            }
+        });
+        
+        // Add animation on load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate header
+            const header = document.querySelector('h1');
+            header.style.opacity = '0';
+            header.style.transform = 'translateY(-30px)';
+            
+            setTimeout(() => {
+                header.style.transition = 'all 0.8s ease-out';
+                header.style.opacity = '1';
+                header.style.transform = 'translateY(0)';
+            }, 200);
+            
+            // Animate method explanation
+            const methodBox = document.querySelector('.method-explanation');
+            methodBox.style.opacity = '0';
+            methodBox.style.transform = 'translateY(30px)';
+            
+            setTimeout(() => {
+                methodBox.style.transition = 'all 0.8s ease-out';
+                methodBox.style.opacity = '1';
+                methodBox.style.transform = 'translateY(0)';
+            }, 400);
+        });
+        
+        // Add hover effects to proof steps
+        document.querySelectorAll('.interactive-step').forEach(step => {
+            step.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = 'rgba(102, 126, 234, 0.05)';
+            });
+            
+            step.addEventListener('mouseleave', function() {
+                if (!this.querySelector('.step-explanation.show')) {
+                    this.style.backgroundColor = 'transparent';
+                }
+            });
+        });
+        
+        // Fun Easter egg - Konami code for extra info
+        let konamiCode = [];
+        const konami = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65]; // up up down down left right left right B A
+        
+        document.addEventListener('keydown', function(e) {
+            konamiCode.push(e.keyCode);
+            if (konamiCode.length > konami.length) {
+                konamiCode.shift();
+            }
+            
+            if (konamiCode.toString() === konami.toString()) {
+                alert('🎉 Easter Egg Found! 🎉\n\nFun fact: The ancient Greeks called irrational numbers "alogos" meaning "unutterable" because they couldn\'t be expressed as ratios. The discovery of √2 being irrational is attributed to Hippasus of Metapontum around 500 BCE!');
+                konamiCode = [];
+            }
+        });
+    </script>
+</body>
+</html>
