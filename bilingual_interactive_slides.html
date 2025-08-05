@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Scanning Applications - Interactive Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .slide.active {
+            display: flex;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .slide-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .slide-title {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .slide-content {
+            max-width: 900px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .content-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: "▶";
+            margin-right: 10px;
+            color: #FFA500;
+        }
+
+        .content-list {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .content-list li {
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 20px;
+            line-height: 1.6;
+        }
+
+        .content-list li::before {
+            content: "•";
+            color: #FFD700;
+            font-size: 1.2em;
+            position: absolute;
+            left: 0;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .controls {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .language-toggle {
+            padding: 10px 20px;
+            background: rgba(255, 215, 0, 0.9);
+            color: #333;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .language-toggle:hover {
+            background: rgba(255, 215, 0, 1);
+            transform: scale(1.05);
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .highlight-box {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 4px solid #FFD700;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .step-number {
+            background: #FFD700;
+            color: #333;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 20px;
+            }
+            
+            .slide-title {
+                font-size: 2em;
+            }
+            
+            .two-column {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .controls {
+                top: 15px;
+                right: 15px;
+            }
+            
+            .slide-counter {
+                top: 15px;
+                left: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="progress-bar" id="progressBar"></div>
+        
+        <div class="slide-counter">
+            <span id="slideNumber">1</span> / <span id="totalSlides">22</span>
+        </div>
+        
+        <div class="controls">
+            <button class="language-toggle" onclick="toggleLanguage()" id="langToggle">中文</button>
+        </div>
+
+        <!-- Slide 1: Title -->
+        <div class="slide active" data-slide="1">
+            <div class="slide-header">
+                <h1 class="slide-title" data-en="Introduction to Location Scanning Applications" data-zh="位置扫描应用程序介绍">Introduction to Location Scanning Applications</h1>
+                <p class="slide-subtitle" data-en="Like Immersial Mapper & Security Practices" data-zh="如 Immersial Mapper 和安全实践">Like Immersial Mapper & Security Practices</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: What is Location Scanning -->
+        <div class="slide" data-slide="2">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="What is Location Scanning?" data-zh="什么是位置扫描？">What is Location Scanning?</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Real-World Digital Mapping Technology" data-zh="真实世界数字地图技术">Real-World Digital Mapping Technology</h3>
+                    <ul class="content-list">
+                        <li data-en="Capture detailed 3D representations of physical spaces" data-zh="捕获物理空间的详细3D表示">Capture detailed 3D representations of physical spaces</li>
+                        <li data-en="Create precise digital maps of real-world locations" data-zh="创建真实世界位置的精确数字地图">Create precise digital maps of real-world locations</li>
+                        <li data-en="Enable augmented reality (AR) and mixed reality experiences" data-zh="启用增强现实(AR)和混合现实体验">Enable augmented reality (AR) and mixed reality experiences</li>
+                        <li data-en="Build spatial databases for navigation and positioning" data-zh="构建用于导航和定位的空间数据库">Build spatial databases for navigation and positioning</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <strong data-en="Key Technology:" data-zh="关键技术：">Key Technology:</strong> 
+                    <span data-en="LiDAR, photogrammetry, SLAM (Simultaneous Localization and Mapping)" data-zh="LiDAR、摄影测量、SLAM（同时定位与地图构建）">LiDAR, photogrammetry, SLAM (Simultaneous Localization and Mapping)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: How Location Scanning Works -->
+        <div class="slide" data-slide="3">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="How Location Scanning Works" data-zh="位置扫描的工作原理">How Location Scanning Works</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="The Scanning Process:" data-zh="扫描过程：">The Scanning Process:</h3>
+                    <ul class="content-list">
+                        <li><span class="step-number">1</span><span data-en="Data Capture: Camera and sensors record visual and spatial data" data-zh="数据捕获：相机和传感器记录视觉和空间数据">Data Capture: Camera and sensors record visual and spatial data</span></li>
+                        <li><span class="step-number">2</span><span data-en="Point Cloud Generation: Creates millions of 3D coordinate points" data-zh="点云生成：创建数百万个3D坐标点">Point Cloud Generation: Creates millions of 3D coordinate points</span></li>
+                        <li><span class="step-number">3</span><span data-en="Mesh Creation: Connects points to form 3D surfaces" data-zh="网格创建：连接点以形成3D表面">Mesh Creation: Connects points to form 3D surfaces</span></li>
+                        <li><span class="step-number">4</span><span data-en="Texture Mapping: Applies visual details and colors" data-zh="纹理映射：应用视觉细节和颜色">Texture Mapping: Applies visual details and colors</span></li>
+                        <li><span class="step-number">5</span><span data-en="Optimization: Compresses data for real-time use" data-zh="优化：压缩数据以供实时使用">Optimization: Compresses data for real-time use</span></li>
+                        <li><span class="step-number">6</span><span data-en="Cloud Processing: Uploads and processes data on remote servers" data-zh="云处理：在远程服务器上上传和处理数据">Cloud Processing: Uploads and processes data on remote servers</span></li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <strong data-en="Result:" data-zh="结果：">Result:</strong> 
+                    <span data-en="Accurate digital twin of physical location" data-zh="物理位置的准确数字孪生">Accurate digital twin of physical location</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Key Features -->
+        <div class="slide" data-slide="4">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Key Features of Modern Scanning Apps" data-zh="现代扫描应用的关键功能">Key Features of Modern Scanning Apps</h2>
+            </div>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Core Capabilities:" data-zh="核心功能：">Core Capabilities:</h3>
+                        <ul class="content-list">
+                            <li data-en="Real-time 3D mapping and reconstruction" data-zh="实时3D地图和重建">Real-time 3D mapping and reconstruction</li>
+                            <li data-en="GPS-independent indoor positioning" data-zh="独立于GPS的室内定位">GPS-independent indoor positioning</li>
+                            <li data-en="Centimeter-level accuracy" data-zh="厘米级精度">Centimeter-level accuracy</li>
+                            <li data-en="Cross-platform compatibility" data-zh="跨平台兼容性">Cross-platform compatibility</li>
+                            <li data-en="Cloud-based processing and storage" data-zh="基于云的处理和存储">Cloud-based processing and storage</li>
+                        </ul>
+                    </div>
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Advanced Features:" data-zh="高级功能：">Advanced Features:</h3>
+                        <ul class="content-list">
+                            <li data-en="AI-powered object recognition" data-zh="AI驱动的物体识别">AI-powered object recognition</li>
+                            <li data-en="Automatic lighting adjustment" data-zh="自动照明调整">Automatic lighting adjustment</li>
+                            <li data-en="Multi-device synchronization" data-zh="多设备同步">Multi-device synchronization</li>
+                            <li data-en="Integration with AR/VR platforms" data-zh="与AR/VR平台集成">Integration with AR/VR platforms</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Use Cases -->
+        <div class="slide" data-slide="5">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Use Cases and Applications" data-zh="用例和应用">Use Cases and Applications</h2>
+            </div>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Entertainment & Media" data-zh="娱乐和媒体">Entertainment & Media</h3>
+                        <ul class="content-list">
+                            <li data-en="Virtual film sets and location scouting" data-zh="虚拟电影片场和选址">Virtual film sets and location scouting</li>
+                            <li data-en="AR gaming environments" data-zh="AR游戏环境">AR gaming environments</li>
+                            <li data-en="Virtual tours and experiences" data-zh="虚拟旅游和体验">Virtual tours and experiences</li>
+                        </ul>
+
+                        <h3 class="section-title" data-en="Architecture & Construction" data-zh="建筑与施工">Architecture & Construction</h3>
+                        <ul class="content-list">
+                            <li data-en="Building documentation and surveys" data-zh="建筑文档和测量">Building documentation and surveys</li>
+                            <li data-en="Progress monitoring" data-zh="进度监控">Progress monitoring</li>
+                            <li data-en="Design visualization" data-zh="设计可视化">Design visualization</li>
+                        </ul>
+                    </div>
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Education & Training" data-zh="教育与培训">Education & Training</h3>
+                        <ul class="content-list">
+                            <li data-en="Virtual field trips" data-zh="虚拟实地考察">Virtual field trips</li>
+                            <li data-en="Immersive learning environments" data-zh="沉浸式学习环境">Immersive learning environments</li>
+                            <li data-en="Historical site preservation" data-zh="历史遗址保护">Historical site preservation</li>
+                        </ul>
+
+                        <h3 class="section-title" data-en="Retail & Marketing" data-zh="零售与营销">Retail & Marketing</h3>
+                        <ul class="content-list">
+                            <li data-en="Virtual showrooms" data-zh="虚拟展厅">Virtual showrooms</li>
+                            <li data-en="Location-based AR advertising" data-zh="基于位置的AR广告">Location-based AR advertising</li>
+                            <li data-en="Customer experience enhancement" data-zh="客户体验提升">Customer experience enhancement</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Benefits for Organizations -->
+        <div class="slide" data-slide="6">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Benefits for Organizations" data-zh="组织的好处">Benefits for Organizations</h2>
+            </div>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Operational Advantages:" data-zh="运营优势：">Operational Advantages:</h3>
+                        <ul class="content-list">
+                            <li data-en="Reduced travel costs for remote collaboration" data-zh="减少远程协作的差旅成本">Reduced travel costs for remote collaboration</li>
+                            <li data-en="Faster project documentation and analysis" data-zh="更快的项目文档和分析">Faster project documentation and analysis</li>
+                            <li data-en="Enhanced visualization for stakeholders" data-zh="为利益相关者提供增强的可视化">Enhanced visualization for stakeholders</li>
+                            <li data-en="Improved accuracy over traditional surveying" data-zh="比传统测量更高的精度">Improved accuracy over traditional surveying</li>
+                        </ul>
+                    </div>
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Competitive Benefits:" data-zh="竞争优势：">Competitive Benefits:</h3>
+                        <ul class="content-list">
+                            <li data-en="Earlier adoption of emerging technologies" data-zh="更早采用新兴技术">Earlier adoption of emerging technologies</li>
+                            <li data-en="Enhanced customer engagement through AR" data-zh="通过AR增强客户参与度">Enhanced customer engagement through AR</li>
+                            <li data-en="Streamlined workflows and processes" data-zh="简化的工作流程和流程">Streamlined workflows and processes</li>
+                            <li data-en="Future-ready infrastructure development" data-zh="面向未来的基础设施开发">Future-ready infrastructure development</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Equipment Needed -->
+        <div class="slide" data-slide="7">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Getting Started - Equipment Needed" data-zh="入门 - 所需设备">Getting Started - Equipment Needed</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Minimum Requirements:" data-zh="最低要求：">Minimum Requirements:</h3>
+                    <ul class="content-list">
+                        <li data-en="Modern smartphone or tablet with LiDAR sensor (iPhone 12 Pro+, iPad Pro)" data-zh="带LiDAR传感器的现代智能手机或平板电脑（iPhone 12 Pro+、iPad Pro）">Modern smartphone or tablet with LiDAR sensor (iPhone 12 Pro+, iPad Pro)</li>
+                        <li data-en="Stable internet connection for cloud processing" data-zh="用于云处理的稳定互联网连接">Stable internet connection for cloud processing</li>
+                        <li data-en="Sufficient device storage (2-5GB per scan session)" data-zh="足够的设备存储空间（每次扫描会话2-5GB）">Sufficient device storage (2-5GB per scan session)</li>
+                    </ul>
+                </div>
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Optional Professional Equipment:" data-zh="可选的专业设备：">Optional Professional Equipment:</h3>
+                    <ul class="content-list">
+                        <li data-en="Dedicated 3D scanning devices" data-zh="专用3D扫描设备">Dedicated 3D scanning devices</li>
+                        <li data-en="Professional cameras with photogrammetry software" data-zh="配备摄影测量软件的专业相机">Professional cameras with photogrammetry software</li>
+                        <li data-en="Survey-grade GPS equipment for outdoor scanning" data-zh="用于户外扫描的测量级GPS设备">Survey-grade GPS equipment for outdoor scanning</li>
+                        <li data-en="Tripods and stabilization equipment" data-zh="三脚架和稳定设备">Tripods and stabilization equipment</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Immersal Mapper Introduction -->
+        <div class="slide" data-slide="8">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Immersal Mapper 2.0 - Introduction" data-zh="Immersal Mapper 2.0 - 介绍">Immersal Mapper 2.0 - Introduction</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Getting Started with Manual Mode" data-zh="开始使用手动模式">Getting Started with Manual Mode</h3>
+                    <p data-en="Immersal Mapper 2.0 is a pre-built application that transforms any physical space into detailed spatial maps or point cloud meshes." data-zh="Immersal Mapper 2.0是一个预构建的应用程序，可将任何物理空间转换为详细的空间地图或点云网格。">Immersal Mapper 2.0 is a pre-built application that transforms any physical space into detailed spatial maps or point cloud meshes.</p>
+                </div>
+                
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Interface Overview:" data-zh="界面概述：">Interface Overview:</h3>
+                    <ul class="content-list">
+                        <li data-en="Top Right: Profile details, user level, and mode selector (M for Manual)" data-zh="右上角：个人资料详情、用户级别和模式选择器（M表示手动）">Top Right: Profile details, user level, and mode selector (M for Manual)</li>
+                        <li data-en="Top Left: Refresh button to update map list view" data-zh="左上角：刷新按钮以更新地图列表视图">Top Left: Refresh button to update map list view</li>
+                        <li data-en="Bottom Center: Yellow capture button for creating new maps" data-zh="底部中央：用于创建新地图的黄色捕获按钮">Bottom Center: Yellow capture button for creating new maps</li>
+                        <li data-en="Three Main Tabs: All Maps, In Cloud, On Device" data-zh="三个主要选项卡：所有地图、云端、设备上">Three Main Tabs: All Maps, In Cloud, On Device</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h3 class="section-title" data-en="Two Operating Modes:" data-zh="两种操作模式：">Two Operating Modes:</h3>
+                    <ul class="content-list">
+                        <li data-en="Manual Mode: Individual image capture with higher quality results" data-zh="手动模式：单独图像捕获，质量更高">Manual Mode: Individual image capture with higher quality results</li>
+                        <li data-en="Real-Time Mode: Automatic capture but lower quality output" data-zh="实时模式：自动捕获但质量较低">Real-Time Mode: Automatic capture but lower quality output</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Manual Mode Setup -->
+        <div class="slide" data-slide="9">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Setting Up Manual Mode" data-zh="设置手动模式">Setting Up Manual Mode</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Pre-Capture Setup:" data-zh="捕获前设置：">Pre-Capture Setup:</h3>
+                </div>
+                
+                <div class="content-section">
+                    <h4 class="section-title" data-en="Account and Login:" data-zh="账户和登录：">Account and Login:</h4>
+                    <ul class="content-list">
+                        <li data-en="Download Immersal Mapper from App Store or Google Play" data-zh="从App Store或Google Play下载Immersal Mapper">Download Immersal Mapper from App Store or Google Play</li>
+                        <li data-en="Leave server setting as 'International Server' (default)" data-zh="将服务器设置保留为'国际服务器'（默认）">Leave server setting as 'International Server' (default)</li>
+                        <li data-en="Login with your developer credentials" data-zh="使用您的开发者凭据登录">Login with your developer credentials</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <h4 class="section-title" data-en="Creating a New Map:" data-zh="创建新地图：">Creating a New Map:</h4>
+                    <ul class="content-list">
+                        <li data-en="Click the plus (+) icon at bottom center to create a new map" data-zh="单击底部中央的加号(+)图标创建新地图">Click the plus (+) icon at bottom center to create a new map</li>
+                        <li data-en="Ensure Manual Mode is selected by clicking 'M' in the top right corner" data-zh="确保通过单击右上角的'M'选择手动模式">Ensure Manual Mode is selected by clicking 'M' in the top right corner</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4 class="section-title" data-en="Device Preparation:" data-zh="设备准备：">Device Preparation:</h4>
+                    <ul class="content-list">
+                        <li data-en="Ensure stable internet connection for uploads" data-zh="确保稳定的互联网连接以进行上传">Ensure stable internet connection for uploads</li>
+                        <li data-en="Clear sufficient storage space (2-5GB recommended)" data-zh="清理足够的存储空间（建议2-5GB）">Clear sufficient storage space (2-5GB recommended)</li>
+                        <li data-en="Consider using devices with LiDAR sensors for enhanced accuracy" data-zh="考虑使用带LiDAR传感器的设备以提高精度">Consider using devices with LiDAR sensors for enhanced accuracy</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Capture Process -->
+        <div class="slide" data-slide="10">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Manual Mode Capture Process" data-zh="手动模式捕获过程">Manual Mode Capture Process</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Step-by-Step Capture Workflow:" data-zh="分步捕获工作流程：">Step-by-Step Capture Workflow:</h3>
+                </div>
+                
+                <div class="content-section">
+                    <h4 class="section-title" data-en="Image Capture Strategy:" data-zh="图像捕获策略：">Image Capture Strategy:</h4>
+                    <ul class="content-list">
+                        <li data-en="Point camera at target area and click CAPTURE button while moving horizontally" data-zh="将相机对准目标区域，水平移动时单击CAPTURE按钮">Point camera at target area and click CAPTURE button while moving horizontally</li>
+                        <li data-en="Aim for 50% overlap between consecutive images" data-zh="力求连续图像之间有50%的重叠">Aim for 50% overlap between consecutive images</li>
+                        <li data-en="Cover the environment from multiple viewpoints and distances" data-zh="从多个视点和距离覆盖环境">Cover the environment from multiple viewpoints and distances</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <h4 class="section-title" data-en="Movement Pattern:" data-zh="移动模式：">Movement Pattern:</h4>
+                    <ul class="content-list">
+                        <li data-en="Walk systematically around your target area" data-zh="系统性地围绕目标区域行走">Walk systematically around your target area</li>
+                        <li data-en="Use 'outside-in' method for rooms - move around perimeter looking across space" data-zh="对房间使用'由外向内'的方法 - 沿着周边移动，观察整个空间">Use 'outside-in' method for rooms - move around perimeter looking across space</li>
+                        <li data-en="Take images from different positions and angles for optimal results" data-zh="从不同位置和角度拍摄图像以获得最佳效果">Take images from different positions and angles for optimal results</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h4 class="section-title" data-en="Visual Feedback:" data-zh="视觉反馈：">Visual Feedback:</h4>
+                    <ul class="content-list">
+                        <li data-en="App displays 'Image connected to previous' notification when images successfully match" data-zh="当图像成功匹配时，应用显示'图像已连接到前一张'通知">App displays 'Image connected to previous' notification when images successfully match</li>
+                        <li data-en="Each image needs visual connection to at least two others for map construction" data-zh="每张图像需要与至少两张其他图像建立视觉连接以进行地图构建">Each image needs visual connection to at least two others for map construction</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Security Practices - Data Protection -->
+        <div class="slide" data-slide="11">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Security Practices - Data Protection" data-zh="安全实践 - 数据保护">Security Practices - Data Protection</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Essential Security Measures:" data-zh="基本安全措施：">Essential Security Measures:</h3>
+                </div>
+                
+                <div class="two-column">
+                    <div class="content-section">
+                        <h4 class="section-title" data-en="Before Scanning:" data-zh="扫描前：">Before Scanning:</h4>
+                        <ul class="content-list">
+                            <li data-en="Review app permissions carefully" data-zh="仔细审查应用权限">Review app permissions carefully</li>
+                            <li data-en="Understand data collection and storage policies" data-zh="了解数据收集和存储政策">Understand data collection and storage policies</li>
+                            <li data-en="Verify the app developer's reputation" data-zh="验证应用开发者的声誉">Verify the app developer's reputation</li>
+                            <li data-en="Check if data is processed locally or in cloud" data-zh="检查数据是本地处理还是云端处理">Check if data is processed locally or in cloud</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h4 class="section-title" data-en="During Scanning:" data-zh="扫描期间：">During Scanning:</h4>
+                        <ul class="content-list">
+                            <li data-en="Avoid scanning sensitive or confidential areas" data-zh="避免扫描敏感或机密区域">Avoid scanning sensitive or confidential areas</li>
+                            <li data-en="Be aware of personal information visible in scans" data-zh="注意扫描中可见的个人信息">Be aware of personal information visible in scans</li>
+                            <li data-en="Consider who has access to your scanning location" data-zh="考虑谁有权访问您的扫描位置">Consider who has access to your scanning location</li>
+                            <li data-en="Remove or cover sensitive documents and screens" data-zh="移除或遮盖敏感文件和屏幕">Remove or cover sensitive documents and screens</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Privacy Protection -->
+        <div class="slide" data-slide="12">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Security Practices - Privacy Protection" data-zh="安全实践 - 隐私保护">Security Practices - Privacy Protection</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Protecting Personal and Organizational Privacy:" data-zh="保护个人和组织隐私：">Protecting Personal and Organizational Privacy:</h3>
+                </div>
+                
+                <div class="two-column">
+                    <div class="content-section">
+                        <h4 class="section-title" data-en="Location Privacy:" data-zh="位置隐私：">Location Privacy:</h4>
+                        <ul class="content-list">
+                            <li data-en="Disable location sharing when not necessary" data-zh="不必要时禁用位置共享">Disable location sharing when not necessary</li>
+                            <li data-en="Use generic project names instead of specific addresses" data-zh="使用通用项目名称而非具体地址">Use generic project names instead of specific addresses</li>
+                            <li data-en="Consider scanning during off-hours to avoid capturing people" data-zh="考虑在非工作时间扫描以避免捕获人员">Consider scanning during off-hours to avoid capturing people</li>
+                            <li data-en="Review metadata attached to scanned content" data-zh="查看附加到扫描内容的元数据">Review metadata attached to scanned content</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h4 class="section-title" data-en="Access Control:" data-zh="访问控制：">Access Control:</h4>
+                        <ul class="content-list">
+                            <li data-en="Use strong, unique passwords for accounts" data-zh="为账户使用强而独特的密码">Use strong, unique passwords for accounts</li>
+                            <li data-en="Enable two-factor authentication when available" data-zh="在可用时启用双因素身份验证">Enable two-factor authentication when available</li>
+                            <li data-en="Regularly review and update sharing permissions" data-zh="定期审查和更新共享权限">Regularly review and update sharing permissions</li>
+                            <li data-en="Limit access to authorized team members only" data-zh="仅限授权团队成员访问">Limit access to authorized team members only</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Conclusion -->
+        <div class="slide" data-slide="13">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Conclusion and Next Steps" data-zh="结论和下一步">Conclusion and Next Steps</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Key Takeaways:" data-zh="关键要点：">Key Takeaways:</h3>
+                    <ul class="content-list">
+                        <li data-en="Location scanning technology offers powerful capabilities for various industries" data-zh="位置扫描技术为各个行业提供强大的功能">Location scanning technology offers powerful capabilities for various industries</li>
+                        <li data-en="Immersal Mapper 2.0 manual mode provides high-quality spatial mapping" data-zh="Immersal Mapper 2.0手动模式提供高质量的空间映射">Immersal Mapper 2.0 manual mode provides high-quality spatial mapping</li>
+                        <li data-en="Security and privacy must be prioritized from the beginning" data-zh="必须从一开始就优先考虑安全和隐私">Security and privacy must be prioritized from the beginning</li>
+                        <li data-en="Proper planning ensures safe and effective use" data-zh="适当的规划确保安全有效的使用">Proper planning ensures safe and effective use</li>
+                    </ul>
+                </div>
+
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Recommended Actions:" data-zh="建议行动：">Recommended Actions:</h3>
+                    <ul class="content-list">
+                        <li><span class="step-number">1</span><span data-en="Evaluate business needs and use cases" data-zh="评估业务需求和用例">Evaluate business needs and use cases</span></li>
+                        <li><span class="step-number">2</span><span data-en="Create free Immersal developer account" data-zh="创建免费的Immersal开发者账户">Create free Immersal developer account</span></li>
+                        <li><span class="step-number">3</span><span data-en="Develop internal security policies" data-zh="制定内部安全政策">Develop internal security policies</span></li>
+                        <li><span class="step-number">4</span><span data-en="Train team members on manual mode techniques" data-zh="培训团队成员使用手动模式技术">Train team members on manual mode techniques</span></li>
+                        <li><span class="step-number">5</span><span data-en="Start with pilot projects in non-sensitive areas" data-zh="从非敏感区域的试点项目开始">Start with pilot projects in non-sensitive areas</span></li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box">
+                    <h3 class="section-title" data-en="Thank You!" data-zh="谢谢！">Thank You!</h3>
+                    <p data-en="Questions and Discussion Welcome" data-zh="欢迎提问和讨论">Questions and Discussion Welcome</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation">
+            <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)" data-en="Previous" data-zh="上一页">Previous</button>
+            <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)" data-en="Next" data-zh="下一页">Next</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        let currentLanguage = 'en';
+        const totalSlides = 13; // Updated to reflect actual slide count
+
+        function updateSlideDisplay() {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active');
+                if (index + 1 === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            // Update slide counter
+            document.getElementById('slideNumber').textContent = currentSlide;
+            document.getElementById('totalSlides').textContent = totalSlides;
+
+            // Update progress bar
+            const progressPercent = (currentSlide / totalSlides) * 100;
+            document.getElementById('progressBar').style.width = progressPercent + '%';
+
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+        }
+
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            if (newSlide >= 1 && newSlide <= totalSlides) {
+                currentSlide = newSlide;
+                updateSlideDisplay();
+            }
+        }
+
+        function toggleLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'zh' : 'en';
+            
+            // Update all elements with data attributes
+            const elements = document.querySelectorAll('[data-en][data-zh]');
+            elements.forEach(element => {
+                if (currentLanguage === 'en') {
+                    element.textContent = element.getAttribute('data-en');
+                } else {
+                    element.textContent = element.getAttribute('data-zh');
+                }
+            });
+
+            // Update language toggle button
+            const toggleBtn = document.getElementById('langToggle');
+            toggleBtn.textContent = currentLanguage === 'en' ? '中文' : 'English';
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'ArrowLeft':
+                case 'ArrowUp':
+                    changeSlide(-1);
+                    break;
+                case 'ArrowRight':
+                case 'ArrowDown':
+                case ' ':
+                    changeSlide(1);
+                    break;
+                case 'Home':
+                    currentSlide = 1;
+                    updateSlideDisplay();
+                    break;
+                case 'End':
+                    currentSlide = totalSlides;
+                    updateSlideDisplay();
+                    break;
+            }
+        });
+
+        // Touch/swipe support
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.addEventListener('touchend', function(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    changeSlide(1); // Swipe left - next slide
+                } else {
+                    changeSlide(-1); // Swipe right - previous slide
+                }
+            }
+        }
+
+        // Initialize
+        updateSlideDisplay();
+    </script>
+</body>
+</html>
