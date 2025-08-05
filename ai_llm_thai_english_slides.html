@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction to AI, LLM & Prompt Engineering</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            color: white;
+            overflow: hidden;
+            line-height: 1.6;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(15px);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .slide.active {
+            display: flex;
+            animation: slideIn 0.6s ease-in-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .slide-title {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FF69B4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .slide-subtitle {
+            font-size: 1.3em;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .slide-content {
+            max-width: 1000px;
+            width: 100%;
+            text-align: left;
+        }
+
+        .content-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #FFD700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title::before {
+            content: "🔸";
+            margin-right: 10px;
+            font-size: 0.8em;
+        }
+
+        .content-list {
+            list-style: none;
+            padding-left: 20px;
+        }
+
+        .content-list li {
+            margin-bottom: 12px;
+            position: relative;
+            padding-left: 25px;
+            line-height: 1.7;
+            font-size: 1.1em;
+        }
+
+        .content-list li::before {
+            content: "▶";
+            color: #FFD700;
+            font-size: 0.8em;
+            position: absolute;
+            left: 0;
+            top: 2px;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-weight: 500;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .controls {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .language-toggle {
+            padding: 10px 20px;
+            background: rgba(255, 215, 0, 0.9);
+            color: #333;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .language-toggle:hover {
+            background: rgba(255, 215, 0, 1);
+            transform: scale(1.05);
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #FFD700, #FFA500, #FF69B4);
+            transition: width 0.3s ease;
+            z-index: 1000;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .three-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        .highlight-box {
+            background: rgba(255, 215, 0, 0.15);
+            border: 2px solid rgba(255, 215, 0, 0.5);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .ai-timeline {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border-left: 3px solid #FFD700;
+            padding-left: 15px;
+        }
+
+        .year {
+            background: #FFD700;
+            color: #333;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: 600;
+            margin-right: 15px;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .step-number {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #333;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .prompt-example {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .good-example {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .bad-example {
+            border-left: 4px solid #f44336;
+        }
+
+        .thai-text {
+            font-family: 'Noto Sans Thai', sans-serif;
+            font-weight: 400;
+        }
+
+        .english-text {
+            font-family: 'Inter', sans-serif;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 20px;
+            }
+            
+            .slide-title {
+                font-size: 2em;
+            }
+            
+            .two-column,
+            .three-column {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .controls {
+                top: 15px;
+                right: 15px;
+            }
+            
+            .slide-counter {
+                top: 15px;
+                left: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="progress-bar" id="progressBar"></div>
+        
+        <div class="slide-counter">
+            <span id="slideNumber">1</span> / <span id="totalSlides">18</span>
+        </div>
+        
+        <div class="controls">
+            <button class="language-toggle" onclick="toggleLanguage()" id="langToggle">ไทย</button>
+        </div>
+
+        <!-- Slide 1: Title -->
+        <div class="slide active" data-slide="1">
+            <div class="slide-header">
+                <h1 class="slide-title" data-en="Introduction to Artificial Intelligence" data-th="ความรู้เบื้องต้นเกี่ยวกับปัญญาประดิษฐ์">Introduction to Artificial Intelligence</h1>
+                <p class="slide-subtitle" data-en="From Current AI to AGI, LLMs, and Effective Prompting" data-th="จากปัญญาประดิษฐ์ปัจจุบันสู่ AGI, LLMs และการเขียนพรอมต์ที่มีประสิทธิภาพ">From Current AI to AGI, LLMs, and Effective Prompting</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: What is AI -->
+        <div class="slide" data-slide="2">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="What is Artificial Intelligence?" data-th="ปัญญาประดิษฐ์คืออะไร?">What is Artificial Intelligence?</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Definition & Core Concepts" data-th="คำนิยามและแนวคิดหลัก">Definition & Core Concepts</h3>
+                    <ul class="content-list">
+                        <li data-en="AI is the simulation of human intelligence in machines" data-th="ปัญญาประดิษฐ์คือการจำลองสติปัญญาของมนุษย์ในเครื่องจักร">AI is the simulation of human intelligence in machines</li>
+                        <li data-en="Machines programmed to think and learn like humans" data-th="เครื่องจักรที่ถูกโปรแกรมให้คิดและเรียนรู้เหมือนมนุษย์">Machines programmed to think and learn like humans</li>
+                        <li data-en="Ability to perceive, reason, learn, and make decisions" data-th="ความสามารถในการรับรู้ คิด เรียนรู้ และตัดสินใจ">Ability to perceive, reason, learn, and make decisions</li>
+                        <li data-en="Goal: Create systems that can perform tasks requiring human intelligence" data-th="เป้าหมาย: สร้างระบบที่สามารถทำงานที่ต้องใช้สติปัญญาของมนุษย์">Goal: Create systems that can perform tasks requiring human intelligence</li>
+                    </ul>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3 class="section-title" data-en="Key AI Capabilities:" data-th="ความสามารถหลักของ AI:">Key AI Capabilities:</h3>
+                    <div class="three-column">
+                        <div>
+                            <strong data-en="Learning" data-th="การเรียนรู้">Learning</strong><br>
+                            <span data-en="Acquiring knowledge from data" data-th="การได้รับความรู้จากข้อมูล">Acquiring knowledge from data</span>
+                        </div>
+                        <div>
+                            <strong data-en="Reasoning" data-th="การใช้เหตุผล">Reasoning</strong><br>
+                            <span data-en="Making logical inferences" data-th="การสร้างข้อสรุปเชิงตรรกะ">Making logical inferences</span>
+                        </div>
+                        <div>
+                            <strong data-en="Problem Solving" data-th="การแก้ปัญหา">Problem Solving</strong><br>
+                            <span data-en="Finding solutions to complex challenges" data-th="การหาทางแก้ปัญหาที่ซับซ้อน">Finding solutions to complex challenges</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Types of AI -->
+        <div class="slide" data-slide="3">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Types of Artificial Intelligence" data-th="ประเภทของปัญญาประดิษฐ์">Types of Artificial Intelligence</h2>
+            </div>
+            <div class="slide-content">
+                <div class="three-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="ANI - Narrow AI" data-th="ANI - ปัญญาประดิษฐ์แบบจำกัด">ANI - Narrow AI</h3>
+                        <div class="highlight-box">
+                            <ul class="content-list">
+                                <li data-en="Current state of AI" data-th="สถานะปัจจุบันของ AI">Current state of AI</li>
+                                <li data-en="Specialized for specific tasks" data-th="เชี่ยวชาญในงานเฉพาะ">Specialized for specific tasks</li>
+                                <li data-en="Examples: Siri, Chess AI, Image recognition" data-th="ตัวอย่าง: Siri, Chess AI, การรู้จำภาพ">Examples: Siri, Chess AI, Image recognition</li>
+                                <li data-en="Cannot generalize beyond training" data-th="ไม่สามารถขยายผลเกินการฝึก">Cannot generalize beyond training</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="AGI - General AI" data-th="AGI - ปัญญาประดิษฐ์ทั่วไป">AGI - General AI</h3>
+                        <div class="highlight-box">
+                            <ul class="content-list">
+                                <li data-en="Future goal of AI research" data-th="เป้าหมายอนาคตของการวิจัย AI">Future goal of AI research</li>
+                                <li data-en="Human-level cognitive abilities" data-th="ความสามารถทางปัญญาระดับมนุษย์">Human-level cognitive abilities</li>
+                                <li data-en="Can understand, learn any task" data-th="สามารถเข้าใจและเรียนรู้งานใดก็ได้">Can understand, learn any task</li>
+                                <li data-en="Expected timeline: 2030s-2040s" data-th="คาดการณ์: ปี 2030-2040">Expected timeline: 2030s-2040s</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="ASI - Super AI" data-th="ASI - ปัญญาประดิษฐ์เหนือมนุษย์">ASI - Super AI</h3>
+                        <div class="highlight-box">
+                            <ul class="content-list">
+                                <li data-en="Theoretical future AI" data-th="ปัญญาประดิษฐ์เชิงทฤษฎีในอนาคต">Theoretical future AI</li>
+                                <li data-en="Surpasses human intelligence" data-th="เหนือกว่าสติปัญญาของมนุษย์">Surpasses human intelligence</li>
+                                <li data-en="Could solve any problem" data-th="สามารถแก้ปัญหาใดก็ได้">Could solve any problem</li>
+                                <li data-en="Requires careful development" data-th="ต้องการการพัฒนาอย่างระมัดระวัง">Requires careful development</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: AI History Timeline -->
+        <div class="slide" data-slide="4">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="AI Development Timeline" data-th="เส้นทางการพัฒนา AI">AI Development Timeline</h2>
+            </div>
+            <div class="slide-content">
+                <div class="ai-timeline">
+                    <div class="timeline-item">
+                        <div class="year">1950s</div>
+                        <div>
+                            <strong data-en="Birth of AI" data-th="การกำเนิดของ AI">Birth of AI</strong><br>
+                            <span data-en="Alan Turing's Test, First AI programs" data-th="การทดสอบของ Alan Turing, โปรแกรม AI แรก">Alan Turing's Test, First AI programs</span>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="year">1980s</div>
+                        <div>
+                            <strong data-en="Expert Systems" data-th="ระบบผู้เชี่ยวชาญ">Expert Systems</strong><br>
+                            <span data-en="Rule-based AI for specific domains" data-th="AI ที่ใช้กฎสำหรับสาขาเฉพาะ">Rule-based AI for specific domains</span>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="year">1990s</div>
+                        <div>
+                            <strong data-en="Machine Learning Rise" data-th="การเพิ่มขึ้นของ Machine Learning">Machine Learning Rise</strong><br>
+                            <span data-en="Statistical approaches, Neural networks revival" data-th="แนวทางทางสถิติ, การฟื้นคืนของ Neural networks">Statistical approaches, Neural networks revival</span>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="year">2010s</div>
+                        <div>
+                            <strong data-en="Deep Learning Revolution" data-th="การปฏิวัติ Deep Learning">Deep Learning Revolution</strong><br>
+                            <span data-en="ImageNet breakthrough, GPU acceleration" data-th="ความก้าวหน้า ImageNet, การเร่งด้วย GPU">ImageNet breakthrough, GPU acceleration</span>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="year">2020s</div>
+                        <div>
+                            <strong data-en="LLM & Transformer Era" data-th="ยุค LLM และ Transformer">LLM & Transformer Era</strong><br>
+                            <span data-en="GPT, BERT, ChatGPT mainstream adoption" data-th="การรับรองอย่างแพร่หลายของ GPT, BERT, ChatGPT">GPT, BERT, ChatGPT mainstream adoption</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Path to AGI -->
+        <div class="slide" data-slide="5">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="The Path to AGI" data-th="เส้นทางสู่ AGI">The Path to AGI</h2>
+            </div>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Current Progress" data-th="ความก้าวหน้าปัจจุบัน">Current Progress</h3>
+                        <ul class="content-list">
+                            <li data-en="Large Language Models showing reasoning" data-th="Large Language Models แสดงการใช้เหตุผล">Large Language Models showing reasoning</li>
+                            <li data-en="Multimodal AI (text, image, audio)" data-th="AI หลายรูปแบบ (ข้อความ ภาพ เสียง)">Multimodal AI (text, image, audio)</li>
+                            <li data-en="Transfer learning across domains" data-th="การเรียนรู้แบบถ่ายทอดข้ามสาขา">Transfer learning across domains</li>
+                            <li data-en="Improved few-shot learning" data-th="การเรียนรู้แบบ few-shot ที่ดีขึ้น">Improved few-shot learning</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Remaining Challenges" data-th="ความท้าทายที่เหลืออยู่">Remaining Challenges</h3>
+                        <ul class="content-list">
+                            <li data-en="Common sense reasoning" data-th="การใช้เหตุผลเชิงสามัญ">Common sense reasoning</li>
+                            <li data-en="Long-term planning and memory" data-th="การวางแผนระยะยาวและความจำ">Long-term planning and memory</li>
+                            <li data-en="Causal understanding" data-th="ความเข้าใจเชิงสาเหตุ">Causal understanding</li>
+                            <li data-en="Continuous learning without forgetting" data-th="การเรียนรู้อย่างต่อเนื่องโดยไม่ลืม">Continuous learning without forgetting</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3 class="section-title" data-en="AGI Timeline Predictions:" data-th="การทำนายเส้นทาง AGI:">AGI Timeline Predictions:</h3>
+                    <ul class="content-list">
+                        <li data-en="Optimistic: 2027-2030 (OpenAI, DeepMind estimates)" data-th="แง่บวก: 2027-2030 (ประมาณการของ OpenAI, DeepMind)">Optimistic: 2027-2030 (OpenAI, DeepMind estimates)</li>
+                        <li data-en="Conservative: 2035-2045 (Academic consensus)" data-th="แง่อนุรักษ์: 2035-2045 (ฉันทามติทางวิชาการ)">Conservative: 2035-2045 (Academic consensus)</li>
+                        <li data-en="Uncertain: May require breakthrough discoveries" data-th="ไม่แน่นอน: อาจต้องการการค้นพบเชิงก้าวกระโดด">Uncertain: May require breakthrough discoveries</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: What are LLMs -->
+        <div class="slide" data-slide="6">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Large Language Models (LLMs)" data-th="โมเดลภาษาขนาดใหญ่ (LLMs)">Large Language Models (LLMs)</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="What are LLMs?" data-th="LLMs คืออะไร?">What are LLMs?</h3>
+                    <ul class="content-list">
+                        <li data-en="AI models trained on vast amounts of text data" data-th="โมเดล AI ที่ฝึกบนข้อมูลข้อความจำนวนมหาศาล">AI models trained on vast amounts of text data</li>
+                        <li data-en="Can understand and generate human-like text" data-th="สามารถเข้าใจและสร้างข้อความที่เหมือนมนุษย์">Can understand and generate human-like text</li>
+                        <li data-en="Based on Transformer architecture (2017)" data-th="อิงจากสถาปัตยกรรม Transformer (2017)">Based on Transformer architecture (2017)</li>
+                        <li data-en="Scale: Billions to trillions of parameters" data-th="ขนาด: หลายพันล้านถึงล้านล้าน parameters">Scale: Billions to trillions of parameters</li>
+                    </ul>
+                </div>
+                
+                <div class="two-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Key Capabilities:" data-th="ความสามารถหลัก:">Key Capabilities:</h3>
+                        <ul class="content-list">
+                            <li data-en="Text generation and completion" data-th="การสร้างและเติมเต็มข้อความ">Text generation and completion</li>
+                            <li data-en="Question answering" data-th="การตอบคำถาม">Question answering</li>
+                            <li data-en="Language translation" data-th="การแปลภาษา">Language translation</li>
+                            <li data-en="Code generation" data-th="การสร้างโค้ด">Code generation</li>
+                            <li data-en="Creative writing" data-th="การเขียนเชิงสร้างสรรค์">Creative writing</li>
+                            <li data-en="Reasoning and analysis" data-th="การใช้เหตุผลและวิเคราะห์">Reasoning and analysis</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Training Process:" data-th="กระบวนการฝึก:">Training Process:</h3>
+                        <ul class="content-list">
+                            <li data-en="Pre-training on internet text" data-th="การฝึกล่วงหน้าบนข้อความอินเทอร์เน็ต">Pre-training on internet text</li>
+                            <li data-en="Fine-tuning for specific tasks" data-th="การปรับแต่งสำหรับงานเฉพาะ">Fine-tuning for specific tasks</li>
+                            <li data-en="RLHF (Reinforcement Learning from Human Feedback)" data-th="RLHF (การเรียนรู้เสริมแรงจากข้อมูลป้อนกลับของมนุษย์)">RLHF (Reinforcement Learning from Human Feedback)</li>
+                            <li data-en="Alignment with human values" data-th="การจัดแนวเข้ากับค่านิยมของมนุษย์">Alignment with human values</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Popular LLMs -->
+        <div class="slide" data-slide="7">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Popular LLM Models" data-th="โมเดล LLM ยอดนิยม">Popular LLM Models</h2>
+            </div>
+            <div class="slide-content">
+                <div class="three-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="OpenAI GPT Series" data-th="ซีรีส์ GPT ของ OpenAI">OpenAI GPT Series</h3>
+                        <div class="highlight-box">
+                            <ul class="content-list">
+                                <li><strong>GPT-4/4o</strong> - <span data-en="Most capable, multimodal" data-th="มีความสามารถสูงสุด หลายรูปแบบ">Most capable, multimodal</span></li>
+                                <li><strong>ChatGPT</strong> - <span data-en="Conversational interface" data-th="อินเทอร์เฟซการสนทนา">Conversational interface</span></li>
+                                <li><strong data-en="Applications:" data-th="การใช้งาน:">Applications:</strong> <span data-en="Writing, coding, analysis" data-th="การเขียน การเขียนโค้ด การวิเคราะห์">Writing, coding, analysis</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Anthropic Claude" data-th="Claude ของ Anthropic">Anthropic Claude</h3>
+                        <div class="highlight-box">
+                            <ul class="content-list">
+                                <li><strong>Claude 3/3.5</strong> - <span data-en="Helpful, harmless, honest" data-th="มีประโยชน์ ไม่เป็นอันตราย ซื่อสัตย์">Helpful, harmless, honest</span></li>
+                                <li><strong data-en="Focus:" data-th="จุดเน้น:">Focus:</strong> <span data-en="Safety and alignment" data-th="ความปลอดภัยและการจัดแนว">Safety and alignment</span></li>
+                                <li><strong data-en="Strengths:" data-th="จุดแข็ง:">Strengths:</strong> <span data-en="Long conversations, reasoning" data-th="การสนทนายาว การใช้เหตุผล">Long conversations, reasoning</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Other Notable Models" data-th="โมเดลที่น่าสนใจอื่นๆ">Other Notable Models</h3>
+                        <div class="highlight-box">
+                            <ul class="content-list">
+                                <li><strong>Google Gemini</strong> - <span data-en="Multimodal, integrated" data-th="หลายรูปแบบ บูรณาการ">Multimodal, integrated</span></li>
+                                <li><strong>Meta Llama</strong> - <span data-en="Open source" data-th="โอเพนซอร์ส">Open source</span></li>
+                                <li><strong>Mistral AI</strong> - <span data-en="Efficient, European" data-th="มีประสิทธิภาพ ยุโรป">Efficient, European</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Introduction to Prompting -->
+        <div class="slide" data-slide="8">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Introduction to Prompt Engineering" data-th="ความรู้เบื้องต้นเกี่ยวกับ Prompt Engineering">Introduction to Prompt Engineering</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="What is a Prompt?" data-th="Prompt คืออะไร?">What is a Prompt?</h3>
+                    <ul class="content-list">
+                        <li data-en="Text input that guides AI to produce desired output" data-th="ข้อความป้อนเข้าที่นำทาง AI ให้ผลิตผลลัพธ์ที่ต้องการ">Text input that guides AI to produce desired output</li>
+                        <li data-en="Instructions, context, and examples for the AI" data-th="คำแนะนำ บริบท และตัวอย่างสำหรับ AI">Instructions, context, and examples for the AI</li>
+                        <li data-en="The interface between human intent and AI capability" data-th="อินเทอร์เฟซระหว่างความตั้งใจของมนุษย์และความสามารถของ AI">The interface between human intent and AI capability</li>
+                    </ul>
+                </div>
+                
+                <div class="two-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Why Prompting Matters:" data-th="ทำไม Prompting จึงสำคัญ:">Why Prompting Matters:</h3>
+                        <ul class="content-list">
+                            <li data-en="Determines quality of AI output" data-th="กำหนดคุณภาพของผลลัพธ์ AI">Determines quality of AI output</li>
+                            <li data-en="Can improve accuracy by 50%+" data-th="สามารถเพิ่มความแม่นยำได้ 50%+">Can improve accuracy by 50%+</li>
+                            <li data-en="Reduces need for fine-tuning" data-th="ลดความจำเป็นในการปรับแต่ง">Reduces need for fine-tuning</li>
+                            <li data-en="Cost-effective way to optimize AI" data-th="วิธีที่คุ้มต้นทุนในการเพิ่มประสิทธิภาพ AI">Cost-effective way to optimize AI</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Key Components:" data-th="องค์ประกอบสำคัญ:">Key Components:</h3>
+                        <ul class="content-list">
+                            <li data-en="Task description" data-th="คำอธิบายงาน">Task description</li>
+                            <li data-en="Context and background" data-th="บริบทและพื้นหลัง">Context and background</li>
+                            <li data-en="Examples (few-shot learning)" data-th="ตัวอย่าง (การเรียนรู้แบบ few-shot)">Examples (few-shot learning)</li>
+                            <li data-en="Output format specifications" data-th="ข้อกำหนดรูปแบบผลลัพธ์">Output format specifications</li>
+                            <li data-en="Constraints and guidelines" data-th="ข้อจำกัดและแนวทาง">Constraints and guidelines</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Basic Prompting Techniques -->
+        <div class="slide" data-slide="9">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Basic Prompting Techniques" data-th="เทคนิคการเขียน Prompt พื้นฐาน">Basic Prompting Techniques</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="1. Clear and Specific Instructions" data-th="1. คำแนะนำที่ชัดเจนและเฉพาะเจาะจง">1. Clear and Specific Instructions</h3>
+                    
+                    <div class="two-column">
+                        <div class="bad-example">
+                            <strong data-en="❌ Poor Prompt:" data-th="❌ Prompt ที่ไม่ดี:">❌ Poor Prompt:</strong>
+                            <div class="prompt-example" data-en="Write about AI" data-th="เขียนเกี่ยวกับ AI">Write about AI</div>
+                        </div>
+                        
+                        <div class="good-example">
+                            <strong data-en="✅ Better Prompt:" data-th="✅ Prompt ที่ดีกว่า:">✅ Better Prompt:</strong>
+                            <div class="prompt-example" data-en="Write a 300-word explanation of artificial intelligence for high school students, focusing on practical applications in daily life." data-th="เขียนคำอธิบายเกี่ยวกับปัญญาประดิษฐ์ 300 คำสำหรับนักเรียนมัธยมปลาย โดยเน้นการใช้งานจริงในชีวิตประจำวัน">เขียนคำอธิบายเกี่ยวกับปัญญาประดิษฐ์ 300 คำสำหรับนักเรียนมัธยมปลาย โดยเน้นการใช้งานจริงในชีวิตประจำวัน</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="content-section">
+                    <h3 class="section-title" data-en="2. Provide Context and Background" data-th="2. ให้บริบทและพื้นหลัง">2. Provide Context and Background</h3>
+                    
+                    <div class="good-example">
+                        <div class="prompt-example" data-en="You are a professional data scientist explaining machine learning to business executives. They need to understand ROI and practical implementation. Explain gradient descent in simple terms." data-th="คุณเป็นนักวิทยาศาสตร์ข้อมูลมืออาชีพที่อธิบาย machine learning ให้ผู้บริหารธุรกิจฟัง พวกเขาต้องการเข้าใจ ROI และการนำไปใช้จริง อธิบาย gradient descent ด้วยคำศัพท์ง่ายๆ">คุณเป็นนักวิทยาศาสตร์ข้อมูลมืออาชีพที่อธิบาย machine learning ให้ผู้บริหารธุรกิจฟัง พวกเขาต้องการเข้าใจ ROI และการนำไปใช้จริง อธิบาย gradient descent ด้วยคำศัพท์ง่ายๆ</div>
+                    </div>
+                </div>
+                
+                <div class="content-section">
+                    <h3 class="section-title" data-en="3. Use Examples (Few-shot Learning)" data-th="3. ใช้ตัวอย่าง (การเรียนรู้แบบ Few-shot)">3. Use Examples (Few-shot Learning)</h3>
+                    
+                    <div class="good-example">
+                        <div class="prompt-example">
+                            <span data-en="Classify the sentiment of these reviews:" data-th="จำแนกอารมณ์ของรีวิวเหล่านี้:">จำแนกอารมณ์ของรีวิวเหล่านี้:</span><br>
+                            <span data-en="Example 1: 'Great product!' → Positive" data-th="ตัวอย่าง 1: 'สินค้าดีมาก!' → เชิงบวก">ตัวอย่าง 1: 'สินค้าดีมาก!' → เชิงบวก</span><br>
+                            <span data-en="Example 2: 'Terrible service' → Negative" data-th="ตัวอย่าง 2: 'บริการแย่มาก' → เชิงลบ">ตัวอย่าง 2: 'บริการแย่มาก' → เชิงลบ</span><br>
+                            <span data-en="Now classify: 'The delivery was fast but the product quality could be better'" data-th="ตอนนี้จำแนก: 'การส่งเร็ว แต่คุณภาพสินค้าอาจจะดีกว่านี้ได้'">ตอนนี้จำแนก: 'การส่งเร็ว แต่คุณภาพสินค้าอาจจะดีกว่านี้ได้'</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Advanced Prompting Techniques -->
+        <div class="slide" data-slide="10">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Advanced Prompting Techniques" data-th="เทคนิคการเขียน Prompt ขั้นสูง">Advanced Prompting Techniques</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Chain-of-Thought (CoT) Prompting" data-th="การ Prompt แบบ Chain-of-Thought (CoT)">Chain-of-Thought (CoT) Prompting</h3>
+                    
+                    <div class="good-example">
+                        <div class="prompt-example">
+                            <span data-en="Solve this step by step:" data-th="แก้ปัญหานี้ทีละขั้นตอน:">แก้ปัญหานี้ทีละขั้นตอน:</span><br>
+                            <span data-en="A company has 120 employees. 30% work remotely, and 25% of remote workers are part-time. How many part-time remote workers are there?" data-th="บริษัทมีพนักงาน 120 คน 30% ทำงานระยะไกล และ 25% ของคนทำงานระยะไกลเป็นพาร์ตไทม์ มีพนักงานระยะไกลแบบพาร์ตไทม์กี่คน?">บริษัทมีพนักงาน 120 คน 30% ทำงานระยะไกล และ 25% ของคนทำงานระยะไกลเป็นพาร์ตไทม์ มีพนักงานระยะไกลแบบพาร์ตไทม์กี่คน?</span><br><br>
+                            <span data-en="Let me think step by step:" data-th="ให้ฉันคิดทีละขั้นตอน:">ให้ฉันคิดทีละขั้นตอน:</span><br>
+                            <span data-en="Step 1: Calculate remote workers..." data-th="ขั้นตอน 1: คำนวณคนทำงานระยะไกล...">ขั้นตอน 1: คำนวณคนทำงานระยะไกล...</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="two-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Role-based Prompting" data-th="การ Prompt แบบกำหนดบทบาท">Role-based Prompting</h3>
+                        
+                        <div class="good-example">
+                            <div class="prompt-example">
+                                <span data-en="Act as a senior marketing strategist with 15 years of experience. Analyze this campaign..." data-th="ทำหน้าที่เป็นนักกลยุทธ์การตลาดอาวุโสที่มีประสบการณ์ 15 ปี วิเคราะห์แคมเปญนี้...">ทำหน้าที่เป็นนักกลยุทธ์การตลาดอาวุโสที่มีประสบการณ์ 15 ปี วิเคราะห์แคมเปญนี้...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Template Prompting" data-th="การ Prompt แบบเทมเพลต">Template Prompting</h3>
+                        
+                        <div class="good-example">
+                            <div class="prompt-example">
+                                <span data-en="Format your response as:" data-th="จัดรูปแบบการตอบเป็น:">จัดรูปแบบการตอบเป็น:</span><br>
+                                <span data-en="**Summary:** [brief overview]" data-th="**สรุป:** [ภาพรวมสั้นๆ]">**สรุป:** [ภาพรวมสั้นๆ]</span><br>
+                                <span data-en="**Key Points:** [3-5 bullets]" data-th="**ประเด็นสำคัญ:** [3-5 ข้อ]">**ประเด็นสำคัญ:** [3-5 ข้อ]</span><br>
+                                <span data-en="**Action Items:** [recommendations]" data-th="**การปฏิบัติ:** [ข้อแนะนำ]">**การปฏิบัติ:** [ข้อแนะนำ]</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Prompt Optimization Strategies -->
+        <div class="slide" data-slide="11">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Prompt Optimization Strategies" data-th="กลยุทธ์การปรับปรุง Prompt">Prompt Optimization Strategies</h2>
+            </div>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Best Practices:" data-th="แนวปฏิบัติที่ดีที่สุด:">Best Practices:</h3>
+                        <ul class="content-list">
+                            <li><span class="step-number">1</span><span data-en="Be specific and detailed" data-th="เฉพาะเจาะจงและละเอียด">เฉพาะเจาะจงและละเอียด</span></li>
+                            <li><span class="step-number">2</span><span data-en="Set clear expectations" data-th="กำหนดความคาดหวังที่ชัดเจน">กำหนดความคาดหวังที่ชัดเจน</span></li>
+                            <li><span class="step-number">3</span><span data-en="Use positive instructions" data-th="ใช้คำแนะนำเชิงบวก">ใช้คำแนะนำเชิงบวก</span></li>
+                            <li><span class="step-number">4</span><span data-en="Iterate and test variations" data-th="ทำซ้ำและทดสอบแบบต่างๆ">ทำซ้ำและทดสอบแบบต่างๆ</span></li>
+                            <li><span class="step-number">5</span><span data-en="Include relevant context" data-th="รวมบริบทที่เกี่ยวข้อง">รวมบริบทที่เกี่ยวข้อง</span></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Common Mistakes:" data-th="ข้อผิดพลาดทั่วไป:">Common Mistakes:</h3>
+                        <ul class="content-list">
+                            <li data-en="Too vague or ambiguous" data-th="คลุมเครือหรือไม่ชัดเจนเกินไป">คลุมเครือหรือไม่ชัดเจนเกินไป</li>
+                            <li data-en="Conflicting instructions" data-th="คำแนะนำที่ขัดแย้งกัน">คำแนะนำที่ขัดแย้งกัน</li>
+                            <li data-en="Too many tasks at once" data-th="งานมากเกินไปในครั้งเดียว">งานมากเกินไปในครั้งเดียว</li>
+                            <li data-en="Assuming AI knows context" data-th="คิดว่า AI รู้บริบท">คิดว่า AI รู้บริบท</li>
+                            <li data-en="Not testing different approaches" data-th="ไม่ทดสอบแนวทางต่างๆ">ไม่ทดสอบแนวทางต่างๆ</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3 class="section-title" data-en="Optimization Framework:" data-th="กรอบการปรับปรุง:">Optimization Framework:</h3>
+                    <div class="three-column">
+                        <div>
+                            <strong data-en="1. Analyze" data-th="1. วิเคราะห์">1. วิเคราะห์</strong><br>
+                            <span data-en="What went wrong?" data-th="อะไรผิดพลาด?">อะไรผิดพลาด?</span>
+                        </div>
+                        <div>
+                            <strong data-en="2. Refine" data-th="2. ปรับปรุง">2. ปรับปรุง</strong><br>
+                            <span data-en="Add clarity, examples" data-th="เพิ่มความชัดเจน ตัวอย่าง">เพิ่มความชัดเจน ตัวอย่าง</span>
+                        </div>
+                        <div>
+                            <strong data-en="3. Test" data-th="3. ทดสอบ">3. ทดสอบ</strong><br>
+                            <span data-en="Compare results" data-th="เปรียบเทียบผล">เปรียบเทียบผล</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Domain-Specific Prompting -->
+        <div class="slide" data-slide="12">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Domain-Specific Prompting Examples" data-th="ตัวอย่างการ Prompt ตามสาขาเฉพาะ">Domain-Specific Prompting Examples</h2>
+            </div>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Business Analysis" data-th="การวิเคราะห์ธุรกิจ">Business Analysis</h3>
+                        <div class="good-example">
+                            <div class="prompt-example">
+                                <span data-en="As a business analyst, analyze this quarterly sales data. Identify trends, potential issues, and actionable recommendations. Present findings in executive summary format with specific metrics and timelines." data-th="ในฐานะนักวิเคราะห์ธุรกิจ วิเคราะห์ข้อมูลยอดขายรายไตรมาสนี้ ระบุแนวโน้ม ปัญหาที่อาจเกิดขึ้น และข้อแนะนำที่ปฏิบัติได้ นำเสนอผลการวิเคราะห์ในรูปแบบสรุปผู้บริหารพร้อมตัวชี้วัดและกรอบเวลาที่เฉพาะเจาะจง">ในฐานะนักวิเคราะห์ธุรกิจ วิเคราะห์ข้อมูลยอดขายรายไตรมาสนี้ ระบุแนวโน้ม ปัญหาที่อาจเกิดขึ้น และข้อแนะนำที่ปฏิบัติได้ นำเสนอผลการวิเคราะห์ในรูปแบบสรุปผู้บริหารพร้อมตัวชี้วัดและกรอบเวลาที่เฉพาะเจาะจง</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Content Creation" data-th="การสร้างเนื้อหา">Content Creation</h3>
+                        <div class="good-example">
+                            <div class="prompt-example">
+                                <span data-en="Write a 500-word blog post about sustainable technology for young professionals aged 25-35. Use an engaging, conversational tone. Include 3 actionable tips they can implement immediately. Target keywords: 'sustainable tech', 'eco-friendly workplace'." data-th="เขียนบล็อกโพสต์ 500 คำเกี่ยวกับเทคโนโลยีที่ยั่งยืนสำหรับวัยทำงานอายุ 25-35 ปี ใช้โทนสนทนาที่น่าสนใจ รวม 3 เคล็ดลับที่สามารถนำไปใช้ได้ทันที คำหลัก: 'เทคโนโลยียั่งยืน', 'ที่ทำงานเป็นมิตรกับสิ่งแวดล้อม'">เขียนบล็อกโพสต์ 500 คำเกี่ยวกับเทคโนโลยีที่ยั่งยืนสำหรับวัยทำงานอายุ 25-35 ปี ใช้โทนสนทนาที่น่าสนใจ รวม 3 เคล็ดลับที่สามารถนำไปใช้ได้ทันที คำหลัก: 'เทคโนโลยียั่งยืน', 'ที่ทำงานเป็นมิตรกับสิ่งแวดล้อม'</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="two-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Code Generation" data-th="การสร้างโค้ด">Code Generation</h3>
+                        <div class="good-example">
+                            <div class="prompt-example">
+                                <span data-en="Create a Python function that validates email addresses using regex. Include error handling, comments, and unit tests. Follow PEP 8 standards. The function should return boolean and handle edge cases like international domains." data-th="สร้างฟังก์ชัน Python ที่ตรวจสอบความถูกต้องของอีเมลโดยใช้ regex รวมการจัดการข้อผิดพลาด คอมเมนต์ และการทดสอบหน่วย ตาม PEP 8 standards ฟังก์ชันควรคืนค่า boolean และจัดการกรณีพิเศษเช่นโดเมนต่างประเทศ">สร้างฟังก์ชัน Python ที่ตรวจสอบความถูกต้องของอีเมลโดยใช้ regex รวมการจัดการข้อผิดพลาด คอมเมนต์ และการทดสอบหน่วย ตาม PEP 8 standards ฟังก์ชันควรคืนค่า boolean และจัดการกรณีพิเศษเช่นโดเมนต่างประเทศ</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Educational Content" data-th="เนื้อหาการศึกษา">Educational Content</h3>
+                        <div class="good-example">
+                            <div class="prompt-example">
+                                <span data-en="Explain quantum computing to a 12-year-old using analogies and simple language. Include 2 real-world applications. Make it interactive with 3 questions they can think about. Keep it under 200 words." data-th="อธิบายการคำนวณควอนตัมให้เด็กอายุ 12 ปีฟังโดยใช้การเปรียบเทียบและภาษาง่ายๆ รวมการใช้งานจริง 2 ตัวอย่าง ทำให้เป็นแบบโต้ตอบด้วยคำถาม 3 ข้อที่เขาสามารถคิดได้ ให้อยู่ในขอบเขต 200 คำ">อธิบายการคำนวณควอนตัมให้เด็กอายุ 12 ปีฟังโดยใช้การเปรียบเทียบและภาษาง่ายๆ รวมการใช้งานจริง 2 ตัวอย่าง ทำให้เป็นแบบโต้ตอบด้วยคำถาม 3 ข้อที่เขาสามารถคิดได้ ให้อยู่ในขอบเขต 200 คำ</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Prompt Safety and Ethics -->
+        <div class="slide" data-slide="13">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Prompt Safety and Ethics" data-th="ความปลอดภัยและจริยธรรมในการใช้ Prompt">Prompt Safety and Ethics</h2>
+            </div>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Responsible Prompting:" data-th="การใช้ Prompt อย่างรับผิดชอบ:">Responsible Prompting:</h3>
+                        <ul class="content-list">
+                            <li data-en="Avoid prompts that could generate harmful content" data-th="หลีกเลี่ยงการ prompt ที่อาจสร้างเนื้อหาที่เป็นอันตราย">หลีกเลี่ยงการ prompt ที่อาจสร้างเนื้อหาที่เป็นอันตราย</li>
+                            <li data-en="Be mindful of bias in prompts and outputs" data-th="ระวังอคติในการ prompt และผลลัพธ์">ระวังอคติในการ prompt และผลลัพธ์</li>
+                            <li data-en="Respect privacy and confidentiality" data-th="เคารพความเป็นส่วนตัวและความลับ">เคารพความเป็นส่วนตัวและความลับ</li>
+                            <li data-en="Consider the impact of AI-generated content" data-th="พิจารณาผลกระทบของเนื้อหาที่ AI สร้าง">พิจารณาผลกระทบของเนื้อหาที่ AI สร้าง</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Data Protection:" data-th="การป้องกันข้อมูล:">Data Protection:</h3>
+                        <ul class="content-list">
+                            <li data-en="Don't include sensitive personal information" data-th="ไม่รวมข้อมูลส่วนบุคคลที่ละเอียดอ่อน">ไม่รวมข้อมูลส่วนบุคคลที่ละเอียดอ่อน</li>
+                            <li data-en="Avoid proprietary business data" data-th="หลีกเลี่ยงข้อมูลธุรกิจที่เป็นกรรมสิทธิ์">หลีกเลี่ยงข้อมูลธุรกิจที่เป็นกรรมสิทธิ์</li>
+                            <li data-en="Be aware of data retention policies" data-th="ทราบนโยบายการเก็บข้อมูล">ทราบนโยบายการเก็บข้อมูล</li>
+                            <li data-en="Use anonymized examples when possible" data-th="ใช้ตัวอย่างที่ไม่ระบุตัวตนเมื่อเป็นไปได้">ใช้ตัวอย่างที่ไม่ระบุตัวตนเมื่อเป็นไปได้</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3 class="section-title" data-en="Guidelines for Ethical AI Use:" data-th="แนวทางการใช้ AI อย่างมีจริยธรรม:">Guidelines for Ethical AI Use:</h3>
+                    <div class="three-column">
+                        <div>
+                            <strong data-en="Transparency" data-th="ความโปร่งใส">ความโปร่งใส</strong><br>
+                            <span data-en="Disclose AI assistance when appropriate" data-th="เปิดเผยการใช้ AI เมื่อเหมาะสม">เปิดเผยการใช้ AI เมื่อเหมาะสม</span>
+                        </div>
+                        <div>
+                            <strong data-en="Accuracy" data-th="ความถูกต้อง">ความถูกต้อง</strong><br>
+                            <span data-en="Verify important information" data-th="ตรวจสอบข้อมูลสำคัญ">ตรวจสอบข้อมูลสำคัญ</span>
+                        </div>
+                        <div>
+                            <strong data-en="Accountability" data-th="ความรับผิดชอบ">ความรับผิดชอบ</strong><br>
+                            <span data-en="Take responsibility for AI outputs" data-th="รับผิดชอบต่อผลลัพธ์ของ AI">รับผิดชอบต่อผลลัพธ์ของ AI</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Tools and Platforms -->
+        <div class="slide" data-slide="14">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Prompting Tools and Platforms" data-th="เครื่องมือและแพลตฟอร์มสำหรับ Prompting">Prompting Tools and Platforms</h2>
+            </div>
+            <div class="slide-content">
+                <div class="three-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Popular Platforms" data-th="แพลตฟอร์มยอดนิยม">Popular Platforms</h3>
+                        <div class="highlight-box">
+                            <ul class="content-list">
+                                <li><strong>ChatGPT</strong> - <span data-en="User-friendly interface" data-th="อินเทอร์เฟซใช้งานง่าย">อินเทอร์เฟซใช้งานง่าย</span></li>
+                                <li><strong>Claude</strong> - <span data-en="Long context conversations" data-th="การสนทนาบริบทยาว">การสนทนาบริบทยาว</span></li>
+                                <li><strong>Google Gemini</strong> - <span data-en="Multimodal capabilities" data-th="ความสามารถหลายรูปแบบ">ความสามารถหลายรูปแบบ</span></li>
+                                <li><strong>Microsoft Copilot</strong> - <span data-en="Office integration" data-th="การบูรณาการ Office">การบูรณาการ Office</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Developer Tools" data-th="เครื่องมือนักพัฒนา">Developer Tools</h3>
+                        <div class="highlight-box">
+                            <ul class="content-list">
+                                <li><strong>OpenAI API</strong> - <span data-en="Programmable access" data-th="การเข้าถึงแบบโปรแกรม">การเข้าถึงแบบโปรแกรม</span></li>
+                                <li><strong>LangChain</strong> - <span data-en="Prompt chaining framework" data-th="กรอบการเชื่อม prompt">กรอบการเชื่อม prompt</span></li>
+                                <li><strong>Prompt Hub</strong> - <span data-en="Template repositories" data-th="คลังเทมเพลต">คลังเทมเพลต</span></li>
+                                <li><strong>Weights & Biases</strong> - <span data-en="Prompt tracking" data-th="การติดตาม prompt">การติดตาม prompt</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Specialized Tools" data-th="เครื่องมือเฉพาะทาง">Specialized Tools</h3>
+                        <div class="highlight-box">
+                            <ul class="content-list">
+                                <li><strong>PromptPerfect</strong> - <span data-en="Prompt optimization" data-th="การปรับปรุง prompt">การปรับปรุง prompt</span></li>
+                                <li><strong>Promptly</strong> - <span data-en="Team collaboration" data-th="การทำงานร่วมกันของทีม">การทำงานร่วมกันของทีม</span></li>
+                                <li><strong>PromptLayer</strong> - <span data-en="Analytics and logging" data-th="การวิเคราะห์และการบันทึก">การวิเคราะห์และการบันทึก</span></li>
+                                <li><strong>Anthropic Workbench</strong> - <span data-en="Advanced testing" data-th="การทดสอบขั้นสูง">การทดสอบขั้นสูง</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3 class="section-title" data-en="Choosing the Right Tool:" data-th="การเลือกเครื่องมือที่เหมาะสม:">การเลือกเครื่องมือที่เหมาะสม:</h3>
+                    <ul class="content-list">
+                        <li data-en="Consider your use case: personal, business, or development" data-th="พิจารณาการใช้งาน: ส่วนตัว ธุรกิจ หรือการพัฒนา">พิจารณาการใช้งาน: ส่วนตัว ธุรกิจ หรือการพัฒนา</li>
+                        <li data-en="Evaluate cost, features, and integration needs" data-th="ประเมินต้นทุน ฟีเจอร์ และความต้องการการบูรณาการ">ประเมินต้นทุน ฟีเจอร์ และความต้องการการบูรณาการ</li>
+                        <li data-en="Test multiple platforms to find the best fit" data-th="ทดสอบหลายแพลตฟอร์มเพื่อหาที่เหมาะสมที่สุด">ทดสอบหลายแพลตฟอร์มเพื่อหาที่เหมาะสมที่สุด</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Future of AI and Prompting -->
+        <div class="slide" data-slide="15">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Future of AI and Prompting" data-th="อนาคตของ AI และการ Prompting">Future of AI and Prompting</h2>
+            </div>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Emerging Trends:" data-th="แนวโน้มใหม่:">Emerging Trends:</h3>
+                        <ul class="content-list">
+                            <li data-en="Multimodal prompting (text + images + audio)" data-th="การ prompt หลายรูปแบบ (ข้อความ + ภาพ + เสียง)">การ prompt หลายรูปแบบ (ข้อความ + ภาพ + เสียง)</li>
+                            <li data-en="Automated prompt optimization" data-th="การปรับปรุง prompt อัตโนมัติ">การปรับปรุง prompt อัตโนมัติ</li>
+                            <li data-en="Context-aware AI assistants" data-th="ผู้ช่วย AI ที่ตระหนักถึงบริบท">ผู้ช่วย AI ที่ตระหนักถึงบริบท</li>
+                            <li data-en="Real-time collaborative prompting" data-th="การ prompt ร่วมกันแบบเรียลไทม์">การ prompt ร่วมกันแบบเรียลไทม์</li>
+                            <li data-en="Domain-specific prompt libraries" data-th="คลัง prompt เฉพาะสาขา">คลัง prompt เฉพาะสาขา</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Potential Challenges:" data-th="ความท้าทายที่อาจเกิดขึ้น:">Potential Challenges:</h3>
+                        <ul class="content-list">
+                            <li data-en="AI becoming too dependent on specific prompts" data-th="AI พึ่งพา prompt เฉพาะเจาะจงมากเกินไป">AI พึ่งพา prompt เฉพาะเจาะจงมากเกินไป</li>
+                            <li data-en="Prompt injection and security vulnerabilities" data-th="การแทรก prompt และช่องโหว่ด้านความปลอดภัย">การแทรก prompt และช่องโหว่ด้านความปลอดภัย</li>
+                            <li data-en="Quality control in automated prompting" data-th="การควบคุมคุณภาพใน prompting อัตโนมัติ">การควบคุมคุณภาพใน prompting อัตโนมัติ</li>
+                            <li data-en="Balancing AI capability with human oversight" data-th="การสมดุลระหว่างความสามารถ AI และการควบคุมของมนุษย์">การสมดุลระหว่างความสามารถ AI และการควบคุมของมนุษย์</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3 class="section-title" data-en="Preparing for the Future:" data-th="การเตรียมตัวสำหรับอนาคต:">การเตรียมตัวสำหรับอนาคต:</h3>
+                    <div class="three-column">
+                        <div>
+                            <strong data-en="Continuous Learning" data-th="การเรียนรู้อย่างต่อเนื่อง">การเรียนรู้อย่างต่อเนื่อง</strong><br>
+                            <span data-en="Stay updated with AI developments" data-th="ติดตามการพัฒนา AI">ติดตามการพัฒนา AI</span>
+                        </div>
+                        <div>
+                            <strong data-en="Skill Development" data-th="การพัฒนาทักษะ">การพัฒนาทักษะ</strong><br>
+                            <span data-en="Master prompt engineering techniques" data-th="เชี่ยวชาญเทคนิค prompt engineering">เชี่ยวชาญเทคนิค prompt engineering</span>
+                        </div>
+                        <div>
+                            <strong data-en="Ethical Practice" data-th="การปฏิบัติอย่างมีจริยธรรม">การปฏิบัติอย่างมีจริยธรรม</strong><br>
+                            <span data-en="Maintain responsible AI usage" data-th="รักษาการใช้ AI อย่างรับผิดชอบ">รักษาการใช้ AI อย่างรับผิดชอบ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Practical Exercise -->
+        <div class="slide" data-slide="16">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Practical Exercise: Improve This Prompt" data-th="แบบฝึกหัดปฏิบัติ: ปรับปรุง Prompt นี้">Practical Exercise: Improve This Prompt</h2>
+            </div>
+            <div class="slide-content">
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Original Prompt (Poor Example):" data-th="Prompt ต้นฉบับ (ตัวอย่างที่ไม่ดี):">Original Prompt (Poor Example):</h3>
+                    <div class="bad-example">
+                        <div class="prompt-example" data-en="Write something about marketing for my business." data-th="เขียนบางอย่างเกี่ยวกับการตลาดสำหรับธุรกิจของฉัน">เขียนบางอย่างเกี่ยวกับการตลาดสำหรับธุรกิจของฉัน</div>
+                    </div>
+                </div>
+                
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Your Task:" data-th="งานของคุณ:">Your Task:</h3>
+                    <ul class="content-list">
+                        <li data-en="Identify what's missing in the original prompt" data-th="ระบุสิ่งที่ขาดหายไปใน prompt ต้นฉบับ">ระบุสิ่งที่ขาดหายไปใน prompt ต้นฉบับ</li>
+                        <li data-en="Consider: Context, specificity, desired output format" data-th="พิจารณา: บริบท ความเฉพาะเจาะจง รูปแบบผลลัพธ์ที่ต้องการ">พิจารณา: บริบท ความเฉพาะเจาะจง รูปแบบผลลัพธ์ที่ต้องการ</li>
+                        <li data-en="Rewrite the prompt using techniques learned" data-th="เขียน prompt ใหม่โดยใช้เทคนิคที่เรียนมา">เขียน prompt ใหม่โดยใช้เทคนิคที่เรียนมา</li>
+                    </ul>
+                </div>
+                
+                <div class="content-section">
+                    <h3 class="section-title" data-en="Improved Version (Example):" data-th="เวอร์ชันที่ปรับปรุงแล้ว (ตัวอย่าง):">Improved Version (Example):</h3>
+                    <div class="good-example">
+                        <div class="prompt-example">
+                            <span data-en="Act as a senior marketing strategist. Create a comprehensive digital marketing plan for a small Thai restaurant in Bangkok targeting young professionals aged 25-35. Include:" data-th="ทำหน้าที่เป็นนักกลยุทธ์การตลาดอาวุโส สร้างแผนการตลาดดิจิทัลที่ครอบคลุมสำหรับร้านอาหารไทยเล็กๆ ในกรุงเทพฯ โดยกำหนดเป้าหมายวัยทำงาน 25-35 ปี รวมถึง:">ทำหน้าที่เป็นนักกลยุทธ์การตลาดอาวุโส สร้างแผนการตลาดดิจิทัลที่ครอบคลุมสำหรับร้านอาหารไทยเล็กๆ ในกรุงเทพฯ โดยกำหนดเป้าหมายวัยทำงาน 25-35 ปี รวมถึง:</span><br>
+                            <span data-en="- 3 social media strategies with specific platforms" data-th="- กลยุทธ์โซเชียลมีเดีย 3 อย่างพร้อมแพลตฟอร์มเฉพาะ">- กลยุทธ์โซเชียลมีเดีย 3 อย่างพร้อมแพลตฟอร์มเฉพาะ</span><br>
+                            <span data-en="- Budget breakdown for 3-month campaign" data-th="- การแบ่งงบประมาณสำหรับแคมเปญ 3 เดือน">- การแบ่งงบประมาณสำหรับแคมเปญ 3 เดือน</span><br>
+                            <span data-en="- Key performance indicators (KPIs)" data-th="- ตัวชี้วัดประสิทธิภาพหลัก (KPIs)">- ตัวชี้วัดประสิทธิภาพหลัก (KPIs)</span><br>
+                            <span data-en="Format as executive summary with actionable steps." data-th="จัดรูปแบบเป็นสรุปผู้บริหารพร้อมขั้นตอนที่ปฏิบัติได้">จัดรูปแบบเป็นสรุปผู้บริหารพร้อมขั้นตอนที่ปฏิบัติได้</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Key Resources and Learning -->
+        <div class="slide" data-slide="17">
+            <div class="slide-header">
+                <h2 class="slide-title" data-en="Resources for Continued Learning" data-th="แหล่งข้อมูลสำหรับการเรียนรู้ต่อ">Resources for Continued Learning</h2>
+            </div>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Learning Resources:" data-th="แหล่งข้อมูลการเรียนรู้:">Learning Resources:</h3>
+                        <ul class="content-list">
+                            <li data-en="OpenAI Prompt Engineering Guide" data-th="คู่มือ Prompt Engineering ของ OpenAI">คู่มือ Prompt Engineering ของ OpenAI</li>
+                            <li data-en="Anthropic's Prompt Library" data-th="คลัง Prompt ของ Anthropic">คลัง Prompt ของ Anthropic</li>
+                            <li data-en="DeepLearning.AI Courses" data-th="หลักสูตร DeepLearning.AI">หลักสูตร DeepLearning.AI</li>
+                            <li data-en="MIT OpenCourseWare on AI" data-th="MIT OpenCourseWare ด้าน AI">MIT OpenCourseWare ด้าน AI</li>
+                            <li data-en="Papers with Code (Research papers)" data-th="Papers with Code (เอกสารวิจัย)">Papers with Code (เอกสารวิจัย)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="content-section">
+                        <h3 class="section-title" data-en="Communities & Forums:" data-th="ชุมชนและฟอรัม:">Communities & Forums:</h3>
+                        <ul class="content-list">
+                            <li data-en="Reddit: r/MachineLearning, r/ChatGPT" data-th="Reddit: r/MachineLearning, r/ChatGPT">Reddit: r/MachineLearning, r/ChatGPT</li>
+                            <li data-en="Discord: AI/ML communities" data-th="Discord: ชุมชน AI/ML">Discord: ชุมชน AI/ML</li>
+                            <li data-en="LinkedIn AI groups" data-th="กลุ่ม AI บน LinkedIn">กลุ่ม AI บน LinkedIn</li>
+                            <li data-en="Stack Overflow AI tags" data-th="แท็ก AI บน Stack Overflow">แท็ก AI บน Stack Overflow</li>
+                            <li data-en="Local AI meetups and conferences" data-th="การพบปะและประชุม AI ท้องถิ่น">การพบปะและประชุม AI ท้องถิ่น</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="highlight-box">
+                    <h3 class="section-title" data-en="Next Steps for Skill Development:" data-th="ขั้นตอนต่อไปสำหรับการพัฒนาทักษะ:">ขั้นตอนต่อไปสำหรับการพัฒนาทักษะ:</h3>
+                    <div class="three-column">
+                        <div>
+                            <span class="step-number">1</span>
+                            <strong data-en="Practice Daily" data-th="ฝึกฝนทุกวัน">ฝึกฝนทุกวัน</strong><br>
+                            <span data-en="Try different prompting techniques" data-th="ลองเทคนิคการ prompt ต่างๆ">ลองเทคนิคการ prompt ต่างๆ</span>
+                        </div>
+                        <div>
+                            <span class="step-number">
