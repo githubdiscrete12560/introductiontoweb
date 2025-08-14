@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vector Operations & Matrix Transformations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .language-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+        }
+
+        .language-toggle:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .slide-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .slide {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 1000px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            display: none;
+            animation: slideIn 0.5s ease-out;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #1e3c72, #2a5298);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide h2 {
+            color: #34495e;
+            margin: 25px 0 15px 0;
+            font-size: 1.8em;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .slide h3 {
+            color: #2980b9;
+            margin: 20px 0 10px 0;
+            font-size: 1.4em;
+        }
+
+        .concept-box {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .formula-box {
+            background: #f8f9fa;
+            border: 2px solid #3498db;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        .interactive-example {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .interactive-example:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .solution {
+            background: #27ae60;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+            font-family: 'Courier New', monospace;
+        }
+
+        .solution.show {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .navigation {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-button {
+            background: linear-gradient(45deg, #1e3c72, #2a5298);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .math-expression {
+            background: #34495e;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .highlight {
+            background: #f39c12;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .vector-viz {
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .uses-list {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .uses-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .uses-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #bdc3c7;
+        }
+
+        .uses-list li:before {
+            content: "→ ";
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .matrix-display {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 10px;
+        }
+
+        .transform-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .transform-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        @media (max-width: 768px) {
+            .slide {
+                padding: 20px;
+                margin: 10px;
+            }
+            
+            .slide h1 {
+                font-size: 2em;
+            }
+            
+            .transform-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 id="header-title">Vector Operations & Matrix Transformations</h1>
+        <button class="language-toggle" onclick="toggleLanguage()">🇹🇭 ภาษาไทย</button>
+    </div>
+
+    <div class="slide-container">
+        <!-- Slide 1: Introduction -->
+        <div class="slide active">
+            <h1 data-en="Vector Operations & Matrix Transformations" data-th="การดำเนินการเวกเตอร์และการแปลงเมทริกซ์">Vector Operations & Matrix Transformations</h1>
+            
+            <div class="concept-box">
+                <h2 data-en="🎯 Vector Fundamentals" data-th="🎯 พื้นฐานเวกเตอร์">🎯 Vector Fundamentals</h2>
+                <p data-en="A vector v = (v₁, v₂, ..., vₙ) has magnitude and direction" data-th="เวกเตอร์ v = (v₁, v₂, ..., vₙ) มีขนาดและทิศทาง">A vector <strong>v</strong> = (v₁, v₂, ..., vₙ) has <span class="highlight">magnitude</span> and <span class="highlight">direction</span></p>
+            </div>
+
+            <div class="formula-box">
+                <p data-en="Magnitude: ||v|| = √(v₁² + v₂² + ... + vₙ²)" data-th="ขนาด: ||v|| = √(v₁² + v₂² + ... + vₙ²)"><strong>Magnitude:</strong> ||v|| = √(v₁² + v₂² + ... + vₙ²)</p>
+                <p data-en="Unit vector: v̂ = v/||v||" data-th="เวกเตอร์หน่วย: v̂ = v/||v||"><strong>Unit vector:</strong> v̂ = v/||v||</p>
+            </div>
+
+            <h2 data-en="Topics We'll Cover:" data-th="หัวข้อที่เราจะเรียน:">Topics We'll Cover:</h2>
+            <div class="uses-list">
+                <ul>
+                    <li data-en="Dot Product - measuring alignment between vectors" data-th="ดอทโปรดักต์ - การวัดความสอดคล้องระหว่างเวกเตอร์">Dot Product - measuring alignment between vectors</li>
+                    <li data-en="Cross Product - finding perpendicular vectors (3D)" data-th="ครอสโปรดักต์ - การหาเวกเตอร์ที่ตั้งฉากกัน (3มิติ)">Cross Product - finding perpendicular vectors (3D)</li>
+                    <li data-en="Matrix as Vectors - column and row perspectives" data-th="เมทริกซ์เป็นเวกเตอร์ - มุมมองแบบคอลัมน์และแถว">Matrix as Vectors - column and row perspectives</li>
+                    <li data-en="Matrix Transformations - geometric operations" data-th="การแปลงเมทริกซ์ - การดำเนินการทางเรขาคณิต">Matrix Transformations - geometric operations</li>
+                </ul>
+            </div>
+
+            <div class="vector-viz">
+                <h3 data-en="🌟 Why Learn This?" data-th="🌟 ทำไมต้องเรียนสิ่งนี้?">🌟 Why Learn This?</h3>
+                <p data-en="Essential for computer graphics, machine learning, robotics, and physics!" data-th="จำเป็นสำหรับคอมพิวเตอร์กราฟิกส์ การเรียนรู้ของเครื่อง หุ่นยนต์ และฟิสิกส์!">Essential for computer graphics, machine learning, robotics, and physics!</p>
+                <p data-en="💡 Tip: Use arrow keys to navigate, click examples for solutions, press 'L' to toggle language" data-th="💡 เคล็ดลับ: ใช้ลูกศรเพื่อนำทาง คลิกตัวอย่างเพื่อดูคำตอบ กด 'L' เพื่อเปลี่ยนภาษา">💡 Tip: Use arrow keys to navigate, click examples for solutions, press 'L' to toggle language</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Dot Product -->
+        <div class="slide">
+            <h1 data-en="Dot Product (a·b)" data-th="ดอทโปรดักต์ (a·b)">Dot Product (a·b)</h1>
+
+            <div class="concept-box">
+                <h2 data-en="Definition & Meaning" data-th="คำนิยามและความหมาย">Definition & Meaning</h2>
+                <p data-en="Measures alignment between vectors - how much they point in the same direction" data-th="วัดความสอดคล้องระหว่างเวกเตอร์ - มากน้อยแค่ไหนที่พวกเขาชี้ไปในทิศทางเดียวกัน">Measures <span class="highlight">alignment</span> between vectors - how much they point in the same direction</p>
+            </div>
+
+            <div class="formula-box">
+                <p data-en="Algebraic: a·b = a₁b₁ + a₂b₂ + ... + aₙbₙ" data-th="พีชคณิต: a·b = a₁b₁ + a₂b₂ + ... + aₙbₙ"><strong>Algebraic:</strong> a·b = a₁b₁ + a₂b₂ + ... + aₙbₙ</p>
+                <p data-en="Geometric: a·b = ||a|| ||b|| cos θ" data-th="เรขาคณิต: a·b = ||a|| ||b|| cos θ"><strong>Geometric:</strong> a·b = ||a|| ||b|| cos θ</p>
+            </div>
+
+            <div class="uses-list">
+                <h3 data-en="Key Applications:" data-th="การประยุกต์ใช้หลัก:">Key Applications:</h3>
+                <ul>
+                    <li data-en="Finding angles between vectors" data-th="หามุมระหว่างเวกเตอร์">Finding angles between vectors</li>
+                    <li data-en="Vector projections" data-th="การฉายเวกเตอร์">Vector projections</li>
+                    <li data-en="Cosine similarity in ML" data-th="ความคล้ายคลึงแบบโคไซน์ใน ML">Cosine similarity in ML</li>
+                    <li data-en="Work calculation in physics" data-th="การคำนวณงานในฟิสิกส์">Work calculation in physics</li>
+                </ul>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('dot1')">
+                <h3 data-en="Example 1: Basic Dot Product" data-th="ตัวอย่าง 1: ดอทโปรดักต์พื้นฐาน">Example 1: Basic Dot Product</h3>
+                <p data-en="Calculate: (2, 1, -1) · (3, 0, 4)" data-th="คำนวณ: (2, 1, -1) · (3, 0, 4)">Calculate: (2, 1, -1) · (3, 0, 4)</p>
+            </div>
+            <div class="solution" id="dot1">
+                <p data-en="a·b = (2)(3) + (1)(0) + (-1)(4) = 6 + 0 - 4 = 2" data-th="a·b = (2)(3) + (1)(0) + (-1)(4) = 6 + 0 - 4 = 2">a·b = (2)(3) + (1)(0) + (-1)(4) = 6 + 0 - 4 = 2</p>
+                <p data-en="Result: 2 (positive → vectors point somewhat in same direction)" data-th="ผลลัพธ์: 2 (บวก → เวกเตอร์ชี้ไปในทิศทางเดียวกันบ้าง)">Result: 2 (positive → vectors point somewhat in same direction)</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('dot2')">
+                <h3 data-en="Example 2: Finding Angle" data-th="ตัวอย่าง 2: หามุม">Example 2: Finding Angle</h3>
+                <p data-en="Find angle between a = (2, -1, 2) and b = (1, 2, 2)" data-th="หามุมระหว่าง a = (2, -1, 2) และ b = (1, 2, 2)">Find angle between a = (2, -1, 2) and b = (1, 2, 2)</p>
+            </div>
+            <div class="solution" id="dot2">
+                <p data-en="a·b = (2)(1) + (-1)(2) + (2)(2) = 2 - 2 + 4 = 4" data-th="a·b = (2)(1) + (-1)(2) + (2)(2) = 2 - 2 + 4 = 4">a·b = (2)(1) + (-1)(2) + (2)(2) = 2 - 2 + 4 = 4</p>
+                <p data-en="||a|| = √(4 + 1 + 4) = 3, ||b|| = √(1 + 4 + 4) = 3" data-th="||a|| = √(4 + 1 + 4) = 3, ||b|| = √(1 + 4 + 4) = 3">||a|| = √(4 + 1 + 4) = 3, ||b|| = √(1 + 4 + 4) = 3</p>
+                <p data-en="cos θ = 4/(3×3) = 4/9 ≈ 0.444 → θ ≈ 63.6°" data-th="cos θ = 4/(3×3) = 4/9 ≈ 0.444 → θ ≈ 63.6°">cos θ = 4/(3×3) = 4/9 ≈ 0.444 → θ ≈ 63.6°</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('dot3')">
+                <h3 data-en="Example 3: Vector Projection" data-th="ตัวอย่าง 3: การฉายเวกเตอร์">Example 3: Vector Projection</h3>
+                <p data-en="Project vector a = (4, 3) onto unit vector û = (1, 0)" data-th="ฉายเวกเตอร์ a = (4, 3) ลงบนเวกเตอร์หน่วย û = (1, 0)">Project vector a = (4, 3) onto unit vector û = (1, 0)</p>
+            </div>
+            <div class="solution" id="dot3">
+                <p data-en="Projection = (a·û)û = ((4, 3)·(1, 0))(1, 0)" data-th="การฉาย = (a·û)û = ((4, 3)·(1, 0))(1, 0)">Projection = (a·û)û = ((4, 3)·(1, 0))(1, 0)</p>
+                <p data-en="= (4×1 + 3×0)(1, 0) = 4(1, 0) = (4, 0)" data-th="= (4×1 + 3×0)(1, 0) = 4(1, 0) = (4, 0)">= (4×1 + 3×0)(1, 0) = 4(1, 0) = (4, 0)</p>
+                <p data-en="This is the shadow of a on the x-axis!" data-th="นี่คือเงาของ a บนแกน x!">This is the "shadow" of a on the x-axis!</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: Cross Product -->
+        <div class="slide">
+            <h1 data-en="Cross Product (a×b) - 3D Only" data-th="ครอสโปรดักต์ (a×b) - 3มิติเท่านั้น">Cross Product (a×b) - 3D Only</h1>
+
+            <div class="concept-box">
+                <h2 data-en="Output: A perpendicular vector!" data-th="ผลลัพธ์: เวกเตอร์ที่ตั้งฉาก!">Output: A perpendicular vector!</h2>
+                <p data-en="Creates a vector perpendicular to both input vectors" data-th="สร้างเวกเตอร์ที่ตั้งฉากกับเวกเตอร์อินพุตทั้งสอง">Creates a vector <span class="highlight">perpendicular</span> to both input vectors</p>
+                <p data-en="Magnitude = ||a|| ||b|| sin θ = area of parallelogram" data-th="ขนาด = ||a|| ||b|| sin θ = พื้นที่สี่เหลี่ยมด้านขนาน">Magnitude = ||a|| ||b|| sin θ = area of parallelogram</p>
+            </div>
+
+            <div class="formula-box">
+                <p data-en="a×b = (a₂b₃-a₃b₂, a₃b₁-a₁b₃, a₁b₂-a₂b₁)" data-th="a×b = (a₂b₃-a₃b₂, a₃b₁-a₁b₃, a₁b₂-a₂b₁)">a×b = (a₂b₃-a₃b₂, a₃b₁-a₁b₃, a₁b₂-a₂b₁)</p>
+                <p data-en="Direction: Right-hand rule" data-th="ทิศทาง: กฎมือขวา">Direction: Right-hand rule</p>
+            </div>
+
+            <div class="uses-list">
+                <h3 data-en="Key Applications:" data-th="การประยุกต์ใช้หลัก:">Key Applications:</h3>
+                <ul>
+                    <li data-en="Surface normals in 3D graphics" data-th="เวกเตอร์นอร์มัลบนผิวใน 3D กราฟิกส์">Surface normals in 3D graphics</li>
+                    <li data-en="Area calculations" data-th="การคำนวณพื้นที่">Area calculations</li>
+                    <li data-en="Torque in physics" data-th="แรงบิดในฟิสิกส์">Torque in physics</li>
+                    <li data-en="Determining orientation" data-th="การกำหนดการวางแนว">Determining orientation</li>
+                </ul>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('cross1')">
+                <h3 data-en="Example 1: Basic Cross Product" data-th="ตัวอย่าง 1: ครอสโปรดักต์พื้นฐาน">Example 1: Basic Cross Product</h3>
+                <p data-en="Calculate: (1, 2, 3) × (0, 1, 0)" data-th="คำนวณ: (1, 2, 3) × (0, 1, 0)">Calculate: (1, 2, 3) × (0, 1, 0)</p>
+            </div>
+            <div class="solution" id="cross1">
+                <p data-en="Using formula: (a₂b₃-a₃b₂, a₃b₁-a₁b₃, a₁b₂-a₂b₁)" data-th="ใช้สูตร: (a₂b₃-a₃b₂, a₃b₁-a₁b₃, a₁b₂-a₂b₁)">Using formula: (a₂b₃-a₃b₂, a₃b₁-a₁b₃, a₁b₂-a₂b₁)</p>
+                <p data-en="= (2×0-3×1, 3×0-1×0, 1×1-2×0) = (-3, 0, 1)" data-th="= (2×0-3×1, 3×0-1×0, 1×1-2×0) = (-3, 0, 1)">= (2×0-3×1, 3×0-1×0, 1×1-2×0) = (-3, 0, 1)</p>
+                <p data-en="Check: (-3, 0, 1)·(1, 2, 3) = -3+0+3 = 0 ✓ (perpendicular)" data-th="ตรวจสอบ: (-3, 0, 1)·(1, 2, 3) = -3+0+3 = 0 ✓ (ตั้งฉาก)">Check: (-3, 0, 1)·(1, 2, 3) = -3+0+3 = 0 ✓ (perpendicular)</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('cross2')">
+                <h3 data-en="Example 2: Area Calculation" data-th="ตัวอย่าง 2: การคำนวณพื้นที่">Example 2: Area Calculation</h3>
+                <p data-en="Find area of parallelogram with sides a = (1, 0, 2) and b = (0, 2, 0)" data-th="หาพื้นที่สี่เหลี่ยมด้านขนานที่มีด้าน a = (1, 0, 2) และ b = (0, 2, 0)">Find area of parallelogram with sides a = (1, 0, 2) and b = (0, 2, 0)</p>
+            </div>
+            <div class="solution" id="cross2">
+                <p data-en="a×b = (0×0-2×2, 2×0-1×0, 1×2-0×0) = (-4, 0, 2)" data-th="a×b = (0×0-2×2, 2×0-1×0, 1×2-0×0) = (-4, 0, 2)">a×b = (0×0-2×2, 2×0-1×0, 1×2-0×0) = (-4, 0, 2)</p>
+                <p data-en="||a×b|| = √(16 + 0 + 4) = √20 = 2√5" data-th="||a×b|| = √(16 + 0 + 4) = √20 = 2√5">||a×b|| = √(16 + 0 + 4) = √20 = 2√5</p>
+                <p data-en="Area = 2√5 ≈ 4.47 square units" data-th="พื้นที่ = 2√5 ≈ 4.47 ตารางหน่วย">Area = 2√5 ≈ 4.47 square units</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('cross3')">
+                <h3 data-en="Example 3: Surface Normal" data-th="ตัวอย่าง 3: เวกเตอร์นอร์มัลบนผิว">Example 3: Surface Normal</h3>
+                <p data-en="Find normal to triangle with vertices A(1,0,0), B(0,1,0), C(0,0,1)" data-th="หาเวกเตอร์นอร์มัลของสามเหลี่ยมที่มีจุดยอด A(1,0,0), B(0,1,0), C(0,0,1)">Find normal to triangle with vertices A(1,0,0), B(0,1,0), C(0,0,1)</p>
+            </div>
+            <div class="solution" id="cross3">
+                <p data-en="AB = B - A = (-1, 1, 0), AC = C - A = (-1, 0, 1)" data-th="AB = B - A = (-1, 1, 0), AC = C - A = (-1, 0, 1)">AB = B - A = (-1, 1, 0), AC = C - A = (-1, 0, 1)</p>
+                <p data-en="Normal = AB × AC = (1×1-0×0, 0×(-1)-(-1)×1, (-1)×0-1×(-1)) = (1, 1, 1)" data-th="นอร์มัล = AB × AC = (1×1-0×0, 0×(-1)-(-1)×1, (-1)×0-1×(-1)) = (1, 1, 1)">Normal = AB × AC = (1×1-0×0, 0×(-1)-(-1)×1, (-1)×0-1×(-1)) = (1, 1, 1)</p>
+                <p data-en="Unit normal = (1, 1, 1)/√3 = (1/√3, 1/√3, 1/√3)" data-th="นอร์มัลหน่วย = (1, 1, 1)/√3 = (1/√3, 1/√3, 1/√3)">Unit normal = (1, 1, 1)/√3 = (1/√3, 1/√3, 1/√3)</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: Matrix as Vectors -->
+        <div class="slide">
+            <h1 data-en="Matrix as Vectors" data-th="เมทริกซ์เป็นเวกเตอร์">Matrix as Vectors</h1>
+
+            <div class="concept-box">
+                <h2 data-en="Two Perspectives" data-th="สองมุมมอง">Two Perspectives</h2>
+                <p data-en="Think of matrix A as collection of column vectors OR row vectors" data-th="คิดของเมทริกซ์ A เป็นชุดของเวกเตอร์คอลัมน์ หรือ เวกเตอร์แถว">Think of matrix A as collection of <span class="highlight">column vectors</span> OR <span class="highlight">row vectors</span></p>
+            </div>
+
+            <div class="formula-box">
+                <p data-en="Column view: A = [a₁ a₂ ... aₙ], then Ax = x₁a₁ + x₂a₂ + ... + xₙaₙ" data-th="มุมมองคอลัมน์: A = [a₁ a₂ ... aₙ], แล้ว Ax = x₁a₁ + x₂a₂ + ... + xₙaₙ"><strong>Column view:</strong> A = [a₁ a₂ ... aₙ], then Ax = x₁a₁ + x₂a₂ + ... + xₙaₙ</p>
+                <p data-en="Row view: Each entry of Ax is dot product of row with x" data-th="มุมมองแถว: แต่ละตัวของ Ax คือดอทโปรดักต์ของแถวกับ x"><strong>Row view:</strong> Each entry of Ax is dot product of row with x</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('matrix1')">
+                <h3 data-en="Example 1: Column View" data-th="ตัวอย่าง 1: มุมมองคอลัมน์">Example 1: Column View</h3>
+                <p data-en="Calculate Ax using column view:" data-th="คำนวณ Ax โดยใช้มุมมองคอลัมน์:">Calculate Ax using column view:</p>
+                <div class="matrix-display">A = [1  2]    x = [5]<br>    [3  4]        [-1]</div>
+            </div>
+            <div class="solution" id="matrix1">
+                <p data-en="Column 1: [1, 3], Column 2: [2, 4]" data-th="คอลัมน์ 1: [1, 3], คอลัมน์ 2: [2, 4]">Column 1: [1, 3], Column 2: [2, 4]</p>
+                <p data-en="Ax = 5[1, 3] + (-1)[2, 4] = [5, 15] + [-2, -4] = [3, 11]" data-th="Ax = 5[1, 3] + (-1)[2, 4] = [5, 15] + [-2, -4] = [3, 11]">Ax = 5[1, 3] + (-1)[2, 4] = [5, 15] + [-2, -4] = [3, 11]</p>
+                <p data-en="Linear combination of columns!" data-th="การรวมเชิงเส้นของคอลัมน์!">Linear combination of columns!</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('matrix2')">
+                <h3 data-en="Example 2: Row View" data-th="ตัวอย่าง 2: มุมมองแถว">Example 2: Row View</h3>
+                <p data-en="Same calculation using row view:" data-th="การคำนวณเดียวกันโดยใช้มุมมองแถว:">Same calculation using row view:</p>
+                <div class="matrix-display">A = [1  2]    x = [5]<br>    [3  4]        [-1]</div>
+            </div>
+            <div class="solution" id="matrix2">
+                <p data-en="Row 1: [1, 2] · [5, -1] = 1×5 + 2×(-1) = 5 - 2 = 3" data-th="แถว 1: [1, 2] · [5, -1] = 1×5 + 2×(-1) = 5 - 2 = 3">Row 1: [1, 2] · [5, -1] = 1×5 + 2×(-1) = 5 - 2 = 3</p>
+                <p data-en="Row 2: [3, 4] · [5, -1] = 3×5 + 4×(-1) = 15 - 4 = 11" data-th="แถว 2: [3, 4] · [5, -1] = 3×5 + 4×(-1) = 15 - 4 = 11">Row 2: [3, 4] · [5, -1] = 3×5 + 4×(-1) = 15 - 4 = 11</p>
+                <p data-en="Result: Ax = [3, 11] - same answer!" data-th="ผลลัพธ์: Ax = [3, 11] - คำตอบเดียวกัน!">Result: Ax = [3, 11] - same answer!</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('matrix3')">
+                <h3 data-en="Example 3: Larger Matrix" data-th="ตัวอย่าง 3: เมทริกซ์ใหญ่กว่า">Example 3: Larger Matrix</h3>
+                <p data-en="Column view calculation:" data-th="การคำนวณมุมมองคอลัมน์:">Column view calculation:</p>
+                <div class="matrix-display">A = [2  -1   0]    x = [1]<br>    [0   1   3]        [4]<br>                           [-2]</div>
+            </div>
+            <div class="solution" id="matrix3">
+                <p data-en="Columns: [2,0], [-1,1], [0,3]" data-th="คอลัมน์: [2,0], [-1,1], [0,3]">Columns: [2,0], [-1,1], [0,3]</p>
+                <p data-en="Ax = 1[2,0] + 4[-1,1] + (-2)[0,3]" data-th="Ax = 1[2,0] + 4[-1,1] + (-2)[0,3]">Ax = 1[2,0] + 4[-1,1] + (-2)[0,3]</p>
+                <p data-en="= [2,0] + [-4,4] + [0,-6] = [-2,-2]" data-th="= [2,0] + [-4,4] + [0,-6] = [-2,-2]">= [2,0] + [-4,4] + [0,-6] = [-2,-2]</p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Matrix Transformations -->
+        <div class="slide">
+            <h1 data-en="Matrix Transformations" data-th="การแปลงเมทริกซ์">Matrix Transformations</h1>
+
+            <div class="concept-box">
+                <h2 data-en="Linear Transformation T(x) = Ax" data-th="การแปลงเชิงเส้น T(x) = Ax">Linear Transformation T(x) = Ax</h2>
+                <p data-en="Matrix A defines a geometric transformation that preserves lines and origin" data-th="เมทริกซ์ A กำหนดการแปลงทางเรขาคณิตที่รักษาเส้นตรงและจุดกำเนิด">Matrix A defines a geometric transformation that preserves <span class="highlight">lines</span> and <span class="highlight">origin</span></p>
+            </div>
+
+            <div class="transform-grid">
+                <div class="transform-item">
+                    <h4 data-en="Scaling" data-th="การขยาย">Scaling</h4>
+                    <div class="matrix-display">[sx  0 ]<br>[ 0  sy]</div>
+                </div>
+                <div class="transform-item">
+                    <h4 data-en="Rotation" data-th="การหมุน">Rotation</h4>
+                    <div class="matrix-display">[cos θ  -sin θ]<br>[sin θ   cos θ]</div>
+                </div>
+                <div class="transform-item">
+                    <h4 data-en="Reflection (x-axis)" data-th="การสะท้อน (แกน x)">Reflection (x-axis)</h4>
+                    <div class="matrix-display">[1   0]<br>[0  -1]</div>
+                </div>
+                <div class="transform-item">
+                    <h4 data-en="Shear" data-th="การเอียง">Shear</h4>
+                    <div class="matrix-display">[1  k]<br>[0  1]</div>
+                </div>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('transform1')">
+                <h3 data-en="Example 1: Scaling Transformation" data-th="ตัวอย่าง 1: การแปลงขยาย">Example 1: Scaling Transformation</h3>
+                <p data-en="Apply scaling matrix to vector (2, 1):" data-th="ใช้เมทริกซ์ขยายกับเวกเตอร์ (2, 1):">Apply scaling matrix to vector (2, 1):</p>
+                <div class="matrix-display">S = [3  0]<br>    [0  2]</div>
+            </div>
+            <div class="solution" id="transform1">
+                <p data-en="S[2, 1] = [3×2 + 0×1, 0×2 + 2×1] = [6, 2]" data-th="S[2, 1] = [3×2 + 0×1, 0×2 + 2×1] = [6, 2]">S[2, 1] = [3×2 + 0×1, 0×2 + 2×1] = [6, 2]</p>
+                <p data-en="Result: (2, 1) → (6, 2)" data-th="ผลลัพธ์: (2, 1) → (6, 2)">Result: (2, 1) → (6, 2)</p>
+                <p data-en="Scaled by 3 in x-direction, 2 in y-direction" data-th="ขยาย 3 เท่าในทิศทาง x, 2 เท่าในทิศทาง y">Scaled by 3 in x-direction, 2 in y-direction</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('transform2')">
+                <h3 data-en="Example 2: 90° Rotation" data-th="ตัวอย่าง 2: การหมุน 90°">Example 2: 90° Rotation</h3>
+                <p data-en="Rotate vector (1, 0) by 90° counterclockwise:" data-th="หมุนเวกเตอร์ (1, 0) 90° ทวนเข็มนาฬิกา:">Rotate vector (1, 0) by 90° counterclockwise:</p>
+                <div class="matrix-display">R = [0  -1]<br>    [1   0]</div>
+            </div>
+            <div class="solution" id="transform2">
+                <p data-en="R[1, 0] = [0×1 + (-1)×0, 1×1 + 0×0] = [0, 1]" data-th="R[1, 0] = [0×1 + (-1)×0, 1×1 + 0×0] = [0, 1]">R[1, 0] = [0×1 + (-1)×0, 1×1 + 0×0] = [0, 1]</p>
+                <p data-en="Result: (1, 0) → (0, 1)" data-th="ผลลัพธ์: (1, 0) → (0, 1)">Result: (1, 0) → (0, 1)</p>
+                <p data-en="x-axis unit vector becomes y-axis unit vector!" data-th="เวกเตอร์หน่วยแกน x กลายเป็นเวกเตอร์หน่วยแกน y!">x-axis unit vector becomes y-axis unit vector!</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('transform3')">
+                <h3 data-en="Example 3: Determinant & Area" data-th="ตัวอย่าง 3: ดีเทอร์มิแนนต์และพื้นที่">Example 3: Determinant & Area</h3>
+                <p data-en="How does this matrix change areas?" data-th="เมทริกซ์นี้เปลี่ยนพื้นที่อย่างไร?">How does this matrix change areas?</p>
+                <div class="matrix-display">A = [3  0]<br>    [1  2]</div>
+            </div>
+            <div class="solution" id="transform3">
+                <p data-en="det(A) = 3×2 - 0×1 = 6" data-th="det(A) = 3×2 - 0×1 = 6">det(A) = 3×2 - 0×1 = 6</p>
+                <p data-en="All areas are scaled by factor of |6| = 6" data-th="พื้นที่ทั้งหมดถูกขยายด้วยตัวประกอบ |6| = 6">All areas are scaled by factor of |6| = 6</p>
+                <p data-en="Unit square (area 1) → parallelogram (area 6)" data-th="สี่เหลี่ยมหน่วย (พื้นที่ 1) → สี่เหลี่ยมด้านขนาน (พื้นที่ 6)">Unit square (area 1) → parallelogram (area 6)</p>
+                <p data-en="Positive det → orientation preserved" data-th="det บวก → การวางแนวได้รับการรักษา">Positive det → orientation preserved</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Determinants in 2D and 3D -->
+        <div class="slide">
+            <h1 data-en="Determinants in 2D & 3D" data-th="ดีเทอร์มิแนนต์ใน 2D และ 3D">Determinants in 2D & 3D</h1>
+
+            <div class="concept-box">
+                <h2 data-en="🎯 Geometric Meaning" data-th="🎯 ความหมายทางเรขาคณิต">🎯 Geometric Meaning</h2>
+                <p data-en="Determinant measures how much a transformation scales areas (2D) or volumes (3D)" data-th="ดีเทอร์มิแนนต์วัดว่าการแปลงขยายพื้นที่ (2D) หรือปริมาตร (3D) เท่าไร">Determinant measures how much a transformation <span class="highlight">scales areas (2D)</span> or <span class="highlight">volumes (3D)</span></p>
+                <p data-en="Sign indicates orientation: positive preserves, negative flips" data-th="เครื่องหมายบ่งบอกการวางแนว: บวกรักษา ลบพลิก">Sign indicates orientation: positive preserves, negative flips</p>
+            </div>
+
+            <div class="formula-box">
+                <p data-en="2D: det([a b; c d]) = ad - bc" data-th="2D: det([a b; c d]) = ad - bc"><strong>2D:</strong> det([a b; c d]) = ad - bc</p>
+                <p data-en="3D: det(A) = a₁₁(a₂₂a₃₃ - a₂₃a₃₂) - a₁₂(a₂₁a₃₃ - a₂₃a₃₁) + a₁₃(a₂₁a₃₂ - a₂₂a₃₁)" data-th="3D: det(A) = a₁₁(a₂₂a₃₃ - a₂₃a₃₂) - a₁₂(a₂₁a₃₃ - a₂₃a₃₁) + a₁₃(a₂₁a₃₂ - a₂₂a₃₁)"><strong>3D:</strong> det(A) = a₁₁(a₂₂a₃₃ - a₂₃a₃₂) - a₁₂(a₂₁a₃₃ - a₂₃a₃₁) + a₁₃(a₂₁a₃₂ - a₂₂a₃₁)</p>
+            </div>
+
+            <div class="uses-list">
+                <h3 data-en="Key Applications:" data-th="การประยุกต์ใช้หลัก:">Key Applications:</h3>
+                <ul>
+                    <li data-en="Area/volume scaling in transformations" data-th="การขยายพื้นที่/ปริมาตรในการแปลง">Area/volume scaling in transformations</li>
+                    <li data-en="Checking matrix invertibility (det ≠ 0)" data-th="ตรวจสอบการผกผันได้ของเมทริกซ์ (det ≠ 0)">Checking matrix invertibility (det ≠ 0)</li>
+                    <li data-en="Orientation testing (clockwise vs counterclockwise)" data-th="การทดสอบการวางแนว (ตามเข็มนาฬิกา vs ทวนเข็มนาฬิกา)">Orientation testing (clockwise vs counterclockwise)</li>
+                    <li data-en="Cross product magnitude in 3D" data-th="ขนาดครอสโปรดักต์ใน 3D">Cross product magnitude in 3D</li>
+                </ul>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('det1')">
+                <h3 data-en="Example 1: 2D Determinant & Area" data-th="ตัวอย่าง 1: ดีเทอร์มิแนนต์ 2D และพื้นที่">Example 1: 2D Determinant & Area</h3>
+                <p data-en="Find det(A) and area scaling for:" data-th="หา det(A) และการขยายพื้นที่สำหรับ:">Find det(A) and area scaling for:</p>
+                <div class="matrix-display">A = [3  1]<br>    [2  4]</div>
+            </div>
+            <div class="solution" id="det1">
+                <p data-en="det(A) = 3×4 - 1×2 = 12 - 2 = 10" data-th="det(A) = 3×4 - 1×2 = 12 - 2 = 10">det(A) = 3×4 - 1×2 = 12 - 2 = 10</p>
+                <p data-en="Areas are scaled by factor |10| = 10" data-th="พื้นที่ถูกขยายด้วยตัวประกอบ |10| = 10">Areas are scaled by factor |10| = 10</p>
+                <p data-en="Unit square (area 1) becomes parallelogram (area 10)" data-th="สี่เหลี่ยมหน่วย (พื้นที่ 1) กลายเป็นสี่เหลี่ยมด้านขนาน (พื้นที่ 10)">Unit square (area 1) becomes parallelogram (area 10)</p>
+                <p data-en="Positive det → orientation preserved" data-th="det บวก → การวางแนวได้รับการรักษา">Positive det → orientation preserved</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('det2')">
+                <h3 data-en="Example 2: Triangle Area using 2D Determinant" data-th="ตัวอย่าง 2: พื้นที่สามเหลี่ยมโดยใช้ดีเทอร์มิแนนต์ 2D">Example 2: Triangle Area using 2D Determinant</h3>
+                <p data-en="Find area of triangle with vertices (0,0), (4,0), (2,3)" data-th="หาพื้นที่สามเหลี่ยมที่มีจุดยอด (0,0), (4,0), (2,3)">Find area of triangle with vertices (0,0), (4,0), (2,3)</p>
+            </div>
+            <div class="solution" id="det2">
+                <p data-en="Form matrix with edge vectors: [4 2; 0 3]" data-th="สร้างเมทริกซ์ด้วยเวกเตอร์ขอบ: [4 2; 0 3]">Form matrix with edge vectors: [4 2; 0 3]</p>
+                <p data-en="det([4 2; 0 3]) = 4×3 - 2×0 = 12" data-th="det([4 2; 0 3]) = 4×3 - 2×0 = 12">det([4 2; 0 3]) = 4×3 - 2×0 = 12</p>
+                <p data-en="Triangle area = ½|det| = ½×12 = 6" data-th="พื้นที่สามเหลี่ยม = ½|det| = ½×12 = 6">Triangle area = ½|det| = ½×12 = 6</p>
+                <p data-en="Alternative: Base=4, Height=3, Area=½×4×3=6 ✓" data-th="ทางเลือก: ฐาน=4, สูง=3, พื้นที่=½×4×3=6 ✓">Alternative: Base=4, Height=3, Area=½×4×3=6 ✓</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('det3')">
+                <h3 data-en="Example 3: 3D Determinant Calculation" data-th="ตัวอย่าง 3: การคำนวณดีเทอร์มิแนนต์ 3D">Example 3: 3D Determinant Calculation</h3>
+                <p data-en="Calculate determinant using cofactor expansion:" data-th="คำนวณดีเทอร์มิแนนต์โดยใช้การขยายโคแฟกเตอร์:">Calculate determinant using cofactor expansion:</p>
+                <div class="matrix-display">A = [2  1  3]<br>    [0  4  1]<br>    [1  2  0]</div>
+            </div>
+            <div class="solution" id="det3">
+                <p data-en="Expand along first row:" data-th="ขยายตามแถวแรก:">Expand along first row:</p>
+                <p data-en="det(A) = 2×det([4 1; 2 0]) - 1×det([0 1; 1 0]) + 3×det([0 4; 1 2])" data-th="det(A) = 2×det([4 1; 2 0]) - 1×det([0 1; 1 0]) + 3×det([0 4; 1 2])">det(A) = 2×det([4 1; 2 0]) - 1×det([0 1; 1 0]) + 3×det([0 4; 1 2])</p>
+                <p data-en="= 2×(4×0-1×2) - 1×(0×0-1×1) + 3×(0×2-4×1)" data-th="= 2×(4×0-1×2) - 1×(0×0-1×1) + 3×(0×2-4×1)">= 2×(4×0-1×2) - 1×(0×0-1×1) + 3×(0×2-4×1)</p>
+                <p data-en="= 2×(-2) - 1×(-1) + 3×(-4) = -4 + 1 - 12 = -15" data-th="= 2×(-2) - 1×(-1) + 3×(-4) = -4 + 1 - 12 = -15">= 2×(-2) - 1×(-1) + 3×(-4) = -4 + 1 - 12 = -15</p>
+                <p data-en="Volume scaling factor = |−15| = 15, with orientation reversal" data-th="ตัวประกอบขยายปริมาตร = |−15| = 15 พร้อมการกลับการวางแนว">Volume scaling factor = |−15| = 15, with orientation reversal</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('det4')">
+                <h3 data-en="Example 4: Cross Product and Determinant Connection" data-th="ตัวอย่าง 4: ความเชื่อมโยงครอสโปรดักต์และดีเทอร์มิแนนต์">Example 4: Cross Product and Determinant Connection</h3>
+                <p data-en="Show that ||a×b|| equals determinant of 2×2 matrix" data-th="แสดงว่า ||a×b|| เท่ากับดีเทอร์มิแนนต์ของเมทริกซ์ 2×2">Show that ||a×b|| equals determinant of 2×2 matrix</p>
+                <p data-en="For a = (3,4,0) and b = (1,2,0) in xy-plane" data-th="สำหรับ a = (3,4,0) และ b = (1,2,0) ในระนาบ xy">For a = (3,4,0) and b = (1,2,0) in xy-plane</p>
+            </div>
+            <div class="solution" id="det4">
+                <p data-en="Cross product: a×b = (4×0-0×2, 0×1-3×0, 3×2-4×1) = (0,0,2)" data-th="ครอสโปรดักต์: a×b = (4×0-0×2, 0×1-3×0, 3×2-4×1) = (0,0,2)">Cross product: a×b = (4×0-0×2, 0×1-3×0, 3×2-4×1) = (0,0,2)</p>
+                <p data-en="||a×b|| = ||(0,0,2)|| = 2" data-th="||a×b|| = ||(0,0,2)|| = 2">||a×b|| = ||(0,0,2)|| = 2</p>
+                <p data-en="2D determinant: det([3 1; 4 2]) = 3×2 - 1×4 = 6 - 4 = 2" data-th="ดีเทอร์มิแนนต์ 2D: det([3 1; 4 2]) = 3×2 - 1×4 = 6 - 4 = 2">2D determinant: det([3 1; 4 2]) = 3×2 - 1×4 = 6 - 4 = 2</p>
+                <p data-en="They match! Cross product magnitude = parallelogram area = |det|" data-th="ตรงกัน! ขนาดครอสโปรดักต์ = พื้นที่สี่เหลี่ยมด้านขนาน = |det|">They match! Cross product magnitude = parallelogram area = |det|</p>
+            </div>
+
+            <div class="vector-viz">
+                <h3 data-en="🔑 Key Insights" data-th="🔑 ข้อมูลเชิงลึกสำคัญ">🔑 Key Insights</h3>
+                <p data-en="Determinant = 0 → matrix is singular (not invertible)" data-th="ดีเทอร์มิแนนต์ = 0 → เมทริกซ์เป็นเอกพจน์ (ผกผันไม่ได้)">Determinant = 0 → matrix is singular (not invertible)</p>
+                <p data-en="Negative determinant → orientation flip (mirror reflection)" data-th="ดีเทอร์มิแนนต์ลบ → การพลิกการวางแนว (การสะท้อนกระจก)">Negative determinant → orientation flip (mirror reflection)</p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Cross Product Quiz -->
+        <div class="slide">
+            <h1 data-en="Cross Product Quiz" data-th="แบบทดสอบครอสโปรดักต์">Cross Product Quiz</h1>
+
+            <div class="concept-box">
+                <h2 data-en="🧠 Test Your Knowledge!" data-th="🧠 ทดสอบความรู้ของคุณ!">🧠 Test Your Knowledge!</h2>
+                <p data-en="Try these cross product problems on your own first!" data-th="ลองทำโจทย์ครอสโปรดักต์เหล่านี้ด้วยตัวเองก่อน!">Try these cross product problems on your own first!</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('quiz_cross1')">
+                <h3 data-en="Quiz 1: Basic Cross Product" data-th="แบบทดสอบ 1: ครอสโปรดักต์พื้นฐาน">Quiz 1: Basic Cross Product</h3>
+                <p data-en="Calculate: (2, 0, 1) × (1, 3, -1)" data-th="คำนวณ: (2, 0, 1) × (1, 3, -1)">Calculate: (2, 0, 1) × (1, 3, -1)</p>
+                <p data-en="Then verify it's perpendicular to both original vectors" data-th="แล้วตรวจสอบว่าตั้งฉากกับเวกเตอร์เดิมทั้งสอง">Then verify it's perpendicular to both original vectors</p>
+            </div>
+            <div class="solution" id="quiz_cross1">
+                <p data-en="Using formula: (a₂b₃-a₃b₂, a₃b₁-a₁b₃, a₁b₂-a₂b₁)" data-th="ใช้สูตร: (a₂b₃-a₃b₂, a₃b₁-a₁b₃, a₁b₂-a₂b₁)">Using formula: (a₂b₃-a₃b₂, a₃b₁-a₁b₃, a₁b₂-a₂b₁)</p>
+                <p data-en="= (0×(-1)-1×3, 1×1-2×(-1), 2×3-0×1) = (-3, 3, 6)" data-th="= (0×(-1)-1×3, 1×1-2×(-1), 2×3-0×1) = (-3, 3, 6)">= (0×(-1)-1×3, 1×1-2×(-1), 2×3-0×1) = (-3, 3, 6)</p>
+                <p data-en="Check: (-3,3,6)·(2,0,1) = -6+0+6 = 0 ✓" data-th="ตรวจสอบ: (-3,3,6)·(2,0,1) = -6+0+6 = 0 ✓">Check: (-3,3,6)·(2,0,1) = -6+0+6 = 0 ✓</p>
+                <p data-en="Check: (-3,3,6)·(1,3,-1) = -3+9-6 = 0 ✓" data-th="ตรวจสอบ: (-3,3,6)·(1,3,-1) = -3+9-6 = 0 ✓">Check: (-3,3,6)·(1,3,-1) = -3+9-6 = 0 ✓</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('quiz_cross2')">
+                <h3 data-en="Quiz 2: Triangle Area" data-th="แบบทดสอบ 2: พื้นที่สามเหลี่ยม">Quiz 2: Triangle Area</h3>
+                <p data-en="Find the area of triangle with vertices:" data-th="หาพื้นที่สามเหลี่ยมที่มีจุดยอด:">Find the area of triangle with vertices:</p>
+                <p data-en="A(0,0,0), B(3,0,0), C(0,4,0)" data-th="A(0,0,0), B(3,0,0), C(0,4,0)">A(0,0,0), B(3,0,0), C(0,4,0)</p>
+            </div>
+            <div class="solution" id="quiz_cross2">
+                <p data-en="Find vectors: AB = (3,0,0), AC = (0,4,0)" data-th="หาเวกเตอร์: AB = (3,0,0), AC = (0,4,0)">Find vectors: AB = (3,0,0), AC = (0,4,0)</p>
+                <p data-en="AB × AC = (0×0-0×4, 0×0-3×0, 3×4-0×0) = (0,0,12)" data-th="AB × AC = (0×0-0×4, 0×0-3×0, 3×4-0×0) = (0,0,12)">AB × AC = (0×0-0×4, 0×0-3×0, 3×4-0×0) = (0,0,12)</p>
+                <p data-en="||AB × AC|| = 12" data-th="||AB × AC|| = 12">||AB × AC|| = 12</p>
+                <p data-en="Triangle area = ½||AB × AC|| = ½(12) = 6" data-th="พื้นที่สามเหลี่ยม = ½||AB × AC|| = ½(12) = 6">Triangle area = ½||AB × AC|| = ½(12) = 6</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('quiz_cross3')">
+                <h3 data-en="Quiz 3: Unit Normal Vector" data-th="แบบทดสอบ 3: เวกเตอร์นอร์มัลหน่วย">Quiz 3: Unit Normal Vector</h3>
+                <p data-en="Find unit normal to plane containing vectors:" data-th="หาเวกเตอร์นอร์มัลหน่วยของระนาบที่มีเวกเตอร์:">Find unit normal to plane containing vectors:</p>
+                <p data-en="u = (1, 1, 0) and v = (0, 1, 1)" data-th="u = (1, 1, 0) และ v = (0, 1, 1)">u = (1, 1, 0) and v = (0, 1, 1)</p>
+            </div>
+            <div class="solution" id="quiz_cross3">
+                <p data-en="u × v = (1×1-0×1, 0×0-1×1, 1×1-1×0) = (1,-1,1)" data-th="u × v = (1×1-0×1, 0×0-1×1, 1×1-1×0) = (1,-1,1)">u × v = (1×1-0×1, 0×0-1×1, 1×1-1×0) = (1,-1,1)</p>
+                <p data-en="||u × v|| = √(1² + (-1)² + 1²) = √3" data-th="||u × v|| = √(1² + (-1)² + 1²) = √3">||u × v|| = √(1² + (-1)² + 1²) = √3</p>
+                <p data-en="Unit normal = (1,-1,1)/√3 = (1/√3, -1/√3, 1/√3)" data-th="นอร์มัลหน่วย = (1,-1,1)/√3 = (1/√3, -1/√3, 1/√3)">Unit normal = (1,-1,1)/√3 = (1/√3, -1/√3, 1/√3)</p>
+            </div>
+        </div>
+
+        <!-- Slide 7: Matrix as Vectors Quiz -->
+        <div class="slide">
+            <h1 data-en="Matrix as Vectors Quiz" data-th="แบบทดสอบเมทริกซ์เป็นเวกเตอร์">Matrix as Vectors Quiz</h1>
+
+            <div class="concept-box">
+                <h2 data-en="🎯 Practice Both Views!" data-th="🎯 ฝึกทั้งสองมุมมอง!">🎯 Practice Both Views!</h2>
+                <p data-en="Master column and row perspectives of matrix multiplication" data-th="เชี่ยวชาญมุมมองแบบคอลัมน์และแถวของการคูณเมทริกซ์">Master column and row perspectives of matrix multiplication</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('quiz_matrix1')">
+                <h3 data-en="Quiz 1: Column View Interpretation" data-th="แบบทดสอบ 1: การตีความมุมมองคอลัมน์">Quiz 1: Column View Interpretation</h3>
+                <p data-en="Given Ax = b, express b as linear combination:" data-th="กำหนด Ax = b แสดง b เป็นการรวมเชิงเส้น:">Given Ax = b, express b as linear combination:</p>
+                <div class="matrix-display">A = [1  -2   3]    x = [2]    b = [?]<br>    [4   0  -1]        [1]<br>                           [3]</div>
+            </div>
+            <div class="solution" id="quiz_matrix1">
+                <p data-en="Columns of A: a₁=[1,4], a₂=[-2,0], a₃=[3,-1]" data-th="คอลัมน์ของ A: a₁=[1,4], a₂=[-2,0], a₃=[3,-1]">Columns of A: a₁=[1,4], a₂=[-2,0], a₃=[3,-1]</p>
+                <p data-en="b = 2a₁ + 1a₂ + 3a₃" data-th="b = 2a₁ + 1a₂ + 3a₃">b = 2a₁ + 1a₂ + 3a₃</p>
+                <p data-en="= 2[1,4] + 1[-2,0] + 3[3,-1]" data-th="= 2[1,4] + 1[-2,0] + 3[3,-1]">= 2[1,4] + 1[-2,0] + 3[3,-1]</p>
+                <p data-en="= [2,8] + [-2,0] + [9,-3] = [9,5]" data-th="= [2,8] + [-2,0] + [9,-3] = [9,5]">= [2,8] + [-2,0] + [9,-3] = [9,5]</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('quiz_matrix2')">
+                <h3 data-en="Quiz 2: Row View Calculation" data-th="แบบทดสอบ 2: การคำนวณมุมมองแถว">Quiz 2: Row View Calculation</h3>
+                <p data-en="Calculate each component using row dot products:" data-th="คำนวณแต่ละส่วนประกอบโดยใช้ดอทโปรดักต์ของแถว:">Calculate each component using row dot products:</p>
+                <div class="matrix-display">A = [2  -1   0]    x = [3]<br>    [1   3  -2]        [-1]<br>    [0   1   4]        [2]</div>
+            </div>
+            <div class="solution" id="quiz_matrix2">
+                <p data-en="Row 1: [2,-1,0] · [3,-1,2] = 2×3 + (-1)×(-1) + 0×2 = 6+1+0 = 7" data-th="แถว 1: [2,-1,0] · [3,-1,2] = 2×3 + (-1)×(-1) + 0×2 = 6+1+0 = 7">Row 1: [2,-1,0] · [3,-1,2] = 2×3 + (-1)×(-1) + 0×2 = 6+1+0 = 7</p>
+                <p data-en="Row 2: [1,3,-2] · [3,-1,2] = 1×3 + 3×(-1) + (-2)×2 = 3-3-4 = -4" data-th="แถว 2: [1,3,-2] · [3,-1,2] = 1×3 + 3×(-1) + (-2)×2 = 3-3-4 = -4">Row 2: [1,3,-2] · [3,-1,2] = 1×3 + 3×(-1) + (-2)×2 = 3-3-4 = -4</p>
+                <p data-en="Row 3: [0,1,4] · [3,-1,2] = 0×3 + 1×(-1) + 4×2 = 0-1+8 = 7" data-th="แถว 3: [0,1,4] · [3,-1,2] = 0×3 + 1×(-1) + 4×2 = 0-1+8 = 7">Row 3: [0,1,4] · [3,-1,2] = 0×3 + 1×(-1) + 4×2 = 0-1+8 = 7</p>
+                <p data-en="Result: Ax = [7, -4, 7]" data-th="ผลลัพธ์: Ax = [7, -4, 7]">Result: Ax = [7, -4, 7]</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('quiz_matrix3')">
+                <h3 data-en="Quiz 3: Both Views Verification" data-th="แบบทดสอบ 3: การตรวจสอบทั้งสองมุมมอง">Quiz 3: Both Views Verification</h3>
+                <p data-en="Verify same answer using both column and row views:" data-th="ตรวจสอบคำตอบเดียวกันโดยใช้ทั้งมุมมองคอลัมน์และแถว:">Verify same answer using both column and row views:</p>
+                <div class="matrix-display">A = [1  2]    x = [3]<br>    [3  1]        [2]</div>
+            </div>
+            <div class="solution" id="quiz_matrix3">
+                <p data-en="Column view: 3[1,3] + 2[2,1] = [3,9] + [4,2] = [7,11]" data-th="มุมมองคอลัมน์: 3[1,3] + 2[2,1] = [3,9] + [4,2] = [7,11]">Column view: 3[1,3] + 2[2,1] = [3,9] + [4,2] = [7,11]</p>
+                <p data-en="Row view:" data-th="มุมมองแถว:">Row view:</p>
+                <p data-en="  Row 1: [1,2]·[3,2] = 3+4 = 7" data-th="  แถว 1: [1,2]·[3,2] = 3+4 = 7">  Row 1: [1,2]·[3,2] = 3+4 = 7</p>
+                <p data-en="  Row 2: [3,1]·[3,2] = 9+2 = 11" data-th="  แถว 2: [3,1]·[3,2] = 9+2 = 11">  Row 2: [3,1]·[3,2] = 9+2 = 11</p>
+                <p data-en="Both give: Ax = [7,11] ✓" data-th="ทั้งคู่ให้: Ax = [7,11] ✓">Both give: Ax = [7,11] ✓</p>
+            </div>
+        </div>
+
+        <!-- Slide 8: Matrix Transformations Quiz -->
+        <div class="slide">
+            <h1 data-en="Matrix Transformations Quiz" data-th="แบบทดสอบการแปลงเมทริกซ์">Matrix Transformations Quiz</h1>
+
+            <div class="concept-box">
+                <h2 data-en="🎭 Geometric Transformations!" data-th="🎭 การแปลงทางเรขาคณิต!">🎭 Geometric Transformations!</h2>
+                <p data-en="Apply transformations and understand their geometric effects" data-th="ใช้การแปลงและเข้าใจผลกระทบทางเรขาคณิต">Apply transformations and understand their geometric effects</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('quiz_transform1')">
+                <h3 data-en="Quiz 1: Composition of Transformations" data-th="แบบทดสอบ 1: การประกอบการแปลง">Quiz 1: Composition of Transformations</h3>
+                <p data-en="Apply scaling then rotation to vector (1,2):" data-th="ใช้การขยายแล้วการหมุนกับเวกเตอร์ (1,2):">Apply scaling then rotation to vector (1,2):</p>
+                <p data-en="Scale by (2,3), then rotate 90° counterclockwise" data-th="ขยาย (2,3) แล้วหมุน 90° ทวนเข็มนาฬิกา">Scale by (2,3), then rotate 90° counterclockwise</p>
+            </div>
+            <div class="solution" id="quiz_transform1">
+                <p data-en="Scale matrix S = [2 0; 0 3]" data-th="เมทริกซ์ขยาย S = [2 0; 0 3]">Scale matrix S = [2 0; 0 3]</p>
+                <p data-en="After scaling: S[1,2] = [2×1, 3×2] = [2,6]" data-th="หลังการขยาย: S[1,2] = [2×1, 3×2] = [2,6]">After scaling: S[1,2] = [2×1, 3×2] = [2,6]</p>
+                <p data-en="Rotation matrix R = [0 -1; 1 0]" data-th="เมทริกซ์หมุน R = [0 -1; 1 0]">Rotation matrix R = [0 -1; 1 0]</p>
+                <p data-en="Final result: R[2,6] = [0×2-1×6, 1×2+0×6] = [-6,2]" data-th="ผลลัพธ์สุดท้าย: R[2,6] = [0×2-1×6, 1×2+0×6] = [-6,2]">Final result: R[2,6] = [0×2-1×6, 1×2+0×6] = [-6,2]</p>
+                <p data-en="Combined matrix: RS = [0 -3; 2 0]" data-th="เมทริกซ์รวม: RS = [0 -3; 2 0]">Combined matrix: RS = [0 -3; 2 0]</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('quiz_transform2')">
+                <h3 data-en="Quiz 2: Reflection and Determinant" data-th="แบบทดสอบ 2: การสะท้อนและดีเทอร์มิแนนต์">Quiz 2: Reflection and Determinant</h3>
+                <p data-en="Find the transformation matrix that reflects across the line y = x" data-th="หาเมทริกซ์การแปลงที่สะท้อนข้ามเส้น y = x">Find the transformation matrix that reflects across the line y = x</p>
+                <p data-en="Apply it to vector (3,1) and find the determinant" data-th="ใช้กับเวกเตอร์ (3,1) และหาดีเทอร์มิแนนต์">Apply it to vector (3,1) and find the determinant</p>
+            </div>
+            <div class="solution" id="quiz_transform2">
+                <p data-en="Reflection across y=x swaps coordinates: (x,y) → (y,x)" data-th="การสะท้อนข้าม y=x สลับพิกัด: (x,y) → (y,x)">Reflection across y=x swaps coordinates: (x,y) → (y,x)</p>
+                <p data-en="Transformation matrix: T = [0 1; 1 0]" data-th="เมทริกซ์การแปลง: T = [0 1; 1 0]">Transformation matrix: T = [0 1; 1 0]</p>
+                <p data-en="T[3,1] = [0×3+1×1, 1×3+0×1] = [1,3]" data-th="T[3,1] = [0×3+1×1, 1×3+0×1] = [1,3]">T[3,1] = [0×3+1×1, 1×3+0×1] = [1,3]</p>
+                <p data-en="det(T) = 0×0 - 1×1 = -1 (orientation reversal)" data-th="det(T) = 0×0 - 1×1 = -1 (การกลับการวางแนว)">det(T) = 0×0 - 1×1 = -1 (orientation reversal)</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('quiz_transform3')">
+                <h3 data-en="Quiz 3: Shear Transformation" data-th="แบบทดสอบ 3: การแปลงเอียง">Quiz 3: Shear Transformation</h3>
+                <p data-en="Apply horizontal shear with parameter k=2 to the unit square" data-th="ใช้การเอียงแนวนอนที่มีพารามิเตอร์ k=2 กับสี่เหลี่ยมหน่วย">Apply horizontal shear with parameter k=2 to the unit square</p>
+                <p data-en="Find where vertices (0,0), (1,0), (1,1), (0,1) go" data-th="หาว่าจุดยอด (0,0), (1,0), (1,1), (0,1) ไปที่ไหน">Find where vertices (0,0), (1,0), (1,1), (0,1) go</p>
+            </div>
+            <div class="solution" id="quiz_transform3">
+                <p data-en="Horizontal shear matrix: S = [1 2; 0 1]" data-th="เมทริกซ์เอียงแนวนอน: S = [1 2; 0 1]">Horizontal shear matrix: S = [1 2; 0 1]</p>
+                <p data-en="S[0,0] = [0,0] (origin stays fixed)" data-th="S[0,0] = [0,0] (จุดกำเนิดคงที่)">S[0,0] = [0,0] (origin stays fixed)</p>
+                <p data-en="S[1,0] = [1×1+2×0, 0×1+1×0] = [1,0]" data-th="S[1,0] = [1×1+2×0, 0×1+1×0] = [1,0]">S[1,0] = [1×1+2×0, 0×1+1×0] = [1,0]</p>
+                <p data-en="S[1,1] = [1×1+2×1, 0×1+1×1] = [3,1]" data-th="S[1,1] = [1×1+2×1, 0×1+1×1] = [3,1]">S[1,1] = [1×1+2×1, 0×1+1×1] = [3,1]</p>
+                <p data-en="S[0,1] = [1×0+2×1, 0×0+1×1] = [2,1]" data-th="S[0,1] = [1×0+2×1, 0×0+1×1] = [2,1]">S[0,1] = [1×0+2×1, 0×0+1×1] = [2,1]</p>
+                <p data-en="Unit square → parallelogram with vertices (0,0), (1,0), (3,1), (2,1)" data-th="สี่เหลี่ยมหน่วย → สี่เหลี่ยมด้านขนานที่มีจุดยอด (0,0), (1,0), (3,1), (2,1)">Unit square → parallelogram with vertices (0,0), (1,0), (3,1), (2,1)</p>
+            </div>
+        </div>
+
+        <!-- Slide 9: Applications & Summary -->
+        <div class="slide">
+            <h1 data-en="Applications & Summary" data-th="การประยุกต์และสรุป">Applications & Summary</h1>
+
+            <div class="concept-box">
+                <h2 data-en="🌟 Where You'll Use These" data-th="🌟 ที่ที่คุณจะใช้สิ่งเหล่านี้">🌟 Where You'll Use These</h2>
+            </div>
+
+            <div class="transform-grid">
+                <div class="transform-item">
+                    <h4 data-en="Computer Graphics" data-th="คอมพิวเตอร์กราฟิกส์">Computer Graphics</h4>
+                    <p data-en="3D rotations, lighting, camera transforms" data-th="การหมุน 3D แสง การแปลงกล้อง">3D rotations, lighting, camera transforms</p>
+                </div>
+                <div class="transform-item">
+                    <h4 data-en="Machine Learning" data-th="การเรียนรู้ของเครื่อง">Machine Learning</h4>
+                    <p data-en="Cosine similarity, neural networks, PCA" data-th="ความคล้ายคลึงแบบโคไซน์ โครงข่ายประสาท PCA">Cosine similarity, neural networks, PCA</p>
+                </div>
+                <div class="transform-item">
+                    <h4 data-en="Robotics" data-th="หุ่นยนต์">Robotics</h4>
+                    <p data-en="Joint rotations, path planning, torque" data-th="การหมุนข้อต่อ การวางแผนเส้นทาง แรงบิด">Joint rotations, path planning, torque</p>
+                </div>
+                <div class="transform-item">
+                    <h4 data-en="Physics" data-th="ฟิสิกส์">Physics</h4>
+                    <p data-en="Forces, work, electromagnetic fields" data-th="แรง งาน สนามแม่เหล็กไฟฟ้า">Forces, work, electromagnetic fields</p>
+                </div>
+            </div>
+
+            <div class="vector-viz">
+                <h2 data-en="🎯 Key Takeaways" data-th="🎯 ประเด็นสำคัญ">🎯 Key Takeaways</h2>
+            </div>
+
+            <div class="uses-list">
+                <ul>
+                    <li data-en="Dot product: measures alignment, gives angles and projections" data-th="ดอทโปรดักต์: วัดความสอดคล้อง ให้มุมและการฉาย">Dot product: measures alignment, gives angles and projections</li>
+                    <li data-en="Cross product: creates perpendicular vectors, calculates areas" data-th="ครอสโปรดักต์: สร้างเวกเตอร์ตั้งฉาก คำนวณพื้นที่">Cross product: creates perpendicular vectors, calculates areas</li>
+                    <li data-en="Matrix-vector: linear combinations of columns OR row dot products" data-th="เมทริกซ์-เวกเตอร์: การรวมเชิงเส้นของคอลัมน์ หรือ ดอทโปรดักต์ของแถว">Matrix-vector: linear combinations of columns OR row dot products</li>
+                    <li data-en="Transformations: scaling, rotation, reflection, shearing" data-th="การแปลง: การขยาย การหมุน การสะท้อน การเอียง">Transformations: scaling, rotation, reflection, shearing</li>
+                    <li data-en="Determinant: measures how transformations change areas/volumes" data-th="ดีเทอร์มิแนนต์: วัดว่าการแปลงเปลี่ยนพื้นที่/ปริมาตรอย่างไร">Determinant: measures how transformations change areas/volumes</li>
+                    <li data-en="Practice makes perfect: 9 quiz problems to test your skills!" data-th="การฝึกฝนสู่ความสมบูรณ์: 9 โจทย์แบบทดสอบเพื่อทดสอบทักษะ!">Practice makes perfect: 9 quiz problems to test your skills!</li>
+                </ul>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('final1')">
+                <h3 data-en="Final Challenge: Combine Everything!" data-th="ความท้าทายสุดท้าย: รวมทุกอย่าง!">Final Challenge: Combine Everything!</h3>
+                <p data-en="Apply 90° rotation to vector (3,4), then find its length" data-th="ใช้การหมุน 90° กับเวกเตอร์ (3,4) แล้วหาความยาว">Apply 90° rotation to vector (3,4), then find its length</p>
+                <p data-en="💪 You've completed 9 slides with comprehensive quizzes!" data-th="💪 คุณทำสไลด์ 9 หน้าพร้อมแบบทดสอบครบถ้วนแล้ว!">💪 You've completed 9 slides with comprehensive quizzes!</p>
+            </div>
+            <div class="solution" id="final1">
+                <p data-en="Rotation matrix: R = [0 -1; 1 0]" data-th="เมทริกซ์หมุน: R = [0 -1; 1 0]">Rotation matrix: R = [0 -1; 1 0]</p>
+                <p data-en="R[3,4] = [0×3 + (-1)×4, 1×3 + 0×4] = [-4, 3]" data-th="R[3,4] = [0×3 + (-1)×4, 1×3 + 0×4] = [-4, 3]">R[3,4] = [0×3 + (-1)×4, 1×3 + 0×4] = [-4, 3]</p>
+                <p data-en="Length: ||(-4,3)|| = √(16+9) = √25 = 5" data-th="ความยาว: ||(-4,3)|| = √(16+9) = √25 = 5">Length: ||(-4,3)|| = √(16+9) = √25 = 5</p>
+                <p data-en="Note: Rotation preserves length! ||R(3,4)|| = ||(3,4)|| = 5" data-th="หมายเหตุ: การหมุนรักษาความยาว! ||R(3,4)|| = ||(3,4)|| = 5">Note: Rotation preserves length! ||R(3,4)|| = ||(3,4)|| = 5</p>
+            </div>
+
+            <div class="concept-box">
+                <p data-en="🚀 You're now ready to tackle advanced topics like eigenvalues, SVD, and beyond!" data-th="🚀 ตอนนี้คุณพร้อมที่จะเผชิญหน้ากับหัวข้อขั้นสูงเช่น eigenvalues, SVD และอื่นๆ!">🚀 You're now ready to tackle advanced topics like eigenvalues, SVD, and beyond!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">← <span data-en="Previous" data-th="ก่อนหน้า">Previous</span></button>
+        <div class="slide-counter">
+            <span id="slideNum">1</span> / <span id="totalSlides">6</span>
+        </div>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)"><span data-en="Next" data-th="ถัดไป">Next</span> →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length; // Now 9 slides total
+        let isThai = false;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[n].classList.add('active');
+            
+            document.getElementById('slideNum').textContent = n + 1;
+            document.getElementById('prevBtn').disabled = n === 0;
+            document.getElementById('nextBtn').disabled = n === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            if (newSlide >= 0 && newSlide < totalSlides) {
+                currentSlide = newSlide;
+                showSlide(currentSlide);
+            }
+        }
+
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            solution.classList.toggle('show');
+        }
+
+        function toggleLanguage() {
+            isThai = !isThai;
+            const elements = document.querySelectorAll('[data-en][data-th]');
+            const langButton = document.querySelector('.language-toggle');
+            
+            elements.forEach(el => {
+                el.textContent = isThai ? el.getAttribute('data-th') : el.getAttribute('data-en');
+            });
+            
+            langButton.textContent = isThai ? '🇺🇸 English' : '🇹🇭 ภาษาไทย';
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'Escape') {
+                // Close all solutions
+                document.querySelectorAll('.solution.show').forEach(sol => {
+                    sol.classList.remove('show');
+                });
+            }
+            // Language toggle with 'L' key
+            if (e.key === 'l' || e.key === 'L') toggleLanguage();
+        });
+
+        // Initialize
+        document.getElementById('totalSlides').textContent = totalSlides;
+        showSlide(0);
+
+        // Add some visual feedback
+        document.querySelectorAll('.interactive-example').forEach(example => {
+            example.addEventListener('click', function() {
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = 'translateY(-3px)';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

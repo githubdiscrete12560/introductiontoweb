@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Column Space & Linear Systems</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .language-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .language-toggle:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .slide-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .slide {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            display: none;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide h2 {
+            color: #34495e;
+            margin: 25px 0 15px 0;
+            font-size: 1.8em;
+        }
+
+        .slide h3 {
+            color: #2980b9;
+            margin: 20px 0 10px 0;
+            font-size: 1.4em;
+        }
+
+        .example-box {
+            background: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .matrix {
+            display: inline-block;
+            border-left: 2px solid #2c3e50;
+            border-right: 2px solid #2c3e50;
+            padding: 10px 15px;
+            margin: 10px 5px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+        }
+
+        .interactive-example {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .interactive-example:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .solution {
+            background: #2ecc71;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        .solution.show {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .navigation {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .math-expression {
+            background: #34495e;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .highlight {
+            background: #f39c12;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        .geometric-viz {
+            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 id="header-title">Column Space & Linear Systems</h1>
+        <button class="language-toggle" onclick="toggleLanguage()">🌐 Español</button>
+    </div>
+
+    <div class="slide-container">
+        <!-- Slide 1: Introduction -->
+        <div class="slide active">
+            <h1 data-en="Column Space & Linear Systems" data-es="Espacio Columna y Sistemas Lineales">Column Space & Linear Systems</h1>
+            
+            <h2 data-en="What is the Column Space?" data-es="¿Qué es el Espacio Columna?">What is the Column Space?</h2>
+            <p data-en="For a matrix A with columns a₁, a₂, ..., aₙ, the column space Col(A) is:" data-es="Para una matriz A con columnas a₁, a₂, ..., aₙ, el espacio columna Col(A) es:">For a matrix A with columns a₁, a₂, ..., aₙ, the column space Col(A) is:</p>
+            
+            <div class="example-box">
+                <p data-en="The set of all possible linear combinations of A's columns" data-es="El conjunto de todas las combinaciones lineales posibles de las columnas de A"><strong>The set of all possible linear combinations of A's columns</strong></p>
+                <div class="math-expression">Col(A) = span{a₁, a₂, ..., aₙ} = {Ax : x ∈ ℝⁿ}</div>
+            </div>
+
+            <div class="geometric-viz">
+                <h3 data-en="🎯 Geometric Intuition" data-es="🎯 Intuición Geométrica">🎯 Geometric Intuition</h3>
+                <p data-en="Think of the column space as a 'canvas' or 'screen' where all possible outputs Ax can land" data-es="Piensa en el espacio columna como un 'lienzo' o 'pantalla' donde pueden aterrizar todas las salidas posibles Ax">Think of the column space as a 'canvas' or 'screen' where all possible outputs Ax can land</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Column Space Examples -->
+        <div class="slide">
+            <h1 data-en="Column Space Examples" data-es="Ejemplos de Espacio Columna">Column Space Examples</h1>
+
+            <div class="interactive-example" onclick="toggleSolution('ex1')">
+                <h3 data-en="Example 1: 2×2 Matrix" data-es="Ejemplo 1: Matriz 2×2">Example 1: 2×2 Matrix</h3>
+                <p data-en="Click to see the column space of:" data-es="Haz clic para ver el espacio columna de:">Click to see the column space of:</p>
+                <div class="matrix">A = [1  2]<br>&nbsp;&nbsp;&nbsp;&nbsp;[3  6]</div>
+            </div>
+            <div class="solution" id="ex1">
+                <p data-en="Column 1: [1, 3], Column 2: [2, 6] = 2×[1, 3]" data-es="Columna 1: [1, 3], Columna 2: [2, 6] = 2×[1, 3]">Column 1: [1, 3], Column 2: [2, 6] = 2×[1, 3]</p>
+                <p data-en="Since column 2 is a multiple of column 1, Col(A) = span{[1, 3]} = line through origin" data-es="Como la columna 2 es un múltiplo de la columna 1, Col(A) = span{[1, 3]} = línea que pasa por el origen">Since column 2 is a multiple of column 1, Col(A) = span{[1, 3]} = line through origin</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('ex2')">
+                <h3 data-en="Example 2: 3×2 Matrix" data-es="Ejemplo 2: Matriz 3×2">Example 2: 3×2 Matrix</h3>
+                <div class="matrix">A = [1  0]<br>&nbsp;&nbsp;&nbsp;&nbsp;[0  1]<br>&nbsp;&nbsp;&nbsp;&nbsp;[1  1]</div>
+            </div>
+            <div class="solution" id="ex2">
+                <p data-en="Columns: [1,0,1] and [0,1,1] are linearly independent" data-es="Columnas: [1,0,1] y [0,1,1] son linealmente independientes">Columns: [1,0,1] and [0,1,1] are linearly independent</p>
+                <p data-en="Col(A) = span{[1,0,1], [0,1,1]} = plane in ℝ³" data-es="Col(A) = span{[1,0,1], [0,1,1]} = plano en ℝ³">Col(A) = span{[1,0,1], [0,1,1]} = plane in ℝ³</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('ex3')">
+                <h3 data-en="Example 3: Identity Matrix" data-es="Ejemplo 3: Matriz Identidad">Example 3: Identity Matrix</h3>
+                <div class="matrix">I₃ = [1  0  0]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0  1  0]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0  0  1]</div>
+            </div>
+            <div class="solution" id="ex3">
+                <p data-en="All columns are standard basis vectors" data-es="Todas las columnas son vectores de base estándar">All columns are standard basis vectors</p>
+                <p data-en="Col(I₃) = span{e₁, e₂, e₃} = ℝ³ (entire 3D space)" data-es="Col(I₃) = span{e₁, e₂, e₃} = ℝ³ (todo el espacio 3D)">Col(I₃) = span{e₁, e₂, e₃} = ℝ³ (entire 3D space)</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: Solving Ax = b -->
+        <div class="slide">
+            <h1 data-en="Solving Ax = b" data-es="Resolviendo Ax = b">Solving Ax = b</h1>
+
+            <div class="example-box">
+                <h2 data-en="🔑 Key Insight" data-es="🔑 Idea Clave">🔑 Key Insight</h2>
+                <p data-en="The system Ax = b has a solution if and only if b lies in the column space of A" data-es="El sistema Ax = b tiene solución si y solo si b está en el espacio columna de A"><span class="highlight">The system Ax = b has a solution if and only if b lies in the column space of A</span></p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('solve1')">
+                <h3 data-en="Example 1: Solvable System" data-es="Ejemplo 1: Sistema con Solución">Example 1: Solvable System</h3>
+                <p data-en="Does this system have a solution?" data-es="¿Tiene solución este sistema?">Does this system have a solution?</p>
+                <div class="matrix">[1  2][x₁] = [5]<br>[3  6][x₂]   [15]</div>
+            </div>
+            <div class="solution" id="solve1">
+                <p data-en="Check if b = [5, 15] ∈ Col(A)" data-es="Verificar si b = [5, 15] ∈ Col(A)">Check if b = [5, 15] ∈ Col(A)</p>
+                <p data-en="[5, 15] = 5×[1, 3] ✓ Yes! b is in Col(A)" data-es="[5, 15] = 5×[1, 3] ✓ ¡Sí! b está en Col(A)">[5, 15] = 5×[1, 3] ✓ Yes! b is in Col(A)</p>
+                <p data-en="Solution: x₁ = 5, x₂ = 0 (or x₁ = 1, x₂ = 2, etc.)" data-es="Solución: x₁ = 5, x₂ = 0 (o x₁ = 1, x₂ = 2, etc.)">Solution: x₁ = 5, x₂ = 0 (or x₁ = 1, x₂ = 2, etc.)</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('solve2')">
+                <h3 data-en="Example 2: Unsolvable System" data-es="Ejemplo 2: Sistema sin Solución">Example 2: Unsolvable System</h3>
+                <div class="matrix">[1  2][x₁] = [1]<br>[3  6][x₂]   [4]</div>
+            </div>
+            <div class="solution" id="solve2">
+                <p data-en="Check if b = [1, 4] ∈ Col(A)" data-es="Verificar si b = [1, 4] ∈ Col(A)">Check if b = [1, 4] ∈ Col(A)</p>
+                <p data-en="Col(A) = span{[1, 3]}, but [1, 4] ≠ c×[1, 3] for any c" data-es="Col(A) = span{[1, 3]}, pero [1, 4] ≠ c×[1, 3] para cualquier c">Col(A) = span{[1, 3]}, but [1, 4] ≠ c×[1, 3] for any c</p>
+                <p data-en="✗ No solution exists!" data-es="✗ ¡No existe solución!">✗ No solution exists!</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('solve3')">
+                <h3 data-en="Example 3: Unique Solution" data-es="Ejemplo 3: Solución Única">Example 3: Unique Solution</h3>
+                <div class="matrix">[1  0][x₁] = [3]<br>[0  1][x₂]   [2]</div>
+            </div>
+            <div class="solution" id="solve3">
+                <p data-en="A = I₂, so Col(A) = ℝ²" data-es="A = I₂, entonces Col(A) = ℝ²">A = I₂, so Col(A) = ℝ²</p>
+                <p data-en="Any b ∈ ℝ² is in Col(A), so solution always exists" data-es="Cualquier b ∈ ℝ² está en Col(A), por lo que siempre existe solución">Any b ∈ ℝ² is in Col(A), so solution always exists</p>
+                <p data-en="Unique solution: x₁ = 3, x₂ = 2" data-es="Solución única: x₁ = 3, x₂ = 2">Unique solution: x₁ = 3, x₂ = 2</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: Projections -->
+        <div class="slide">
+            <h1 data-en="Projections" data-es="Proyecciones">Projections</h1>
+
+            <div class="example-box">
+                <h2 data-en="When Ax = b has no solution..." data-es="Cuando Ax = b no tiene solución...">When Ax = b has no solution...</h2>
+                <p data-en="We find the closest point in Col(A) to b using orthogonal projection" data-es="Encontramos el punto más cercano en Col(A) a b usando proyección ortogonal">We find the <span class="highlight">closest point in Col(A) to b</span> using orthogonal projection</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('proj1')">
+                <h3 data-en="Example 1: Project onto Column Space" data-es="Ejemplo 1: Proyectar al Espacio Columna">Example 1: Project onto Column Space</h3>
+                <p data-en="Find projection of b = [1, 4] onto Col(A) where:" data-es="Encontrar la proyección de b = [1, 4] sobre Col(A) donde:">Find projection of b = [1, 4] onto Col(A) where:</p>
+                <div class="matrix">A = [1  2]<br>&nbsp;&nbsp;&nbsp;&nbsp;[3  6]</div>
+            </div>
+            <div class="solution" id="proj1">
+                <p data-en="Col(A) = span{[1, 3]}, so we project b onto this line" data-es="Col(A) = span{[1, 3]}, entonces proyectamos b sobre esta línea">Col(A) = span{[1, 3]}, so we project b onto this line</p>
+                <p data-en="proj = (b·a₁/‖a₁‖²)a₁ = (13/10)[1, 3] = [1.3, 3.9]" data-es="proj = (b·a₁/‖a₁‖²)a₁ = (13/10)[1, 3] = [1.3, 3.9]">proj = (b·a₁/‖a₁‖²)a₁ = (13/10)[1, 3] = [1.3, 3.9]</p>
+                <p data-en="This is the closest point in Col(A) to b" data-es="Este es el punto más cercano en Col(A) a b">This is the closest point in Col(A) to b</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('proj2')">
+                <h3 data-en="Example 2: Normal Equations" data-es="Ejemplo 2: Ecuaciones Normales">Example 2: Normal Equations</h3>
+                <p data-en="Solve AᵀAx̂ = Aᵀb for the projection" data-es="Resolver AᵀAx̂ = Aᵀb para la proyección">Solve AᵀAx̂ = Aᵀb for the projection</p>
+                <div class="matrix">A = [1]<br>&nbsp;&nbsp;&nbsp;&nbsp;[1], b = [3]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1]</div>
+            </div>
+            <div class="solution" id="proj2">
+                <p data-en="AᵀA = [2], Aᵀb = [4]" data-es="AᵀA = [2], Aᵀb = [4]">AᵀA = [2], Aᵀb = [4]</p>
+                <p data-en="2x̂ = 4 → x̂ = 2" data-es="2x̂ = 4 → x̂ = 2">2x̂ = 4 → x̂ = 2</p>
+                <p data-en="Projection: Ax̂ = [2, 2]" data-es="Proyección: Ax̂ = [2, 2]">Projection: Ax̂ = [2, 2]</p>
+                <p data-en="Error: b - Ax̂ = [1, -1] ⊥ Col(A)" data-es="Error: b - Ax̂ = [1, -1] ⊥ Col(A)">Error: b - Ax̂ = [1, -1] ⊥ Col(A)</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('proj3')">
+                <h3 data-en="Example 3: Least Squares" data-es="Ejemplo 3: Mínimos Cuadrados">Example 3: Least Squares</h3>
+                <p data-en="Find the best fit line for points (0,1), (1,1), (2,3)" data-es="Encontrar la línea de mejor ajuste para los puntos (0,1), (1,1), (2,3)">Find the best fit line for points (0,1), (1,1), (2,3)</p>
+            </div>
+            <div class="solution" id="proj3">
+                <p data-en="Set up: Ax = b where A = [1 0; 1 1; 1 2], b = [1; 1; 3]" data-es="Configurar: Ax = b donde A = [1 0; 1 1; 1 2], b = [1; 1; 3]">Set up: Ax = b where A = [1 0; 1 1; 1 2], b = [1; 1; 3]</p>
+                <p data-en="AᵀA = [3 3; 3 5], Aᵀb = [5; 7]" data-es="AᵀA = [3 3; 3 5], Aᵀb = [5; 7]">AᵀA = [3 3; 3 5], Aᵀb = [5; 7]</p>
+                <p data-en="Best fit: y = 2/3 + x" data-es="Mejor ajuste: y = 2/3 + x">Best fit: y = 2/3 + x</p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Rank -->
+        <div class="slide">
+            <h1 data-en="Rank & Dimension" data-es="Rango y Dimensión">Rank & Dimension</h1>
+
+            <div class="example-box">
+                <h2 data-en="🎯 Key Connection" data-es="🎯 Conexión Clave">🎯 Key Connection</h2>
+                <p data-en="rank(A) = dim(Col(A)) = number of linearly independent columns" data-es="rango(A) = dim(Col(A)) = número de columnas linealmente independientes"><span class="highlight">rank(A) = dim(Col(A))</span> = number of linearly independent columns</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('rank1')">
+                <h3 data-en="Example 1: Rank-Deficient Matrix" data-es="Ejemplo 1: Matriz con Rango Deficiente">Example 1: Rank-Deficient Matrix</h3>
+                <div class="matrix">A = [1  2  3]<br>&nbsp;&nbsp;&nbsp;&nbsp;[2  4  6]</div>
+            </div>
+            <div class="solution" id="rank1">
+                <p data-en="Columns: [1,2], [2,4], [3,6]" data-es="Columnas: [1,2], [2,4], [3,6]">Columns: [1,2], [2,4], [3,6]</p>
+                <p data-en="All columns are multiples of [1,2]" data-es="Todas las columnas son múltiplos de [1,2]">All columns are multiples of [1,2]</p>
+                <p data-en="rank(A) = 1, dim(Col(A)) = 1 (line in ℝ²)" data-es="rango(A) = 1, dim(Col(A)) = 1 (línea en ℝ²)">rank(A) = 1, dim(Col(A)) = 1 (line in ℝ²)</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('rank2')">
+                <h3 data-en="Example 2: Full Rank Matrix" data-es="Ejemplo 2: Matriz de Rango Completo">Example 2: Full Rank Matrix</h3>
+                <div class="matrix">A = [1  0  2]<br>&nbsp;&nbsp;&nbsp;&nbsp;[0  1  3]<br>&nbsp;&nbsp;&nbsp;&nbsp;[0  0  1]</div>
+            </div>
+            <div class="solution" id="rank2">
+                <p data-en="Upper triangular with non-zero diagonal" data-es="Triangular superior con diagonal no nula">Upper triangular with non-zero diagonal</p>
+                <p data-en="All 3 columns are linearly independent" data-es="Las 3 columnas son linealmente independientes">All 3 columns are linearly independent</p>
+                <p data-en="rank(A) = 3, Col(A) = ℝ³" data-es="rango(A) = 3, Col(A) = ℝ³">rank(A) = 3, Col(A) = ℝ³</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('rank3')">
+                <h3 data-en="Example 3: Rank and Solutions" data-es="Ejemplo 3: Rango y Soluciones">Example 3: Rank and Solutions</h3>
+                <p data-en="What does rank tell us about Ax = b?" data-es="¿Qué nos dice el rango sobre Ax = b?">What does rank tell us about Ax = b?</p>
+            </div>
+            <div class="solution" id="rank3">
+                <p data-en="• rank(A) = n (full column rank): At most one solution" data-es="• rango(A) = n (rango de columna completo): A lo sumo una solución">• rank(A) = n (full column rank): At most one solution</p>
+                <p data-en="• rank(A) = m (full row rank): Solution exists for any b" data-es="• rango(A) = m (rango de fila completo): Existe solución para cualquier b">• rank(A) = m (full row rank): Solution exists for any b</p>
+                <p data-en="• rank(A) < min(m,n): Either no solution or infinitely many" data-es="• rango(A) < min(m,n): O no hay solución o hay infinitas">• rank(A) < min(m,n): Either no solution or infinitely many</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('rank4')">
+                <h3 data-en="Example 4: Four Fundamental Subspaces" data-es="Ejemplo 4: Cuatro Subespacios Fundamentales">Example 4: Four Fundamental Subspaces</h3>
+                <p data-en="How do they connect?" data-es="¿Cómo se conectan?">How do they connect?</p>
+            </div>
+            <div class="solution" id="rank4">
+                <p data-en="• Col(A) ⊥ Null(Aᵀ) in ℝᵐ" data-es="• Col(A) ⊥ Null(Aᵀ) en ℝᵐ">• Col(A) ⊥ Null(Aᵀ) in ℝᵐ</p>
+                <p data-en="• Row(A) ⊥ Null(A) in ℝⁿ" data-es="• Row(A) ⊥ Null(A) en ℝⁿ">• Row(A) ⊥ Null(A) in ℝⁿ</p>
+                <p data-en="• dim(Col(A)) = dim(Row(A)) = rank(A)" data-es="• dim(Col(A)) = dim(Row(A)) = rango(A)">• dim(Col(A)) = dim(Row(A)) = rank(A)</p>
+                <p data-en="• All four subspaces partition their respective spaces!" data-es="• ¡Los cuatro subespacios particionan sus espacios respectivos!">• All four subspaces partition their respective spaces!</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Unified Picture -->
+        <div class="slide">
+            <h1 data-en="The Unified Picture" data-es="La Imagen Unificada">The Unified Picture</h1>
+
+            <div class="geometric-viz">
+                <h2 data-en="🌟 Everything Connected" data-es="🌟 Todo Conectado">🌟 Everything Connected</h2>
+                <p data-en="Column space is the central organizing principle!" data-es="¡El espacio columna es el principio organizador central!">Column space is the central organizing principle!</p>
+            </div>
+
+            <div class="example-box">
+                <h3 data-en="The Complete Story:" data-es="La Historia Completa:">The Complete Story:</h3>
+                <p data-en="1. Column space defines where Ax can land" data-es="1. El espacio columna define dónde puede aterrizar Ax">1. <strong>Column space</strong> defines where Ax can land</p>
+                <p data-en="2. Solvability: b ∈ Col(A) ⟺ solution exists" data-es="2. Resolubilidad: b ∈ Col(A) ⟺ existe solución">2. <strong>Solvability:</strong> b ∈ Col(A) ⟺ solution exists</p>
+                <p data-en="3. Projection: finds closest point in Col(A) to b" data-es="3. Proyección: encuentra el punto más cercano en Col(A) a b">3. <strong>Projection:</strong> finds closest point in Col(A) to b</p>
+                <p data-en="4. Rank: measures dimension of Col(A)" data-es="4. Rango: mide la dimensión de Col(A)">4. <strong>Rank:</strong> measures dimension of Col(A)</p>
+            </div>
+
+            <div class="interactive-example" onclick="toggleSolution('unified1')">
+                <h3 data-en="Example: Complete Analysis" data-es="Ejemplo: Análisis Completo">Example: Complete Analysis</h3>
+                <p data-en="Analyze everything for:" data-es="Analizar todo para:">Analyze everything for:</p>
+                <div class="matrix">A = [1  1]<br>&nbsp;&nbsp;&nbsp;&nbsp;[1  1]<br>&nbsp;&nbsp;&nbsp;&nbsp;[0  1]</div>
+            </div>
+            <div class="solution" id="unified1">
+                <p data-en="• Col(A) = span{[1,1,0], [1,1,1]} = plane in ℝ³" data-es="• Col(A) = span{[1,1,0], [1,1,1]} = plano en ℝ³">• <strong>Col(A)</strong> = span{[1,1,0], [1,1,1]} = plane in ℝ³</p>
+                <p data-en="• rank(A) = 2 (columns are linearly independent)" data-es="• rango(A) = 2 (las columnas son linealmente independientes)">• <strong>rank(A)</strong> = 2 (columns are linearly independent)</p>
+                <p data-en="• For b = [3,3,1]: b ∈ Col(A)? Yes! Solution: x = [2,1]" data-es="• Para b = [3,3,1]: ¿b ∈ Col(A)? ¡Sí! Solución: x = [2,1]">• For b = [3,3,1]: b ∈ Col(A)? Yes! Solution: x = [2,1]</p>
+                <p data-en="• For b = [1,0,1]: Not in Col(A), need projection" data-es="• Para b = [1,0,1]: No está en Col(A), necesitamos proyección">• For b = [1,0,1]: Not in Col(A), need projection</p>
+            </div>
+
+            <div class="geometric-viz">
+                <h3 data-en="🎯 Key Takeaway" data-es="🎯 Conclusión Clave">🎯 Key Takeaway</h3>
+                <p data-en="Understanding column space gives you geometric insight into all of linear algebra!" data-es="¡Entender el espacio columna te da una visión geométrica de toda el álgebra lineal!">Understanding column space gives you geometric insight into all of linear algebra!</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">← <span data-en="Previous" data-es="Anterior">Previous</span></button>
+        <div class="slide-counter">
+            <span id="slideNum">1</span> / <span id="totalSlides">6</span>
+        </div>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)"><span data-en="Next" data-es="Siguiente">Next</span> →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let isSpanish = false;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[n].classList.add('active');
+            
+            document.getElementById('slideNum').textContent = n + 1;
+            document.getElementById('prevBtn').disabled = n === 0;
+            document.getElementById('nextBtn').disabled = n === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            if (newSlide >= 0 && newSlide < totalSlides) {
+                currentSlide = newSlide;
+                showSlide(currentSlide);
+            }
+        }
+
+        function toggleSolution(id) {
+            const solution = document.getElementById(id);
+            solution.classList.toggle('show');
+        }
+
+        function toggleLanguage() {
+            isSpanish = !isSpanish;
+            const elements = document.querySelectorAll('[data-en][data-es]');
+            const langButton = document.querySelector('.language-toggle');
+            
+            elements.forEach(el => {
+                el.textContent = isSpanish ? el.getAttribute('data-es') : el.getAttribute('data-en');
+            });
+            
+            langButton.textContent = isSpanish ? '🌐 English' : '🌐 Español';
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+            if (e.key === 'Escape') {
+                // Close all solutions
+                document.querySelectorAll('.solution.show').forEach(sol => {
+                    sol.classList.remove('show');
+                });
+            }
+        });
+
+        // Initialize
+        document.getElementById('totalSlides').textContent = totalSlides;
+        showSlide(0);
+    </script>
+</body>
+</html>
