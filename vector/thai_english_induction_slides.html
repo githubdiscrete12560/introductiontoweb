@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mathematical Induction & Trees | การพิสูจน์เหนี่ยวนำและต้นไม้</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .presentation-container {
+            width: 90%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .slide {
+            padding: 60px 50px;
+            min-height: 600px;
+            display: none;
+            position: relative;
+        }
+
+        .slide.active {
+            display: block;
+        }
+
+        .slide h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        .slide h2 {
+            color: #34495e;
+            font-size: 2em;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .slide h3 {
+            color: #2980b9;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            margin-top: 25px;
+        }
+
+        .thai {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .english {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .math-formula {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            border-left: 4px solid #3498db;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        .example-box {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #27ae60;
+        }
+
+        .tree-diagram {
+            text-align: center;
+            font-family: monospace;
+            font-size: 14px;
+            background: #f4f4f4;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .nav-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+
+        .nav-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .slide-counter {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: #34495e;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .interactive-element {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .interactive-element:hover {
+            background: #fff1b3;
+            transform: scale(1.02);
+        }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .steps {
+            counter-reset: step-counter;
+        }
+
+        .step {
+            counter-increment: step-counter;
+            margin: 15px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #e74c3c;
+        }
+
+        .step::before {
+            content: "Step " counter(step-counter) ": ";
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            background: #fff2cc;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .references {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            border: 1px solid #dee2e6;
+        }
+
+        .references h4 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .references ol {
+            margin-left: 20px;
+        }
+
+        .references li {
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="slide-counter">
+            <span id="current-slide">1</span> / <span id="total-slides">13</span>
+        </div>
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <h1>Mathematical Induction & Tree Structures</h1>
+            <h1 class="thai">การพิสูจน์อุปนัยทางคณิตศาสตร์และโครงสร้างต้นไม้</h1>
+            
+            <div style="text-align: center; margin-top: 50px;">
+                <div class="english">An Interactive Introduction to Proof Techniques</div>
+                <div class="thai">บทนำเชิงปฏิสัมพันธ์สู่เทคนิคการพิสูจน์</div>
+            </div>
+
+            <div style="text-align: center; margin-top: 100px; font-size: 1.2em;">
+                <div class="english">Topics Covered | หัวข้อที่ครอบคลุม:</div>
+                <ul style="text-align: left; display: inline-block; margin-top: 30px;">
+                    <li><span class="english">Introduction to Mathematical Induction</span> | <span class="thai">บทนำสู่การพิสูจน์อุปนัย</span></li>
+                    <li><span class="english">Tree Data Structures</span> | <span class="thai">โครงสร้างข้อมูลต้นไม้</span></li>
+                    <li><span class="english">Induction on Trees</span> | <span class="thai">การพิสูจน์อุปนัยบนต้นไม้</span></li>
+                </ul>
+            </div>
+
+            <div style="text-align: center; margin-top: 50px; font-size: 0.9em; color: #7f8c8d;">
+                <div>Created by Claude.ai | สร้างโดย Claude.ai</div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Deductive vs Inductive Reasoning -->
+        <div class="slide">
+            <h2>Deductive vs Inductive Reasoning | การให้เหตุผลแบบนิรนัยและอุปนัย</h2>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
+                <div style="background: #e8f5e8; padding: 20px; border-radius: 10px; border-left: 4px solid #27ae60;">
+                    <h3 style="color: #27ae60; text-align: center;">Deductive Reasoning | การให้เหตุผลแบบนิรนัย</h3>
+                    <div class="english"><strong>General → Specific</strong></div>
+                    <div class="thai"><strong>ทั่วไป → เฉพาะ</strong></div>
+                    
+                    <div style="margin: 15px 0;">
+                        <div class="english">Start with general principles, reach specific conclusions</div>
+                        <div class="thai">เริ่มจากหลักการทั่วไป ไปสู่ข้อสรุปเฉพาะ</div>
+                    </div>
+
+                    <div class="example-box" style="background: #f0f8f0; border-left: 4px solid #27ae60;">
+                        <h4>Example | ตัวอย่าง:</h4>
+                        <div class="english">1. All Nordic countries provide free higher education (general)</div>
+                        <div class="thai">1. ประเทศนอร์ดิกทุกประเทศให้การศึกษาระดับสูงฟรี (ทั่วไป)</div>
+                        <div class="english">2. Finland is a Nordic country (specific)</div>
+                        <div class="thai">2. ฟินแลนด์เป็นประเทศนอร์ดิก (เฉพาะ)</div>
+                        <div class="english">3. Therefore, Finland provides free higher education</div>
+                        <div class="thai">3. ดังนั้น ฟินแลนด์ให้การศึกษาระดับสูงฟรี</div>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <div class="english"><strong>Characteristics | ลักษณะ:</strong></div>
+                        <ul style="font-size: 0.9em;">
+                            <li><span class="english">Guarantees truth if premises are true</span> | <span class="thai">รับประกันความจริงถ้าสมมติฐานเป็นจริง</span></li>
+                            <li><span class="english">Conclusions are certain</span> | <span class="thai">ข้อสรุปแน่นอน</span></li>
+                            <li><span class="english">No new information created</span> | <span class="thai">ไม่สร้างข้อมูลใหม่</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="background: #fff3cd; padding: 20px; border-radius: 10px; border-left: 4px solid #ffc107;">
+                    <h3 style="color: #e67e22; text-align: center;">Inductive Reasoning | การให้เหตุผลแบบอุปนัย</h3>
+                    <div class="english"><strong>Specific → General</strong></div>
+                    <div class="thai"><strong>เฉพาะ → ทั่วไป</strong></div>
+                    
+                    <div style="margin: 15px 0;">
+                        <div class="english">Observe specific cases, form general conclusions</div>
+                        <div class="thai">สังเกตกรณีเฉพาะ ตั้งข้อสรุปทั่วไป</div>
+                    </div>
+
+                    <div class="example-box" style="background: #fffbf0; border-left: 4px solid #ffc107;">
+                        <h4>Example | ตัวอย่าง:</h4>
+                        <div class="english">1. Denmark ranks #1 in World Happiness Report (observation)</div>
+                        <div class="thai">1. เดนมาร์กอันดับ 1 ในรายงานความสุขโลก (สังเกต)</div>
+                        <div class="english">2. Norway ranks #2 in World Happiness Report (observation)</div>
+                        <div class="thai">2. นอร์เวย์อันดับ 2 ในรายงานความสุขโลก (สังเกต)</div>
+                        <div class="english">3. Sweden ranks #3 in World Happiness Report (observation)</div>
+                        <div class="thai">3. สวีเดนอันดับ 3 ในรายงานความสุขโลก (สังเกต)</div>
+                        <div class="english">4. Therefore, Nordic model creates the happiest societies</div>
+                        <div class="thai">4. ดังนั้น แบบจำลองนอร์ดิกสร้างสังคมที่มีความสุขที่สุด</div>
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <div class="english"><strong>Characteristics | ลักษณะ:</strong></div>
+                        <ul style="font-size: 0.9em;">
+                            <li><span class="english">Conclusions are probable, not certain</span> | <span class="thai">ข้อสรุปเป็นไปได้ ไม่แน่นอน</span></li>
+                            <li><span class="english">Creates new knowledge</span> | <span class="thai">สร้างความรู้ใหม่</span></li>
+                            <li><span class="english">Risk of false conclusions</span> | <span class="thai">เสี่ยงต่อข้อสรุปที่ผิด</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: #e3f2fd; padding: 20px; border-radius: 10px; margin-top: 30px; border-left: 4px solid #2196f3;">
+                <h3 style="color: #1976d2;">Mathematical Induction: A Special Case | การอุปนัยทางคณิตศาสตร์: กรณีพิเศษ</h3>
+                <div class="english">Mathematical induction combines both approaches:</div>
+                <div class="thai">การอุปนัยทางคณิตศาสตร์รวมทั้งสองแนวทาง:</div>
+                <ul style="margin-top: 15px;">
+                    <li><span class="english">Uses <strong>deductive logic</strong> in each step</span> | <span class="thai">ใช้ <strong>ตรรกนิรนัย</strong> ในแต่ละขั้นตอน</span></li>
+                    <li><span class="english">Applies to <strong>infinite cases</strong> (inductive-like reach)</span> | <span class="thai">ใช้กับ <strong>กรณีอนันต์</strong> (การเข้าถึงแบบอุปนัย)</span></li>
+                    <li><span class="english">Provides <strong>certainty</strong> like deduction</span> | <span class="thai">ให้ <strong>ความแน่นอน</strong> เหมือนนิรนัย</span></li>
+                    <li><span class="english">Proves statements for <strong>all natural numbers</strong></span> | <span class="thai">พิสูจน์ข้อความสำหรับ <strong>จำนวนธรรมชาติทั้งหมด</strong></span></li>
+                </ul>
+            </div>
+
+            <div class="interactive-element" onclick="this.style.background='#d4edda'" style="margin-top: 20px;">
+                <div class="english">💡 Click here: Why is mathematical induction so powerful?</div>
+                <div class="thai">💡 คลิกที่นี่: ทำไมการอุปนัยทางคณิตศาสตร์ถึงมีพลังมาก?</div>
+                <div style="display: none; margin-top: 10px; font-size: 0.9em;">
+                    <div class="english">It allows us to prove infinite statements with finite steps, combining the certainty of deduction with the scope of induction!</div>
+                    <div class="thai">มันช่วยให้เราพิสูจน์ข้อความอนันต์ด้วยขั้นตอนจำกัด โดยรวมความแน่นอนของนิรนัยกับขอบเขตของอุปนัย!</div>
+                </div>
+            </div>
+
+            <div style="background: #f0fff0; padding: 25px; border-radius: 15px; margin: 30px 0; border-left: 6px solid #28a745; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.1);">
+                <h3 style="color: #28a745; text-align: center; margin-bottom: 20px; font-size: 1.4em;">การพิสูจน์โดยอุปนัยทางคณิตศาสตร์ | Mathematical Induction</h3>
+                
+                <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #d4edda;">
+                    <div class="thai" style="font-size: 1.05em; line-height: 1.7; color: #2d5016;">
+                        <strong>การพิสูจน์โดยอุปนัย (Inductive Proof)</strong> ในทางคณิตศาสตร์ หมายถึง <strong>วิธีการพิสูจน์ทางคณิตศาสตร์รูปแบบหนึ่งที่ใช้พิสูจน์ว่าข้อความหนึ่งเป็นจริงสำหรับจำนวนนับทุกตัว (n = 1, 2, 3, ...)</strong>
+                    </div>
+                </div>
+
+                <div style="background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #d4edda;">
+                    <h4 style="color: #28a745; margin-bottom: 15px;">หลักการทำงานมี 2 ขั้นตอนหลัก:</h4>
+                    <div class="steps" style="counter-reset: thai-step;">
+                        <div style="counter-increment: thai-step; margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #28a745;">
+                            <div class="thai" style="font-weight: bold; color: #28a745;">ขั้นที่ 1: ฐานการอุปนัย (Base Case)</div>
+                            <div class="thai" style="margin-top: 8px; line-height: 1.6;">พิสูจน์ว่าข้อความเป็นจริงสำหรับกรณีแรกเริ่ม (มักจะเป็น n = 1 หรือบางครั้ง n = 0)</div>
+                        </div>
+                        <div style="counter-increment: thai-step; margin: 15px 0; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #28a745;">
+                            <div class="thai" style="font-weight: bold; color: #28a745;">ขั้นที่ 2: ขั้นอุปนัย (Inductive Step)</div>
+                            <ul style="margin: 8px 0 0 20px; line-height: 1.6;">
+                                <li class="thai"><strong>สมมติว่า:</strong> ข้อความเป็นจริงสำหรับจำนวนนับ <em>บางตัว</em> k (สมมติฐานการอุปนัย)</li>
+                                <li class="thai"><strong>พิสูจน์ว่า:</strong> จากสมมติฐานนั้น ทำให้สรุปได้ว่าข้อความ <em>ต้อง</em> เป็นจริงสำหรับ k+1 ด้วย</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #fff3cd; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #ffeaa7;">
+                    <div class="thai" style="font-weight: bold; color: #856404; font-size: 1.1em; text-align: center;">
+                        <strong>สรุป:</strong> เมื่อทั้งสองขั้นตอนนี้ถูกต้อง เราสามารถสรุปได้ว่า <strong>ข้อความเป็นจริงสำหรับจำนวนนับ n ทุกตัว</strong>
+                    </div>
+                </div>
+
+                <div style="background: #e1f5fe; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #b3e5fc;">
+                    <h4 style="color: #0277bd; margin-bottom: 15px;">เปรียบเทียบให้เข้าใจง่าย - อุปมาบันได:</h4>
+                    <ul style="margin-left: 20px; line-height: 1.7;">
+                        <li class="thai"><strong>ฐานการอุปนัย:</strong> เหมือนพิสูจน์ว่าขั้นบันไดขั้นแรกแข็งแรงพอที่จะยืนได้</li>
+                        <li class="thai"><strong>ขั้นอุปนัย:</strong> พิสูจน์ว่าถ้าขั้นบันไดขั้นที่ k แข็งแรง (ยืนได้) แล้ว ขั้นบันไดขั้นที่ k+1 <em>ก็ต้องแข็งแรง</em> (ยืนได้) ด้วย</li>
+                        <li class="thai"><strong>ผลสรุป:</strong> ถ้าขั้นแรกแข็งแรง และทุกครั้งที่ขั้น k แข็งแรงแล้วขั้น k+1 ก็แข็งแรงตามไปด้วย เราก็มั่นใจได้ว่าทั้งบันได (ทุกขั้น) แข็งแรงทั้งหมด</li>
+                    </ul>
+                </div>
+
+                <div style="background: #f3e5f5; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #e1bee7;">
+                    <h4 style="color: #7b1fa2; margin-bottom: 15px;">ตัวอย่างการประยุกต์ใช้:</h4>
+                    <div class="thai" style="line-height: 1.6;">
+                        การพิสูจน์สูตรผลบวกของอนุกรม (เช่น 1 + 2 + 3 + ... + n = n(n+1)/2) การพิสูจน์สมบัติของจำนวนนับ หรือการพิสูจน์ความสัมพันธ์เวียนเกิด (Recurrence Relations)
+                    </div>
+                </div>
+
+                <div style="background: #ffebee; padding: 20px; border-radius: 10px; border: 1px solid #ffcdd2;">
+                    <h4 style="color: #c62828; margin-bottom: 15px;">⚠️ ข้อสำคัญ:</h4>
+                    <div class="thai" style="line-height: 1.6; color: #c62828;">
+                        "<strong>การพิสูจน์โดยอุปนัย</strong>" ในคณิตศาสตร์นี้ (Mathematical Induction) เป็นคนละอย่างกับ "<strong>การให้เหตุผลแบบอุปนัย</strong>" (Inductive Reasoning) ในปรัชญาหรือวิทยาศาสตร์ ที่หมายถึงการสรุปข้อความทั่วไปจากข้อสังเกตเฉพาะเจาะจงหลายๆ ครั้ง (ซึ่งการสรุปแบบนั้น <em>อาจไม่ถูกต้องเสมอไป</em>)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Three Types of Reasoning (from ChatGPT) -->
+        <div class="slide">
+            <h2>Three Types of Reasoning | การให้เหตุผลสามประเภท</h2>
+            
+            <div style="overflow-x: auto; margin: 20px 0;">
+                <table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: white;">
+                    <thead>
+                        <tr style="background: #3498db; color: white;">
+                            <th style="padding: 15px; border: 1px solid #ddd; text-align: left;">Notion | แนวคิด</th>
+                            <th style="padding: 15px; border: 1px solid #ddd; text-align: left;">What it does | สิ่งที่ทำ</th>
+                            <th style="padding: 15px; border: 1px solid #ddd; text-align: left;">Guarantee | การรับประกัน</th>
+                            <th style="padding: 15px; border: 1px solid #ddd; text-align: left;">Example | ตัวอย่าง</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background: #f8f9fa;">
+                            <td style="padding: 15px; border: 1px solid #ddd; font-weight: bold;">
+                                <div class="english">Deduction</div>
+                                <div class="thai">นิรนัย</div>
+                            </td>
+                            <td style="padding: 15px; border: 1px solid #ddd;">
+                                <div class="english">Derives conclusions that must be true if premises are true</div>
+                                <div class="thai">อนุมานข้อสรุปที่ต้องเป็นจริงหากสมมติฐานเป็นจริง</div>
+                            </td>
+                            <td style="padding: 15px; border: 1px solid #ddd;">
+                                <div class="english"><strong>Certainty</strong> (truth preserved)</div>
+                                <div class="thai"><strong>ความแน่นอน</strong> (รักษาความจริง)</div>
+                            </td>
+                            <td style="padding: 15px; border: 1px solid #ddd; font-size: 0.9em;">
+                                <div class="english">From "All BST inserts keep the BST property" and "We inserted x into a BST", deduce "Result is a BST" (modus ponens)</div>
+                                <div class="thai">จาก "การใส่ BST ทั้งหมดรักษาคุณสมบัติ BST" และ "เราใส่ x เข้า BST" สรุป "ผลลัพธ์เป็น BST" (โมดัสโปเนนส์)</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 15px; border: 1px solid #ddd; font-weight: bold;">
+                                <div class="english">Empirical/Statistical Induction</div>
+                                <div class="thai">อุปนัยเชิงประจักษ์/สถิติ</div>
+                            </td>
+                            <td style="padding: 15px; border: 1px solid #ddd;">
+                                <div class="english">Generalizes from instances to hypothesis ("probably true")</div>
+                                <div class="thai">สรุปจากกรณีเฉพาะเป็นสมมติฐาน ("น่าจะเป็นจริง")</div>
+                            </td>
+                            <td style="padding: 15px; border: 1px solid #ddd;">
+                                <div class="english"><strong>No certainty</strong> - evidential</div>
+                                <div class="thai"><strong>ไม่แน่นอน</strong> - เป็นหลักฐาน</div>
+                            </td>
+                            <td style="padding: 15px; border: 1px solid #ddd; font-size: 0.9em;">
+                                <div class="english">1,000 servers run fine → patch is safe</div>
+                                <div class="thai">เซิร์ฟเวอร์ 1,000 ตัวทำงานดี → แพทช์ปลอดภัย</div>
+                            </td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <td style="padding: 15px; border: 1px solid #ddd; font-weight: bold;">
+                                <div class="english">Mathematical Induction</div>
+                                <div class="thai">อุปนัยทางคณิตศาสตร์</div>
+                            </td>
+                            <td style="padding: 15px; border: 1px solid #ddd;">
+                                <div class="english">Proves statement for all natural numbers via base case + inductive step</div>
+                                <div class="thai">พิสูจน์ข้อความสำหรับจำนวนธรรมชาติทั้งหมดผ่านกรณีฐาน + ขั้นตอนอุปนัย</div>
+                            </td>
+                            <td style="padding: 15px; border: 1px solid #ddd;">
+                                <div class="english"><strong>Certainty</strong> - deductive proof rule</div>
+                                <div class="thai"><strong>ความแน่นอน</strong> - กฎการพิสูจน์แบบนิรนัย</div>
+                            </td>
+                            <td style="padding: 15px; border: 1px solid #ddd; font-size: 0.9em;">
+                                <div class="english">Tree/list properties</div>
+                                <div class="thai">คุณสมบัติของต้นไม้/รายการ</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="background: #f0f8ff; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #4169e1;">
+                <h3 style="color: #4169e1;">Modus Ponens Explained | คำอธิบายโมดัสโปเนนส์</h3>
+                <div class="english">Modus ponens is a fundamental rule of inference in deductive logic:</div>
+                <div class="thai">โมดัสโปเนนส์เป็นกฎพื้นฐานของการอนุมานในตรรกะนิรนัย:</div>
+                
+                <div class="math-formula" style="margin: 15px 0; background: #f8f8ff;">
+                    <div class="english"><strong>Form:</strong> If P → Q (premise 1) and P (premise 2), then Q (conclusion)</div>
+                    <div class="thai"><strong>รูปแบบ:</strong> ถ้า P → Q (สมมติฐาน 1) และ P (สมมติฐาน 2) แล้ว Q (ข้อสรุป)</div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                    <div>
+                        <div class="english"><strong>BST Example:</strong></div>
+                        <div class="thai"><strong>ตัวอย่าง BST:</strong></div>
+                        <ul style="margin: 10px 0; font-size: 0.9em;">
+                            <li><span class="english">P → Q: "All BST inserts preserve BST property"</span> | <span class="thai">P → Q: "การใส่ BST ทั้งหมดรักษาคุณสมบัติ BST"</span></li>
+                            <li><span class="english">P: "We inserted x into a BST"</span> | <span class="thai">P: "เราใส่ x เข้า BST"</span></li>
+                            <li><span class="english">Q: "Result is a BST"</span> | <span class="thai">Q: "ผลลัพธ์เป็น BST"</span></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="english"><strong>Why it works:</strong></div>
+                        <div class="thai"><strong>ทำไมมันใช้ได้:</strong></div>
+                        <ul style="margin: 10px 0; font-size: 0.9em;">
+                            <li><span class="english">Logically valid inference rule</span> | <span class="thai">กฎการอนุมานที่ถูกต้องตามตรรกะ</span></li>
+                            <li><span class="english">Preserves truth from premises to conclusion</span> | <span class="thai">รักษาความจริงจากสมมติฐานไปสู่ข้อสรุป</span></li>
+                            <li><span class="english">Foundation of mathematical reasoning</span> | <span class="thai">รากฐานของการให้เหตุผลทางคณิตศาสตร์</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div style="background: #fff5f5; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #dc3545;">
+                <h3 style="color: #dc3545;">Truth Table for P → Q | ตารางความจริงสำหรับ P → Q</h3>
+                <div class="english">Understanding when a conditional statement P → Q is true or false:</div>
+                <div class="thai">เข้าใจว่าเมื่อไหร่ข้อความเงื่อนไข P → Q เป็นจริงหรือเท็จ:</div>
+                
+                <div style="display: flex; justify-content: center; margin: 20px 0;">
+                    <table style="border-collapse: collapse; background: white; border: 2px solid #dc3545;">
+                        <thead>
+                            <tr style="background: #dc3545; color: white;">
+                                <th style="padding: 12px 20px; border: 1px solid #fff; text-align: center;">P</th>
+                                <th style="padding: 12px 20px; border: 1px solid #fff; text-align: center;">Q</th>
+                                <th style="padding: 12px 20px; border: 1px solid #fff; text-align: center;">P → Q</th>
+                                <th style="padding: 12px 20px; border: 1px solid #fff; text-align: center;">
+                                    <div class="english">Explanation</div>
+                                    <div class="thai">คำอธิบาย</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="background: #f8f9fa;">
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; text-align: center; font-weight: bold;">T</td>
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; text-align: center; font-weight: bold;">T</td>
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: #27ae60;">T</td>
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; font-size: 0.85em;">
+                                    <div class="english">Promise kept</div>
+                                    <div class="thai">สัญญาเป็นจริง</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; text-align: center; font-weight: bold;">T</td>
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; text-align: center; font-weight: bold;">F</td>
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: #dc3545;">F</td>
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; font-size: 0.85em;">
+                                    <div class="english">Promise broken</div>
+                                    <div class="thai">สัญญาผิด</div>
+                                </td>
+                            </tr>
+                            <tr style="background: #f8f9fa;">
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; text-align: center; font-weight: bold;">F</td>
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; text-align: center; font-weight: bold;">T</td>
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: #27ae60;">T</td>
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; font-size: 0.85em;">
+                                    <div class="english">No promise made</div>
+                                    <div class="thai">ไม่ได้ให้สัญญา</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; text-align: center; font-weight: bold;">F</td>
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; text-align: center; font-weight: bold;">F</td>
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; text-align: center; font-weight: bold; color: #27ae60;">T</td>
+                                <td style="padding: 12px 20px; border: 1px solid #ddd; font-size: 0.85em;">
+                                    <div class="english">No promise made</div>
+                                    <div class="thai">ไม่ได้ให้สัญญา</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                    <div>
+                        <div class="english"><strong>Key Insight:</strong></div>
+                        <div class="thai"><strong>ข้อสำคัญ:</strong></div>
+                        <div style="font-size: 0.9em; margin-top: 8px;">
+                            <div class="english">P → Q is only false when P is true but Q is false</div>
+                            <div class="thai">P → Q เป็นเท็จเฉพาะเมื่อ P เป็นจริงแต่ Q เป็นเท็จ</div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="english"><strong>Modus Ponens:</strong></div>
+                        <div class="thai"><strong>โมดัสโปเนนส์:</strong></div>
+                        <div style="font-size: 0.9em; margin-top: 8px;">
+                            <div class="english">When P → Q is true and P is true, Q must be true</div>
+                            <div class="thai">เมื่อ P → Q เป็นจริงและ P เป็นจริง Q ต้องเป็นจริง</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px solid #ffc107;">
+                    <div class="english"><strong>BST Example Applied:</strong> If "All BST inserts preserve property" is true and "We did a BST insert" is true, then "Result is BST" must be true.</div>
+                    <div class="thai"><strong>ตัวอย่าง BST:</strong> ถ้า "การใส่ BST ทั้งหมดรักษาคุณสมบัติ" เป็นจริงและ "เราทำการใส่ BST" เป็นจริง แล้ว "ผลลัพธ์เป็น BST" ต้องเป็นจริง</div>
+                </div>
+            </div>
+
+            <div style="background: #e8f5e8; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #27ae60;">
+                <h3 style="color: #27ae60;">When to Use Induction in CS/Math | เมื่อไหร่ใช้อุปนัยในวิทยาการคอมพิวเตอร์/คณิตศาสตร์</h3>
+                <ul style="margin-left: 20px;">
+                    <li><span class="english"><strong>Recursively defined data:</strong> lists, trees, graphs with size measures</span> | <span class="thai"><strong>ข้อมูลที่นิยามแบบเรียกซ้ำ:</strong> รายการ, ต้นไม้, กราฟที่มีการวัดขนาด</span></li>
+                    <li><span class="english"><strong>Recursive algorithms:</strong> prove correctness, termination, complexity</span> | <span class="thai"><strong>อัลกอริทึมเรียกซ้ำ:</strong> พิสูจน์ความถูกต้อง, การสิ้นสุด, ความซับซ้อน</span></li>
+                    <li><span class="english"><strong>Loop invariants:</strong> induction on iteration count</span> | <span class="thai"><strong>ค่าคงที่ของลูป:</strong> อุปนัยบนจำนวนการทำซ้ำ</span></li>
+                </ul>
+            </div>
+
+            <div style="background: #fff3cd; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #ffc107;">
+                <h3 style="color: #e67e22;">Key Contrasts | ความแตกต่างสำคัญ</h3>
+                <ul style="margin-left: 20px;">
+                    <li><span class="english"><strong>Deduction:</strong> If premises true → conclusion cannot be false</span> | <span class="thai"><strong>นิรนัย:</strong> หากสมมติฐานจริง → ข้อสรุปไม่อาจเท็จ</span></li>
+                    <li><span class="english"><strong>Empirical:</strong> Many cases can be overturned by one counterexample</span> | <span class="thai"><strong>ประจักษ์:</strong> หลายกรณีสามารถถูกล้มด้วยตัวอย่างตรงข้ามหนึ่งตัว</span></li>
+                    <li><span class="english"><strong>Structural:</strong> Deductive principle for recursively built structures</span> | <span class="thai"><strong>โครงสร้าง:</strong> หลักนิรนัยสำหรับโครงสร้างที่สร้างแบบเรียกซ้ำ</span></li>
+                </ul>
+            </div>
+
+            <div style="background: #e3f2fd; padding: 15px; border-radius: 10px; margin-top: 30px; border: 1px solid #2196f3;">
+                <div style="font-size: 0.9em; color: #1565c0; text-align: center;">
+                    <div class="english"><strong>Source:</strong> Information compiled from ChatGPT explanations on mathematical reasoning</div>
+                    <div class="thai"><strong>แหล่งที่มา:</strong> ข้อมูลรวบรวมจากคำอธิบายของ ChatGPT เกี่ยวกับการให้เหตุผลทางคณิตศาสตร์</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Introduction to Mathematical Induction -->
+        <div class="slide">
+            <h2>Mathematical Induction | การพิสูจน์อุปนัยทางคณิตศาสตร์</h2>
+            
+            <h3>What is Mathematical Induction? | การพิสูจน์อุปนัยคืออะไร?</h3>
+            <div class="english">Mathematical induction is a proof technique used to prove statements about natural numbers.</div>
+            <div class="thai">การพิสูจน์อุปนัยเป็นเทคนิคการพิสูจน์ที่ใช้พิสูจน์ข้อความเกี่ยวกับจำนวนธรรมชาติ</div>
+
+            <div class="math-formula">
+                <div class="english">For all n ≥ n₀, P(n) is true</div>
+                <div class="thai">สำหรับทุก n ≥ n₀, P(n) เป็นจริง</div>
+            </div>
+
+            <h3>The Induction Principle | หลักการอุปนัย</h3>
+            <div class="steps">
+                <div class="step">
+                    <div class="english"><strong>Base Case:</strong> Prove P(n₀) is true</div>
+                    <div class="thai"><strong>กรณีฐาน:</strong> พิสูจน์ว่า P(n₀) เป็นจริง</div>
+                </div>
+                <div class="step">
+                    <div class="english"><strong>Inductive Hypothesis:</strong> Assume P(k) is true for some k ≥ n₀</div>
+                    <div class="thai"><strong>สมมติฐานอุปนัย:</strong> สมมติว่า P(k) เป็นจริงสำหรับ k ≥ n₀ บางค่า</div>
+                </div>
+                <div class="step">
+                    <div class="english"><strong>Inductive Step:</strong> Prove P(k+1) is true</div>
+                    <div class="thai"><strong>ขั้นตอนอุปนัย:</strong> พิสูจน์ว่า P(k+1) เป็นจริง</div>
+                </div>
+            </div>
+
+            <div class="example-box">
+                <h4>Example | ตัวอย่าง:</h4>
+                <div class="english">Prove: 1 + 2 + 3 + ... + n = n(n+1)/2</div>
+                <div class="thai">พิสูจน์: 1 + 2 + 3 + ... + n = n(n+1)/2</div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Induction Example -->
+        <div class="slide">
+            <h2>Induction Example | ตัวอย่างการพิสูจน์อุปนัย</h2>
+            
+            <div class="math-formula">
+                <div class="english">Prove: 1 + 2 + 3 + ... + n = n(n+1)/2</div>
+                <div class="thai">พิสูจน์: 1 + 2 + 3 + ... + n = n(n+1)/2</div>
+            </div>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="english"><strong>Base Case (n=1):</strong></div>
+                    <div class="thai"><strong>กรณีฐาน (n=1):</strong></div>
+                    <div class="math-formula">
+                        LHS = 1, RHS = 1(1+1)/2 = 1 ✓
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="english"><strong>Inductive Hypothesis:</strong> Assume true for n=k</div>
+                    <div class="thai"><strong>สมมติฐานเหนี่ยวนำ:</strong> สมมติเป็นจริงสำหรับ n=k</div>
+                    <div class="math-formula">
+                        1 + 2 + 3 + ... + k = k(k+1)/2
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="english"><strong>Inductive Step:</strong> Prove for n=k+1</div>
+                    <div class="thai"><strong>ขั้นตอนเหนี่ยวนำ:</strong> พิสูจน์สำหรับ n=k+1</div>
+                    <div class="math-formula">
+                        1 + 2 + ... + k + (k+1) = k(k+1)/2 + (k+1)<br>
+                        = (k+1)(k/2 + 1) = (k+1)(k+2)/2 ✓
+                    </div>
+                </div>
+            </div>
+
+            <div class="interactive-element" onclick="this.style.background='#d4edda'; this.querySelector('.hidden-content').style.display = this.querySelector('.hidden-content').style.display === 'none' ? 'block' : 'none';">
+                <div class="english">💡 Click here: Why does this work?</div>
+                <div class="thai">💡 คลิกที่นี่: ทำไมมันใช้ได้?</div>
+                <div class="hidden-content" style="display: none; margin-top: 15px; font-size: 0.9em; border-top: 2px solid #27ae60; padding-top: 15px;">
+                    
+                    <h4 style="color: #27ae60; margin-bottom: 10px;">The Well-Ordering Principle | หลักการลำดับที่ดี</h4>
+                    <div class="math-formula" style="margin: 15px 0; background: #f0f8f0;">
+                        <div class="english"><strong>Well-ordering of ℕ:</strong> Every nonempty subset of natural numbers has a <strong>least</strong> element.</div>
+                        <div class="thai"><strong>การเรียงลำดับที่ดีของ ℕ:</strong> เซตย่อยที่ไม่ว่างของจำนวนธรรมชาติทุกเซตมีสมาชิก <strong>น้อยที่สุด</strong></div>
+                    </div>
+
+                    <h4 style="color: #27ae60; margin: 15px 0 10px 0;">The "Least Missing Number" Proof | การพิสูจน์ "จำนวนที่หายไปน้อยที่สุด"</h4>
+                    
+                    <div class="steps" style="counter-reset: step-counter;">
+                        <div class="step" style="background: #fff; border-left: 4px solid #27ae60; margin: 10px 0; padding: 12px;">
+                            <div class="english">Suppose some number ≥ n₀ makes P(n) false. Define "bad" numbers:</div>
+                            <div class="thai">สมมติว่ามีจำนวน ≥ n₀ ทำให้ P(n) เป็นเท็จ นิยาม "จำนวนเลว":</div>
+                            <div class="math-formula" style="margin: 8px 0; font-size: 0.85em;">
+                                B = {n ∈ ℕ | n ≥ n₀ and P(n) is false}
+                            </div>
+                        </div>
+
+                        <div class="step" style="background: #fff; border-left: 4px solid #27ae60; margin: 10px 0; padding: 12px;">
+                            <div class="english">By well-ordering, B has a <strong>least</strong> element m. So P(m) is false, but P(k) is true for all n₀ ≤ k < m</div>
+                            <div class="thai">ด้วยการเรียงลำดับที่ดี B มีสมาชิก <strong>น้อยที่สุด</strong> m ดังนั้น P(m) เป็นเท็จ แต่ P(k) เป็นจริงสำหรับ n₀ ≤ k < m ทั้งหมด</div>
+                        </div>
+
+                        <div class="step" style="background: #fff; border-left: 4px solid #27ae60; margin: 10px 0; padding: 12px;">
+                            <div class="english">Since m ≠ n₀ (base case works), we have m-1 ≥ n₀, so P(m-1) is true</div>
+                            <div class="thai">เนื่องจาก m ≠ n₀ (กรณีฐานใช้ได้) เรามี m-1 ≥ n₀ ดังนั้น P(m-1) เป็นจริง</div>
+                        </div>
+
+                        <div class="step" style="background: #fff; border-left: 4px solid #27ae60; margin: 10px 0; padding: 12px;">
+                            <div class="english">Apply inductive step to k = m-1: Since P(m-1) is true, then P(m) must be true</div>
+                            <div class="thai">ใช้ขั้นตอนอุปนัยกับ k = m-1: เนื่องจาก P(m-1) เป็นจริง ดังนั้น P(m) ต้องเป็นจริง</div>
+                        </div>
+
+                        <div class="step" style="background: #fff; border-left: 4px solid #e74c3c; margin: 10px 0; padding: 12px;">
+                            <div class="english"><strong>Contradiction!</strong> We assumed P(m) is false, but proved P(m) is true. Therefore B = ∅</div>
+                            <div class="thai"><strong>ขัดแย้ง!</strong> เราสมมติว่า P(m) เป็นเท็จ แต่พิสูจน์ได้ว่า P(m) เป็นจริง ดังนั้น B = ∅</div>
+                        </div>
+
+                        <div class="step" style="background: #e8f5e8; border-left: 4px solid #27ae60; margin: 10px 0; padding: 12px;">
+                            <div class="english"><strong>Conclusion:</strong> No number is missing from S. P(n) holds for all n ≥ n₀</div>
+                            <div class="thai"><strong>สรุป:</strong> ไม่มีจำนวนใดหายไปจาก S คือ P(n) เป็นจริงสำหรับ n ≥ n₀ ทั้งหมด</div>
+                        </div>
+                    </div>
+
+                    <div style="background: #e3f2fd; padding: 15px; border-radius: 8px; margin-top: 15px; border-left: 4px solid #2196f3;">
+                        <div class="english"><strong>Key Insight:</strong> This is purely <strong>deductive</strong> reasoning - no probability involved!</div>
+                        <div class="thai"><strong>สิ่งสำคัญ:</strong> นี่เป็นการให้เหตุผลแบบ <strong>นิรนัย</strong> อย่างล้วน - ไม่เกี่ยวกับความน่าจะเป็น!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Introduction to Trees -->
+        <div class="slide">
+            <h2>Tree Data Structures | โครงสร้างข้อมูลต้นไม้</h2>
+            
+            <h3>What is a Tree? | ต้นไม้คืออะไร?</h3>
+            <div class="english">A tree is a hierarchical data structure consisting of nodes connected by edges, with no cycles.</div>
+            <div class="thai">ต้นไม้เป็นโครงสร้างข้อมูลแบบลำดับชั้นที่ประกอบด้วยโหนดที่เชื่อมต่อด้วยขอบ โดยไม่มีวัฏจักร</div>
+
+            <div class="tree-diagram">
+                <div class="english">Example Tree Structure:</div>
+                <div class="thai">ตัวอย่างโครงสร้างต้นไม้:</div>
+                <pre>
+        A (Root/ราก)
+       / \
+      B   C
+     /   / \
+    D   E   F (Leaves/ใบ)
+                </pre>
+            </div>
+
+            <h3>Key Terminology | คำศัพท์สำคัญ</h3>
+            <ul>
+                <li><span class="english"><strong>Root:</strong> The topmost node</span> | <span class="thai"><strong>ราก:</strong> โหนดบนสุด</span></li>
+                <li><span class="english"><strong>Leaf:</strong> Node with no children</span> | <span class="thai"><strong>ใบ:</strong> โหนดที่ไม่มีลูก</span></li>
+                <li><span class="english"><strong>Parent:</strong> Node with children</span> | <span class="thai"><strong>พ่อแม่:</strong> โหนดที่มีลูก</span></li>
+                <li><span class="english"><strong>Child:</strong> Node with a parent</span> | <span class="thai"><strong>ลูก:</strong> โหนดที่มีพ่อแม่</span></li>
+                <li><span class="english"><strong>Height:</strong> Length of longest path to leaf</span> | <span class="thai"><strong>ความสูง:</strong> ความยาวของเส้นทางที่ยาวที่สุดไปยังใบ</span></li>
+                <li><span class="english"><strong>Subtree:</strong> Tree rooted at any node</span> | <span class="thai"><strong>ต้นไม้ย่อย:</strong> ต้นไม้ที่มีรากที่โหนดใดโหนดหนึ่ง</span></li>
+            </ul>
+
+            <div class="example-box">
+                <div class="english">In the example above: A is root, D, E, F are leaves, height = 2</div>
+                <div class="thai">ในตัวอย่างข้างต้น: A คือราก, D, E, F คือใบ, ความสูง = 2</div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Tree Properties -->
+        <div class="slide">
+            <h2>Important Tree Properties | คุณสมบัติสำคัญของต้นไม้</h2>
+            
+            <h3>Recursive Nature | ลักษณะเรียกซ้ำ</h3>
+            <div class="english">Trees are naturally recursive: every subtree is also a tree!</div>
+            <div class="thai">ต้นไม้มีลักษณะเรียกซ้ำตามธรรมชาติ: ต้นไม้ย่อยทุกต้นก็เป็นต้นไม้ด้วย!</div>
+
+            <div class="tree-diagram">
+                <pre>
+     Tree T        Subtree T₁    Subtree T₂
+        A              B            C
+       / \            /            / \
+      B   C          D            E   F
+     /   / \
+    D   E   F
+                </pre>
+            </div>
+
+            <h3>Key Properties for Induction | คุณสมบัติสำคัญสำหรับการเหนี่ยวนำ</h3>
+            <ul>
+                <li><span class="english">A tree with n nodes has exactly n-1 edges</span> | <span class="thai">ต้นไม้ที่มี n โหนดจะมีขอบพอดี n-1 เส้น</span></li>
+                <li><span class="english">Every tree has at least one leaf (except single node)</span> | <span class="thai">ต้นไม้ทุกต้นมีใบอย่างน้อยหนึ่งใบ (ยกเว้นโหนดเดียว)</span></li>
+                <li><span class="english">Removing any edge disconnects the tree</span> | <span class="thai">การลบขอบใดๆ จะทำให้ต้นไม้ขาดการเชื่อมต่อ</span></li>
+                <li><span class="english">There's exactly one path between any two nodes</span> | <span class="thai">มีเส้นทางเดียวระหว่างโหนดสองโหนดใดๆ</span></li>
+            </ul>
+
+            <div class="interactive-element" onclick="this.style.background='#d1ecf1'">
+                <div class="english">🤔 Think: Why are these properties perfect for induction?</div>
+                <div class="thai">🤔 คิดดู: ทำไมคุณสมบัติเหล่านี้ถึงเหมาะสำหรับการเหนี่ยวนำ?</div>
+                <div style="display: none; margin-top: 10px; font-size: 0.9em;">
+                    <div class="english">The recursive structure means we can prove for small trees and extend to larger ones!</div>
+                    <div class="thai">โครงสร้างเรียกซ้ำหมายความว่าเราสามารถพิสูจน์สำหรับต้นไม้เล็กและขยายไปยังต้นไม้ใหญ่!</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Strong vs Structural Induction -->
+        <div class="slide">
+            <h2>Types of Induction for Trees | ประเภทการอุปนัยสำหรับต้นไม้</h2>
+            
+            <h3>Simple Induction | การอุปนัยแบบธรรมดา</h3>
+            <div class="english">Prove for the immediate predecessor, then prove for current value using only that predecessor</div>
+            <div class="thai">พิสูจน์สำหรับค่าก่อนหน้าโดยตรง แล้วพิสูจน์สำหรับค่าปัจจุบันโดยใช้เฉพาะค่าก่อนหน้านั้น</div>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="english">Base Case: Prove for trees with 1 node</div>
+                    <div class="thai">กรณีฐาน: พิสูจน์สำหรับต้นไม้ที่มี 1 โหนด</div>
+                </div>
+                <div class="step">
+                    <div class="english">Inductive Hypothesis: Assume true for an arbitrary tree with k nodes (k ≥ 1)</div>
+                    <div class="thai">สมมติฐานอุปนัย: สมมติเป็นจริงสำหรับต้นไม้ที่มี k โหนด (k ≥ 1) โดยพลการ</div>
+                </div>
+                <div class="step">
+                    <div class="english">Inductive Step: Prove for n = k+1 using only the case n = k</div>
+                    <div class="thai">ขั้นตอนอุปนัย: พิสูจน์สำหรับ n = k+1 โดยใช้เฉพาะกรณี n = k</div>
+                    <div style="margin-left: 20px; margin-top: 10px; font-size: 0.9em;">
+                        <div class="english">• Take a tree T with k+1 nodes</div>
+                        <div class="thai">• ใช้ต้นไม้ T ที่มี k+1 โหนด</div>
+                        <div class="english">• Remove a leaf node (and its edge) → get tree T' with k nodes</div>
+                        <div class="thai">• เอาโหนดใบ (และขอบของมัน) ออก → ได้ต้นไม้ T' ที่มี k โหนด</div>
+                        <div class="english">• Apply hypothesis only to T' (the k-node case)</div>
+                        <div class="thai">• ใช้สมมติฐานเฉพาะกับ T' (กรณี k โหนด)</div>
+                        <div class="english">• Add back the leaf and edge → T has (k-1) + 1 = k edges</div>
+                        <div class="thai">• เพิ่มใบและขอบกลับ → T มี (k-1) + 1 = k ขอบ</div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>Structural Induction | การอุปนัยเชิงโครงสร้าง</h3>
+            <div class="english">Prove directly on the recursive structure of trees</div>
+            <div class="thai">พิสูจน์โดยตรงบนโครงสร้างเรียกซ้ำของต้นไม้</div>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="english">Base Case: Prove for single node (leaf)</div>
+                    <div class="thai">กรณีฐาน: พิสูจน์สำหรับโหนดเดียว (ใบ)</div>
+                </div>
+                <div class="step">
+                    <div class="english">Inductive Step: If true for subtrees T₁, T₂, ..., Tₖ, prove true for tree with root connecting to these subtrees</div>
+                    <div class="thai">ขั้นตอนอุปนัย: ถ้าเป็นจริงสำหรับต้นไม้ย่อย T₁, T₂, ..., Tₖ พิสูจน์ว่าเป็นจริงสำหรับต้นไม้ที่มีรากเชื่อมต่อกับต้นไม้ย่อยเหล่านี้</div>
+                </div>
+            </div>
+
+            <div class="example-box">
+                <div class="english">Example: Proving "A tree with n nodes has n-1 edges"</div>
+                <div class="thai">ตัวอย่าง: พิสูจน์ "ต้นไม้ที่มี n โหนดมี n-1 ขอบ"</div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Tree Induction Example -->
+        <div class="slide">
+            <h2>Tree Induction Example | ตัวอย่างการอุปนัยบนต้นไม้</h2>
+            
+            <div class="math-formula">
+                <div class="english">Theorem: A tree with n nodes has exactly n-1 edges</div>
+                <div class="thai">ทฤษฎีบท: ต้นไม้ที่มี n โหนดมีขอบพอดี n-1 เส้น</div>
+            </div>
+
+            <h3>Proof by Structural Induction | การพิสูจน์ด้วยการอุปนัยเชิงโครงสร้าง</h3>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="english"><strong>Base Case:</strong> Single node tree</div>
+                    <div class="thai"><strong>กรณีฐาน:</strong> ต้นไม้โหนดเดียว</div>
+                    <div class="math-formula">
+                        n = 1, edges = 0 = 1-1 ✓
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="english"><strong>Inductive Hypothesis:</strong> Every subtree Tᵢ with nᵢ nodes has nᵢ-1 edges</div>
+                    <div class="thai"><strong>สมมติฐานอุปนัย:</strong> ต้นไม้ย่อยทุกต้น Tᵢ ที่มี nᵢ โหนดมี nᵢ-1 ขอบ</div>
+                </div>
+
+                <div class="step">
+                    <div class="english"><strong>Inductive Step:</strong> Consider tree T with root r and subtrees T₁, T₂, ..., Tₖ</div>
+                    <div class="thai"><strong>ขั้นตอนอุปนัย:</strong> พิจารณาต้นไม้ T ที่มีราก r และต้นไม้ย่อย T₁, T₂, ..., Tₖ</div>
+                    <div class="math-formula">
+                        Total nodes: n = 1 + n₁ + n₂ + ... + nₖ<br>
+                        Total edges: k + (n₁-1) + (n₂-1) + ... + (nₖ-1)<br>
+                        = k + (n₁ + n₂ + ... + nₖ) - k = n - 1 ✓
+                    </div>
+                </div>
+            </div>
+
+            <div class="tree-diagram">
+                <div class="english">Visual representation:</div>
+                <div class="thai">การแสดงภาพ:</div>
+                <pre>
+       r (root)
+      /|\  \
+     T₁ T₂ ... Tₖ
+    (each with nᵢ-1 edges)
+    + k new edges to root
+                </pre>
+            </div>
+        </div>
+
+        <!-- Quiz Slide 1: Tree Height -->
+        <div class="slide">
+            <h2>Quiz 1: Tree Height | แบบทดสอบ 1: ความสูงของต้นไม้</h2>
+            
+            <div class="math-formula">
+                <div class="english">Prove by structural induction: A binary tree with height h has at most 2^h leaves</div>
+                <div class="thai">พิสูจน์ด้วยการอุปนัยเชิงโครงสร้าง: ต้นไม้ไบนารีที่มีความสูง h มีใบได้มากที่สุด 2^h ใบ</div>
+            </div>
+
+            <div class="tree-diagram">
+                <div class="english">Example: Height 2 tree</div>
+                <div class="thai">ตัวอย่าง: ต้นไม้ความสูง 2</div>
+                <pre>
+       A
+      / \
+     B   C
+    /   / \
+   D   E   F
+                </pre>
+                <div style="margin-top: 10px;">
+                    <div class="english">Height = 2, Leaves = 3 ≤ 2² = 4 ✓</div>
+                    <div class="thai">ความสูง = 2, ใบ = 3 ≤ 2² = 4 ✓</div>
+                </div>
+            </div>
+
+            <h3>Question | คำถาม:</h3>
+            <div class="english">What should be the base case for this proof?</div>
+            <div class="thai">กรณีฐานของการพิสูจน์นี้ควรเป็นอย่างไร?</div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;">
+                <div class="interactive-element" onclick="this.style.background='#ffcccb'; this.querySelector('.feedback').style.display='block';" style="cursor: pointer;">
+                    <div class="english"><strong>A)</strong> Empty tree (height = -1)</div>
+                    <div class="thai"><strong>A)</strong> ต้นไม้ว่าง (ความสูง = -1)</div>
+                    <div class="feedback" style="display: none; margin-top: 10px; color: #d32f2f; font-size: 0.9em;">
+                        <div class="english">❌ Incorrect. Empty tree is not always the best base case.</div>
+                        <div class="thai">❌ ไม่ถูกต้อง ต้นไม้ว่างไม่ใช่กรณีฐานที่ดีที่สุดเสมอไป</div>
+                    </div>
+                </div>
+
+                <div class="interactive-element" onclick="this.style.background='#c8e6c9'; this.querySelector('.feedback').style.display='block';" style="cursor: pointer;">
+                    <div class="english"><strong>B)</strong> Single node (height = 0)</div>
+                    <div class="thai"><strong>B)</strong> โหนดเดียว (ความสูง = 0)</div>
+                    <div class="feedback" style="display: none; margin-top: 10px; color: #2e7d32; font-size: 0.9em;">
+                        <div class="english">✅ Correct! Single node: height = 0, leaves = 1 ≤ 2⁰ = 1</div>
+                        <div class="thai">✅ ถูกต้อง! โหนดเดียว: ความสูง = 0, ใบ = 1 ≤ 2⁰ = 1</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interactive-element" onclick="this.style.background='#e1f5fe'; this.querySelector('.solution').style.display = this.querySelector('.solution').style.display === 'none' ? 'block' : 'none';" style="margin-top: 20px;">
+                <div class="english">🧠 Click for complete solution</div>
+                <div class="thai">🧠 คลิกเพื่อดูคำตอบฉบับสมบูรณ์</div>
+                <div class="solution" style="display: none; margin-top: 15px; font-size: 0.9em; border-top: 2px solid #2196f3; padding-top: 15px;">
+                    <div class="steps">
+                        <div class="step">
+                            <div class="english"><strong>Base Case:</strong> Single node (height 0) has 1 leaf ≤ 2⁰ = 1 ✓</div>
+                            <div class="thai"><strong>กรณีฐาน:</strong> โหนดเดียว (ความสูง 0) มี 1 ใบ ≤ 2⁰ = 1 ✓</div>
+                        </div>
+                        <div class="step">
+                            <div class="english"><strong>Inductive Step:</strong> Tree T with height h has left subtree L (height ≤ h-1) and right subtree R (height ≤ h-1)</div>
+                            <div class="thai"><strong>ขั้นตอนอุปนัย:</strong> ต้นไม้ T ความสูง h มีต้นไม้ย่อยซ้าย L (ความสูง ≤ h-1) และต้นไม้ย่อยขวา R (ความสูง ≤ h-1)</div>
+                        </div>
+                        <div class="step">
+                            <div class="english"><strong>By IH:</strong> L has ≤ 2^(h-1) leaves, R has ≤ 2^(h-1) leaves</div>
+                            <div class="thai"><strong>ด้วยสมมติฐานอุปนัย:</strong> L มี ≤ 2^(h-1) ใบ, R มี ≤ 2^(h-1) ใบ</div>
+                        </div>
+                        <div class="step">
+                            <div class="english"><strong>Total leaves:</strong> ≤ 2^(h-1) + 2^(h-1) = 2·2^(h-1) = 2^h ✓</div>
+                            <div class="thai"><strong>ใบทั้งหมด:</strong> ≤ 2^(h-1) + 2^(h-1) = 2·2^(h-1) = 2^h ✓</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Slide 2: Binary Tree Nodes -->
+        <div class="slide">
+            <h2>Quiz 2: Binary Tree Nodes | แบบทดสอบ 2: โหนดของต้นไม้ไบนารี</h2>
+            
+            <div class="math-formula">
+                <div class="english">Prove: In any binary tree, the number of leaves is at most ⌊(n+1)/2⌋ where n is the total number of nodes</div>
+                <div class="thai">พิสูจน์: ในต้นไม้ไบนารีใดๆ จำนวนใบมีได้มากที่สุด ⌊(n+1)/2⌋ เมื่อ n คือจำนวนโหนดทั้งหมด</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                <div class="tree-diagram">
+                    <div class="english">Example 1: n=5</div>
+                    <div class="thai">ตัวอย่าง 1: n=5</div>
+                    <pre>
+    A
+   / \
+  B   C
+ / \
+D   E
+                    </pre>
+                    <div>Leaves = 3, ⌊(5+1)/2⌋ = 3 ✓</div>
+                </div>
+                
+                <div class="tree-diagram">
+                    <div class="english">Example 2: n=4</div>
+                    <div class="thai">ตัวอย่าง 2: n=4</div>
+                    <pre>
+  A
+ / \
+B   C
+   /
+  D
+                    </pre>
+                    <div>Leaves = 2, ⌊(4+1)/2⌋ = 2 ✓</div>
+                </div>
+            </div>
+
+            <h3>Question | คำถาม:</h3>
+            <div class="english">What is the inductive step when a tree has both left and right subtrees?</div>
+            <div class="thai">ขั้นตอนเหนี่ยวนำเป็นอย่างไรเมื่อต้นไม้มีทั้งต้นไม้ย่อยซ้ายและขวา?</div>
+
+            <div style="margin: 20px 0;">
+                <div class="interactive-element" onclick="this.style.background='#ffcccb'; this.querySelector('.feedback').style.display='block';" style="cursor: pointer; margin-bottom: 15px;">
+                    <div class="english"><strong>A)</strong> Leaves(T) = Leaves(L) + Leaves(R) + 1</div>
+                    <div class="thai"><strong>A)</strong> ใบ(T) = ใบ(L) + ใบ(R) + 1</div>
+                    <div class="feedback" style="display: none; margin-top: 10px; color: #d32f2f; font-size: 0.9em;">
+                        <div class="english">❌ Wrong! Root is not a leaf when it has children.</div>
+                        <div class="thai">❌ ผิด! รากไม่ใช่ใบเมื่อมีลูก</div>
+                    </div>
+                </div>
+
+                <div class="interactive-element" onclick="this.style.background='#c8e6c9'; this.querySelector('.feedback').style.display='block';" style="cursor: pointer; margin-bottom: 15px;">
+                    <div class="english"><strong>B)</strong> Leaves(T) = Leaves(L) + Leaves(R)</div>
+                    <div class="thai"><strong>B)</strong> ใบ(T) = ใบ(L) + ใบ(R)</div>
+                    <div class="feedback" style="display: none; margin-top: 10px; color: #2e7d32; font-size: 0.9em;">
+                        <div class="english">✅ Correct! All leaves are in subtrees, root is internal.</div>
+                        <div class="thai">✅ ถูกต้อง! ใบทั้งหมดอยู่ในต้นไม้ย่อย รากเป็นโหนดภายใน</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interactive-element" onclick="this.style.background='#fff3cd'; this.querySelector('.hint').style.display = this.querySelector('.hint').style.display === 'none' ? 'block' : 'none';" style="margin-top: 20px;">
+                <div class="english">💡 Click for proof strategy hint</div>
+                <div class="thai">💡 คลิกเพื่อดูคำแนะนำกลยุทธ์การพิสูจน์</div>
+                <div class="hint" style="display: none; margin-top: 15px; font-size: 0.9em; border-top: 2px solid #ffc107; padding-top: 15px;">
+                    <div class="english"><strong>Hint:</strong> Use simple induction on the number of nodes. Consider three cases: single node, only one subtree, both subtrees present.</div>
+                    <div class="thai"><strong>คำแนะนำ:</strong> ใช้การอุปนัยแบบธรรมดาบนจำนวนโหนด พิจารณาสามกรณี: โหนดเดียว, ต้นไม้ย่อยเดียว, มีต้นไม้ย่อยทั้งสอง</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Slide 3: Tree Traversal -->
+        <div class="slide">
+            <h2>Quiz 3: Tree Traversal Properties | แบบทดสอบ 3: คุณสมบัติการเดินผ่านต้นไม้</h2>
+            
+            <div class="math-formula">
+                <div class="english">Prove: An inorder traversal of a binary search tree visits nodes in sorted order</div>
+                <div class="thai">พิสูจน์: การเดินผ่านแบบอินออร์เดอร์ของต้นไม้ค้นหาไบนารีจะเยี่ยมชมโหนดตามลำดับที่เรียงแล้ว</div>
+            </div>
+
+            <div class="tree-diagram">
+                <div class="english">BST Example:</div>
+                <div class="thai">ตัวอย่าง BST:</div>
+                <pre>
+       5
+      / \
+     3   7
+    / \ / \
+   2  4 6  8
+                </pre>
+                <div style="margin-top: 10px;">
+                    <div class="english">Inorder: 2, 3, 4, 5, 6, 7, 8 (sorted!)</div>
+                    <div class="thai">อินออร์เดอร์: 2, 3, 4, 5, 6, 7, 8 (เรียงแล้ว!)</div>
+                </div>
+            </div>
+
+            <h3>Challenge Question | คำถามท้าทาย:</h3>
+            <div class="english">What is the key insight that makes this proof work?</div>
+            <div class="thai">ข้อมูลที่สำคัญที่ทำให้การพิสูจน์นี้ใช้ได้คืออะไร?</div>
+
+            <div style="margin: 20px 0;">
+                <div class="interactive-element" onclick="this.style.background='#ffcccb'; this.querySelector('.feedback').style.display='block';" style="cursor: pointer; margin-bottom: 15px;">
+                    <div class="english"><strong>A)</strong> Trees are recursive structures</div>
+                    <div class="thai"><strong>A)</strong> ต้นไม้เป็นโครงสร้างเรียกซ้ำ</div>
+                    <div class="feedback" style="display: none; margin-top: 10px; color: #d32f2f; font-size: 0.9em;">
+                        <div class="english">❌ Too general. This doesn't explain the sorted property.</div>
+                        <div class="thai">❌ กว้างเกินไป ไม่อธิบายคุณสมบัติการเรียงลำดับ</div>
+                    </div>
+                </div>
+
+                <div class="interactive-element" onclick="this.style.background='#c8e6c9'; this.querySelector('.feedback').style.display='block';" style="cursor: pointer; margin-bottom: 15px;">
+                    <div class="english"><strong>B)</strong> BST property: left < root < right</div>
+                    <div class="thai"><strong>B)</strong> คุณสมบัติ BST: ซ้าย < ราก < ขวา</div>
+                    <div class="feedback" style="display: none; margin-top: 10px; color: #2e7d32; font-size: 0.9em;">
+                        <div class="english">✅ Exactly! This ordering property + inorder traversal = sorted output.</div>
+                        <div class="thai">✅ ถูกต้อง! คุณสมบัติการเรียงลำดับนี้ + การเดินผ่านอินออร์เดอร์ = ผลลัพธ์ที่เรียงแล้ว</div>
+                    </div>
+                </div>
+
+                <div class="interactive-element" onclick="this.style.background='#ffcccb'; this.querySelector('.feedback').style.display='block';" style="cursor: pointer; margin-bottom: 15px;">
+                    <div class="english"><strong>C)</strong> Mathematical induction always works on trees</div>
+                    <div class="thai"><strong>C)</strong> การเหนี่ยวนำทางคณิตศาสตร์ใช้ได้กับต้นไม้เสมอ</div>
+                    <div class="feedback" style="display: none; margin-top: 10px; color: #d32f2f; font-size: 0.9em;">
+                        <div class="english">❌ Induction is the method, not the reason for the sorted property.</div>
+                        <div class="thai">❌ การเหนี่ยวนำเป็นวิธีการ ไม่ใช่เหตุผลของคุณสมบัติการเรียงลำดับ</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="interactive-element" onclick="this.style.background='#e8f5e8'; this.querySelector('.proof-outline').style.display = this.querySelector('.proof-outline').style.display === 'none' ? 'block' : 'none';" style="margin-top: 20px;">
+                <div class="english">📝 Click for proof outline</div>
+                <div class="thai">📝 คลิกเพื่อดูโครงร่างการพิสูจน์</div>
+                <div class="proof-outline" style="display: none; margin-top: 15px; font-size: 0.9em; border-top: 2px solid #27ae60; padding-top: 15px;">
+                    <div class="steps">
+                        <div class="step">
+                            <div class="english"><strong>Base Case:</strong> Single node BST - inorder visits just that node (trivially sorted)</div>
+                            <div class="thai"><strong>กรณีฐาน:</strong> BST โหนดเดียว - อินออร์เดอร์เยี่ยมชมแค่โหนดนั้น (เรียงแล้วโดยธรรมดา)</div>
+                        </div>
+                        <div class="step">
+                            <div class="english"><strong>Inductive Hypothesis:</strong> Inorder traversal of left and right subtrees produces sorted sequences</div>
+                            <div class="thai"><strong>สมมติฐานเหนี่ยวนำ:</strong> การเดินผ่านอินออร์เดอร์ของต้นไม้ย่อยซ้ายและขวาสร้างลำดับที่เรียงแล้ว</div>
+                        </div>
+                        <div class="step">
+                            <div class="english"><strong>Inductive Step:</strong> By BST property, all left values < root < all right values</div>
+                            <div class="thai"><strong>ขั้นตอนเหนี่ยวนำ:</strong> ด้วยคุณสมบัติ BST ค่าซ้ายทั้งหมด < ราก < ค่าขวาทั้งหมด</div>
+                        </div>
+                        <div class="step">
+                            <div class="english"><strong>Conclusion:</strong> Inorder sequence = [sorted left] + [root] + [sorted right] = sorted overall</div>
+                            <div class="thai"><strong>สรุป:</strong> ลำดับอินออร์เดอร์ = [ซ้ายที่เรียงแล้ว] + [ราก] + [ขวาที่เรียงแล้ว] = เรียงแล้วโดยรวม</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Summary and References -->
+        <div class="slide">
+            <h2>Summary & Applications | สรุปและการประยุกต์</h2>
+            
+            <h3>Key Takeaways | สิ่งสำคัญที่ได้เรียนรู้</h3>
+            <ul>
+                <li><span class="english">Mathematical induction is powerful for proving properties about infinite sets</span> | <span class="thai">การพิสูจน์อุปนัยมีพลังสำหรับพิสูจน์คุณสมบัติเกี่ยวกับเซตอนันต์</span></li>
+                <li><span class="english">Trees have natural recursive structure perfect for induction</span> | <span class="thai">ต้นไม้มีโครงสร้างเรียกซ้ำตามธรรมชาติที่เหมาะสำหรับการอุปนัย</span></li>
+                <li><span class="english">Structural induction follows the recursive definition directly</span> | <span class="thai">การอุปนัยเชิงโครงสร้างตามคำนิยามเรียกซ้ำโดยตรง</span></li>
+                <li><span class="english">Simple induction is useful when the statement depends on all smaller cases</span> | <span class="thai">การอุปนัยแบบธรรมดามีประโยชน์เมื่อข้อความขึ้นอยู่กับกรณีที่เล็กกว่าทั้งหมด</span></li>
+            </ul>
+
+            <h3>Common Applications | การประยุกต์ทั่วไป</h3>
+            <ul>
+                <li><span class="english">Proving tree traversal algorithms</span> | <span class="thai">พิสูจน์อัลกอริทึมการเดินผ่านต้นไม้</span></li>
+                <li><span class="english">Analyzing tree height and balance properties</span> | <span class="thai">วิเคราะห์ความสูงและคุณสมบัติความสมดุลของต้นไม้</span></li>
+                <li><span class="english">Proving correctness of recursive algorithms</span> | <span class="thai">พิสูจน์ความถูกต้องของอัลกอริทึมเรียกซ้ำ</span></li>
+                <li><span class="english">Establishing complexity bounds</span> | <span class="thai">กำหนดขอบเขตความซับซ้อน</span></li>
+            </ul>
+
+            <div class="references">
+                <h4>References | เอกสารอ้างอิง</h4>
+                <ol>
+                    <li>Rosen, K. H. (2019). <em>Discrete Mathematics and Its Applications</em> (8th ed.). McGraw-Hill Education.</li>
+                    <li>Cormen, T. H., Leiserson, C. E., Rivest, R. L., & Stein, C. (2009). <em>Introduction to Algorithms</em> (3rd ed.). MIT Press.</li>
+                    <li>Epp, S. S. (2020). <em>Discrete Mathematics with Applications</em> (5th ed.). Cengage Learning.</li>
+                    <li>Weiss, M. A. (2014). <em>Data Structures and Algorithm Analysis in C++</em> (4th ed.). Pearson.</li>
+                    <li>Mathematical Induction Tutorial. Khan Academy. Retrieved from https://www.khanacademy.org</li>
+                    <li><strong>Created by Claude.ai</strong> - An AI assistant by Anthropic (August 2025)</li>
+                    <li><strong>Additional consultation with DeepSeek AI</strong> - Advanced reasoning model (August 2025)</li>
+                </ol>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #e3f2fd; border-radius: 8px;">
+                    <div class="english"><strong>Note:</strong> This presentation was created as an educational resource combining mathematical induction principles with tree data structures.</div>
+                    <div class="thai"><strong>หมายเหตุ:</strong> การนำเสนอนี้สร้างขึ้นเป็นทรัพยากรการศึกษาที่รวมหลักการเหนี่ยวนำทางคณิตศาสตร์เข้ากับโครงสร้างข้อมูลต้นไม้</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prevBtn" onclick="changeSlide(-1)">◀ Previous | ก่อนหน้า</button>
+        <button class="nav-btn" id="nextBtn" onclick="changeSlide(1)">Next | ถัดไป ▶</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = 13;
+
+        function updateSlideCounter() {
+            document.getElementById('current-slide').textContent = currentSlide;
+            document.getElementById('total-slides').textContent = totalSlides;
+        }
+
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentSlide === 1;
+            nextBtn.disabled = currentSlide === totalSlides;
+        }
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[n - 1].classList.add('active');
+            
+            updateSlideCounter();
+            updateNavButtons();
+        }
+
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            if (newSlide >= 1 && newSlide <= totalSlides) {
+                currentSlide = newSlide;
+                showSlide(currentSlide);
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') changeSlide(-1);
+            if (event.key === 'ArrowRight') changeSlide(1);
+        });
+
+        // Add click functionality to interactive elements
+        document.querySelectorAll('.interactive-element').forEach(element => {
+            element.addEventListener('click', function() {
+                const hiddenContent = this.querySelector('div[style*="display: none"]');
+                if (hiddenContent) {
+                    hiddenContent.style.display = hiddenContent.style.display === 'none' ? 'block' : 'none';
+                }
+            });
+        });
+
+        // Initialize
+        updateSlideCounter();
+        updateNavButtons();
+    </script>
+</body>
+</html>
