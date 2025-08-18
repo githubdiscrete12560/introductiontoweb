@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction to AI, LLM & Prompt Engineering | การเรียนรู้ AI และการเขียน Prompt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-bar {
+            flex: 1;
+            margin: 0 2rem;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            width: 11.1%;
+        }
+
+        .slide-counter {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .slides-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s ease;
+            padding: 2rem;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.prev {
+            transform: translateX(-100%);
+        }
+
+        .slide h1 {
+            font-size: 2.8rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .slide h2 {
+            font-size: 2.2rem;
+            color: #764ba2;
+            margin-bottom: 1.5rem;
+        }
+
+        .slide h3 {
+            font-size: 1.6rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .thai-text {
+            color: #e74c3c;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .english-text {
+            color: #2980b9;
+            margin-bottom: 1.5rem;
+        }
+
+        .prompt-example {
+            background: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
+            text-align: left;
+            max-width: 90%;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .prompt-bad {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .prompt-good {
+            border-left-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .interactive-demo {
+            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            border: 2px solid #667eea;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            max-width: 90%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .slide-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: #667eea;
+            transform: scale(1.2);
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            color: #856404;
+        }
+
+        .ai-concept {
+            display: inline-block;
+            background: #e8f4fd;
+            padding: 0.4rem 0.8rem;
+            margin: 0.3rem;
+            border-radius: 20px;
+            border: 2px solid #667eea;
+            font-weight: 500;
+        }
+
+        .split-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .content-section {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .comparison-table {
+            width: 100%;
+            max-width: 800px;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .comparison-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .prompt-tips {
+            text-align: left;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 1rem 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 90%;
+        }
+
+        .tip-item {
+            display: flex;
+            align-items: flex-start;
+            margin: 0.8rem 0;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .tip-emoji {
+            font-size: 1.5rem;
+            margin-right: 1rem;
+            min-width: 2rem;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .slide.active .content-section {
+            animation: slideIn 0.6s ease forwards;
+        }
+
+        .llm-flow {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .flow-step {
+            background: #667eea;
+            color: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: 25px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: #764ba2;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="header">
+            <div class="logo">
+                🤖 AI & LLM Tutorial
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="slide-counter">
+                <span id="current-slide">1</span> / <span id="total-slides">9</span>
+            </div>
+        </div>
+
+        <div class="slides-container">
+            <!-- Slide 1: Welcome -->
+            <div class="slide active">
+                <h1>🤖 เรียนรู้ AI และ LLM</h1>
+                <h1>Learn AI & LLM</h1>
+                <div class="thai-text">การแนะนำปัญญาประดิษฐ์และการเขียน Prompt</div>
+                <div class="english-text">Introduction to Artificial Intelligence & Prompt Engineering</div>
+                <div class="interactive-demo">
+                    <div class="thai-text">🎯 สิ่งที่คุณจะได้เรียนรู้:</div>
+                    <div class="english-text">🎯 What you'll learn:</div>
+                    <ul style="text-align: left; max-width: 500px;">
+                        <li>AI คืออะไร? (What is AI?)</li>
+                        <li>LLM และการทำงาน (LLM & How it works)</li>
+                        <li>Prompt Engineering พื้นฐาน (Basic Prompt Engineering)</li>
+                        <li>เทคนิคการเขียน Prompt ที่มีประสิทธิภาพ (Effective Prompt Writing)</li>
+                        <li>ตัวอย่างจริง (Real Examples)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 2: What is AI -->
+            <div class="slide">
+                <h2>AI คืออะไร? / What is AI?</h2>
+                <div class="split-content">
+                    <div class="content-section">
+                        <h3 class="thai-text">🧠 ปัญญาประดิษฐ์ (AI)</h3>
+                        <p><strong>Artificial Intelligence</strong></p>
+                        <p>• การจำลองความฉลาดของมนุษย์</p>
+                        <p>• เครื่องจักรที่คิดและเรียนรู้ได้</p>
+                        <p>• แก้ปัญหาที่ซับซ้อน</p>
+                        <p>• ทำงานอัตโนมัติ</p>
+                        <p>• ปรับปรุงตัวเองจากข้อมูล</p>
+                    </div>
+                    <div class="content-section">
+                        <h3 class="english-text">🧠 Artificial Intelligence</h3>
+                        <p><strong>Human-like Intelligence in Machines</strong></p>
+                        <p>• Simulating human intelligence</p>
+                        <p>• Machines that think and learn</p>
+                        <p>• Solving complex problems</p>
+                        <p>• Autonomous operation</p>
+                        <p>• Self-improvement from data</p>
+                    </div>
+                </div>
+                <div class="interactive-demo">
+                    <h3>ตัวอย่าง AI ในชีวิตประจำวัน / AI Examples in Daily Life:</h3>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem;">
+                        <div class="ai-concept">📱 Siri/Google Assistant</div>
+                        <div class="ai-concept">🛒 Amazon Recommendations</div>
+                        <div class="ai-concept">🚗 Tesla Autopilot</div>
+                        <div class="ai-concept">📷 Face Recognition</div>
+                        <div class="ai-concept">🌐 Google Translate</div>
+                        <div class="ai-concept">🎵 Spotify Playlists</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: What is LLM -->
+            <div class="slide">
+                <h2>LLM คืออะไร? / What is LLM?</h2>
+                <div class="split-content">
+                    <div class="content-section">
+                        <h3 class="thai-text">🔤 Large Language Model</h3>
+                        <p><strong>โมเดลภาษาขนาดใหญ่</strong></p>
+                        <p>• AI ที่เข้าใจและสร้างภาษามนุษย์</p>
+                        <p>• เรียนรู้จากข้อความมหาศาล</p>
+                        <p>• ตอบคำถาม เขียนเนื้อหา</p>
+                        <p>• แปลภาษา สรุปข้อมูล</p>
+                        <p>• เข้าใจบริบทและความหมาย</p>
+                    </div>
+                    <div class="content-section">
+                        <h3 class="english-text">🔤 Large Language Model</h3>
+                        <p><strong>AI for Human Language</strong></p>
+                        <p>• AI that understands & generates text</p>
+                        <p>• Trained on massive text data</p>
+                        <p>• Answers questions, writes content</p>
+                        <p>• Translates, summarizes information</p>
+                        <p>• Understands context & meaning</p>
+                    </div>
+                </div>
+                <div class="interactive-demo">
+                    <h3>ตัวอย่าง LLM ที่มีชื่อเสียง / Popular LLMs:</h3>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin-top: 1rem;">
+                        <div class="ai-concept">🤖 ChatGPT (OpenAI)</div>
+                        <div class="ai-concept">🧠 Claude (Anthropic)</div>
+                        <div class="ai-concept">⚡ Gemini (Google)</div>
+                        <div class="ai-concept">🦙 Llama (Meta)</div>
+                        <div class="ai-concept">💫 Copilot (Microsoft)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4: How LLM Works -->
+            <div class="slide">
+                <h2>LLM ทำงานอย่างไร? / How LLM Works?</h2>
+                <div class="thai-text">กระบวนการทำงานของ LLM</div>
+                <div class="english-text">LLM Working Process</div>
+                
+                <div class="llm-flow">
+                    <div class="flow-step">📝 Input / ข้อมูลเข้า</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">🧠 Processing / ประมวลผล</div>
+                    <div class="flow-arrow">→</div>
+                    <div class="flow-step">💡 Output / ผลลัพธ์</div>
+                </div>
+
+                <div class="split-content">
+                    <div class="content-section">
+                        <h3 class="thai-text">ขั้นตอนการทำงาน</h3>
+                        <div class="tip-item">
+                            <div class="tip-emoji">1️⃣</div>
+                            <div>
+                                <strong>รับ Prompt</strong><br>
+                                อ่านและเข้าใจคำถาม/คำสั่ง
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-emoji">2️⃣</div>
+                            <div>
+                                <strong>วิเคราะห์บริบท</strong><br>
+                                เข้าใจความหมายและเจตนา
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-emoji">3️⃣</div>
+                            <div>
+                                <strong>สร้างคำตอบ</strong><br>
+                                ใช้ความรู้ที่เรียนมาตอบ
+                            </div>
+                        </div>
+                    </div>
+                    <div class="content-section">
+                        <h3 class="english-text">Working Steps</h3>
+                        <div class="tip-item">
+                            <div class="tip-emoji">1️⃣</div>
+                            <div>
+                                <strong>Receive Prompt</strong><br>
+                                Read and understand the input
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-emoji">2️⃣</div>
+                            <div>
+                                <strong>Analyze Context</strong><br>
+                                Understand meaning and intent
+                            </div>
+                        </div>
+                        <div class="tip-item">
+                            <div class="tip-emoji">3️⃣</div>
+                            <div>
+                                <strong>Generate Response</strong><br>
+                                Use learned knowledge to answer
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: What is Prompt -->
+            <div class="slide">
+                <h2>Prompt คืออะไร? / What is a Prompt?</h2>
+                <div class="split-content">
+                    <div class="content-section">
+                        <h3 class="thai-text">📝 Prompt (พรอมต์)</h3>
+                        <p><strong>คำสั่งหรือคำถามที่ให้ AI</strong></p>
+                        <p>• ข้อความที่เราพิมพ์ให้ AI</p>
+                        <p>• คำแนะนำสำหรับ AI</p>
+                        <p>• กำหนดสิ่งที่เราต้องการ</p>
+                        <p>• เหมือนการสั่งงานผู้ช่วย</p>
+                    </div>
+                    <div class="content-section">
+                        <h3 class="english-text">📝 Prompt</h3>
+                        <p><strong>Instructions or Questions for AI</strong></p>
+                        <p>• Text we type to the AI</p>
+                        <p>• Guidance for AI behavior</p>
+                        <p>• Defines what we want</p>
+                        <p>• Like instructing an assistant</p>
+                    </div>
+                </div>
+
+                <div class="interactive-demo">
+                    <h3>ตัวอย่าง Prompt / Prompt Examples:</h3>
+                    <div class="prompt-example prompt-bad">
+                        <strong>❌ Prompt ไม่ดี / Bad Prompt:</strong><br>
+                        "เขียนเรื่อง" / "Write something"
+                    </div>
+                    <div class="prompt-example prompt-good">
+                        <strong>✅ Prompt ดี / Good Prompt:</strong><br>
+                        "เขียนเรื่องสั้นเกี่ยวกับมิตรภาพ ความยาว 200 คำ สำหรับเด็กอายุ 8-12 ปี"<br>
+                        "Write a short story about friendship, 200 words, for children aged 8-12"
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: Prompt Engineering Basics -->
+            <div class="slide">
+                <h2>Prompt Engineering คืออะไร?</h2>
+                <h2>What is Prompt Engineering?</h2>
+                <div class="split-content">
+                    <div class="content-section">
+                        <h3 class="thai-text">🔧 Prompt Engineering</h3>
+                        <p><strong>ศิลปะการเขียน Prompt ที่มีประสิทธิภาพ</strong></p>
+                        <p>• การออกแบบคำสั่งที่ชัดเจน</p>
+                        <p>• ได้ผลลัพธ์ตรงตามต้องการ</p>
+                        <p>• ลดข้อผิดพลาดของ AI</p>
+                        <p>• เพิ่มคุณภาพคำตอบ</p>
+                    </div>
+                    <div class="content-section">
+                        <h3 class="english-text">🔧 Prompt Engineering</h3>
+                        <p><strong>Art of Writing Effective Prompts</strong></p>
+                        <p>• Designing clear instructions</p>
+                        <p>• Getting desired results</p>
+                        <p>• Reducing AI errors</p>
+                        <p>• Improving response quality</p>
+                    </div>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Prompt ทั่วไป / Regular Prompt</th>
+                            <th>Prompt Engineering</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>❌ "ช่วยทำการบ้าน" / "Help with homework"</td>
+                            <td>✅ "อธิบายสูตรพีทาโกรัสพร้อมตัวอย่าง 3 ข้อ ระดับ ม.3" / "Explain Pythagorean theorem with 3 examples for grade 9"</td>
+                        </tr>
+                        <tr>
+                            <td>❌ "เขียนอีเมล" / "Write email"</td>
+                            <td>✅ "เขียนอีเมลขอลางาน 1 วัน แบบสุภาพ ให้หัวหน้า" / "Write a polite 1-day leave request email to my boss"</td>
+                        </tr>
+                        <tr>
+                            <td>❌ "แปลภาษา" / "Translate"</td>
+                            <td>✅ "แปลภาษาอังกฤษเป็นไทย สำหรับเด็ก ใช้คำง่าย" / "Translate English to Thai for children using simple words"</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Slide 7: Effective Prompt Techniques -->
+            <div class="slide">
+                <h2>เทคนิคการเขียน Prompt ที่มีประสิทธิภาพ</h2>
+                <h2>Effective Prompt Writing Techniques</h2>
+                
+                <div class="prompt-tips">
+                    <div class="tip-item">
+                        <div class="tip-emoji">🎯</div>
+                        <div>
+                            <strong class="thai-text">ชัดเจนและเฉพาะเจาะจง / Be Clear & Specific</strong><br>
+                            ระบุรายละเอียดที่ต้องการ / Specify exactly what you want
+                        </div>
+                    </div>
+
+                    <div class="tip-item">
+                        <div class="tip-emoji">🏷️</div>
+                        <div>
+                            <strong class="thai-text">กำหนดบทบาท / Define Role</strong><br>
+                            "คุณเป็นครูสอนคณิตศาสตร์" / "You are a math teacher"
+                        </div>
+                    </div>
+
+                    <div class="tip-item">
+                        <div class="tip-emoji">📏</div>
+                        <div>
+                            <strong class="thai-text">ระบุความยาว / Specify Length</strong><br>
+                            "ตอบใน 100 คำ" / "Answer in 100 words"
+                        </div>
+                    </div>
+
+                    <div class="tip-item">
+                        <div class="tip-emoji">📋</div>
+                        <div>
+                            <strong class="thai-text">กำหนดรูปแบบ / Set Format</strong><br>
+                            "จัดเป็นลิสต์ 5 ข้อ" / "Make a list of 5 points"
+                        </div>
+                    </div>
+
+                    <div class="tip-item">
+                        <div class="tip-emoji">🎭</div>
+                        <div>
+                            <strong class="thai-text">ระบุกลุ่มเป้าหมาย / Define Audience</strong><br>
+                            "อธิบายให้เด็กอายุ 10 ปี" / "Explain for 10-year-old children"
+                        </div>
+                    </div>
+
+                    <div class="tip-item">
+                        <div class="tip-emoji">📝</div>
+                        <div>
+                            <strong class="thai-text">ให้ตัวอย่าง / Provide Examples</strong><br>
+                            แสดงตัวอย่างที่ต้องการ / Show what you want
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 8: Prompt Examples Comparison -->
+            <div class="slide">
+                <h2>เปรียบเทียบ Prompt ดี vs ไม่ดี</h2>
+                <h2>Good vs Bad Prompt Comparison</h2>
+
+                <div style="max-width: 1000px; width: 100%;">
+                    <div style="margin-bottom: 2rem;">
+                        <h3 class="thai-text">ตัวอย่างที่ 1: การเขียนอีเมล / Example 1: Email Writing</h3>
+                        <div class="prompt-example prompt-bad">
+                            <strong>❌ Prompt ไม่ดี / Bad:</strong><br>
+                            "เขียนอีเมล" / "Write an email"
+                        </div>
+                        <div class="prompt-example prompt-good">
+                            <strong>✅ Prompt ดี / Good:</strong><br>
+                            "เขียนอีเมลขอนัดหมายลูกค้า สำหรับการนำเสนอผลิตภัณฑ์ใหม่ วันอังคารหน้า เวลา 14:00 น. ใช้ภาษาที่สุภาพและเป็นทางการ"<br><br>
+                            "Write a client meeting request email for a new product presentation next Tuesday at 2:00 PM, using polite and formal language"
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 2rem;">
+                        <h3 class="thai-text">ตัวอย่างที่ 2: การอธิบายแนวคิด / Example 2: Concept Explanation</h3>
+                        <div class="prompt-example prompt-bad">
+                            <strong>❌ Prompt ไม่ดี / Bad:</strong><br>
+                            "อธิบายการเงิน" / "Explain finance"
+                        </div>
+                        <div class="prompt-example prompt-good">
+                            <strong>✅ Prompt ดี / Good:</strong><br>
+                            "อธิบายการลงทุนในหุ้นเบื้องต้น สำหรับคนที่ไม่เคยลงทุน ใช้ภาษาง่าย พร้อมตัวอย่าง 3 ข้อ ความยาว 300 คำ"<br><br>
+                            "Explain basic stock investment for beginners who never invested, use simple language with 3 examples, 300 words"
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 9: Summary & Best Practices -->
+            <div class="slide">
+                <h2>สรุปและแนวทางปฏิบัติ / Summary & Best Practices</h2>
+                
+                <div class="split-content">
+                    <div class="content-section">
+                        <h3 class="thai-text">🎯 สิ่งที่เรียนรู้:</h3>
+                        <ul style="text-align: left;">
+                            <li>AI = ปัญญาประดิษฐ์</li>
+                            <li>LLM = โมเดลภาษาขนาดใหญ่</li>
+                            <li>Prompt = คำสั่งให้ AI</li>
+                            <li>Prompt Engineering = การเขียน Prompt ที่มีประสิทธิภาพ</li>
+                            <li>เทคนิคการเขียน Prompt ที่ดี</li>
+                        </ul>
+                    </div>
+                    <div class="content-section">
+                        <h3 class="english-text">🎯 What we learned:</h3>
+                        <ul style="text-align: left;">
+                            <li>AI = Artificial Intelligence</li>
+                            <li>LLM = Large Language Model</li>
+                            <li>Prompt = Instructions for AI</li>
+                            <li>Prompt Engineering = Effective prompt writing</li>
+                            <li>Good prompt writing techniques</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="interactive-demo">
+                    <h3>🚀 เคล็ดลับสำคัญ / Key Tips:</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem;">
+                        <div class="ai-concept">🎯 ชัดเจน / Be Clear</div>
+                        <div class="ai-concept">📝 เฉพาะเจาะจง / Be Specific</div>
+                        <div class="ai-concept">🏷️ กำหนดบทบาท / Define Role</div>
+                        <div class="ai-concept">📏 ระบุความยาว / Set Length</div>
+                        <div class="ai-concept">🎭 ระบุผู้ฟัง / Define Audience</div>
+                        <div class="ai-concept">📋 กำหนดรูปแบบ / Set Format</div>
+                    </div>
+                    
+                    <div style="margin-top: 2rem;">
+                        <h4 class="thai-text">🌟 ข้อควรจำ: Prompt ที่ดีคือกุญแจสู่ผลลัพธ์ที่ดี!</h4>
+                        <h4 class="english-text">🌟 Remember: Good prompts are the key to great results!</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="prevBtn" onclick="changeSlide(-1)">← ก่อนหน้า / Previous</button>
+            <div class="slide-dots" id="dots"></div>
+            <button class="btn" id="nextBtn" onclick="changeSlide(1)">ถัดไป / Next →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const progressFill = document.querySelector('.progress-fill');
+        const currentSlideSpan = document.getElementById('current-slide');
+        const totalSlidesSpan = document.getElementById('total-slides');
+        const dotsContainer = document.getElementById('dots');
+
+        // Initialize
+        totalSlidesSpan.textContent = totalSlides;
+        
+        // Create dots
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            if (i === 0) dot.classList.add('active');
+            dot.onclick = () => goToSlide(i);
+            dotsContainer.appendChild(dot);
+        }
+
+        function updateSlide() {
+            // Hide all slides
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'prev');
+                if (index < currentSlide) {
+                    slide.classList.add('prev');
+                } else if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            // Update progress
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressFill.style.width = progress + '%';
+            
+            // Update counter
+            currentSlideSpan.textContent = currentSlide + 1;
+            
+            // Update dots
+            document.querySelectorAll('.dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+            
+            // Update buttons
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            if (newSlide >= 0 && newSlide < totalSlides) {
+                currentSlide = newSlide;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(slideIndex) {
+            if (slideIndex >= 0 && slideIndex < totalSlides) {
+                currentSlide = slideIndex;
+                updateSlide();
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>

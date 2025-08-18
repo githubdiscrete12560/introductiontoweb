@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction to HTML & CSS | การเรียนรู้ HTML และ CSS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .progress-bar {
+            flex: 1;
+            margin: 0 2rem;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            width: 12.5%;
+        }
+
+        .slide-counter {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .slides-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.95);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s ease;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.prev {
+            transform: translateX(-100%);
+        }
+
+        .slide h1 {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .slide h2 {
+            font-size: 2.5rem;
+            color: #764ba2;
+            margin-bottom: 1.5rem;
+        }
+
+        .slide h3 {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .thai-text {
+            color: #e74c3c;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .english-text {
+            color: #2980b9;
+            margin-bottom: 1.5rem;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 1.5rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+            text-align: left;
+            white-space: pre-wrap;
+            max-width: 80%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .interactive-demo {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            max-width: 80%;
+        }
+
+        .demo-result {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .slide-dots {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: #667eea;
+            transform: scale(1.2);
+        }
+
+        .highlight {
+            background: #fff3cd;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            color: #856404;
+        }
+
+        .tag-demo {
+            display: inline-block;
+            background: #e8f4fd;
+            padding: 0.3rem 0.6rem;
+            margin: 0.2rem;
+            border-radius: 4px;
+            border-left: 4px solid #667eea;
+        }
+
+        .split-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .content-section {
+            background: rgba(255,255,255,0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .slide.active .content-section {
+            animation: slideIn 0.6s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <div class="header">
+            <div class="logo">HTML & CSS Tutorial</div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="slide-counter">
+                <span id="current-slide">1</span> / <span id="total-slides">8</span>
+            </div>
+        </div>
+
+        <div class="slides-container">
+            <!-- Slide 1: Welcome -->
+            <div class="slide active">
+                <h1>🚀 เรียนรู้ HTML & CSS</h1>
+                <h1>Learn HTML & CSS</h1>
+                <div class="thai-text">การแนะนำสู่การพัฒนาเว็บไซต์</div>
+                <div class="english-text">Introduction to Web Development</div>
+                <div class="interactive-demo">
+                    <div class="thai-text">🎯 สิ่งที่คุณจะได้เรียนรู้:</div>
+                    <div class="english-text">🎯 What you'll learn:</div>
+                    <ul style="text-align: left; max-width: 400px;">
+                        <li>HTML โครงสร้างของเว็บ (Web Structure)</li>
+                        <li>CSS การจัดแต่งหน้าตา (Styling)</li>
+                        <li>การรวม HTML + CSS (Combining Both)</li>
+                        <li>ตัวอย่างจริง (Live Examples)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 2: What is HTML -->
+            <div class="slide">
+                <h2>HTML คืออะไร? / What is HTML?</h2>
+                <div class="split-content">
+                    <div class="content-section">
+                        <h3 class="thai-text">🏗️ HTML (ไทย)</h3>
+                        <p><strong>HyperText Markup Language</strong></p>
+                        <p>• ภาษาสำหรับสร้างโครงสร้างเว็บไซต์</p>
+                        <p>• เหมือนโครงกระดูกของบ้าน</p>
+                        <p>• ใช้แท็ก (Tags) ในการจัดเนื้อหา</p>
+                        <p>• ไม่ใช่ภาษาโปรแกรม แต่เป็น Markup</p>
+                    </div>
+                    <div class="content-section">
+                        <h3 class="english-text">🏗️ HTML (English)</h3>
+                        <p><strong>HyperText Markup Language</strong></p>
+                        <p>• Language for creating web structure</p>
+                        <p>• Like the skeleton of a house</p>
+                        <p>• Uses tags to organize content</p>
+                        <p>• Not programming, but markup language</p>
+                    </div>
+                </div>
+                <div class="code-block">
+&lt;h1&gt;Hello World!&lt;/h1&gt;
+&lt;p&gt;This is a paragraph.&lt;/p&gt;</div>
+            </div>
+
+            <!-- Slide 3: HTML Structure -->
+            <div class="slide">
+                <h2>โครงสร้าง HTML / HTML Structure</h2>
+                <div class="thai-text">โครงสร้างพื้นฐานของ HTML</div>
+                <div class="english-text">Basic HTML Structure</div>
+                <div class="code-block">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;ชื่อหน้าเว็บ / Page Title&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;หัวข้อใหญ่ / Main Heading&lt;/h1&gt;
+    &lt;p&gt;เนื้อหา / Content goes here&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</div>
+                <div class="interactive-demo">
+                    <div class="thai-text">• &lt;head&gt; = ข้อมูลเกี่ยวกับหน้าเว็บ</div>
+                    <div class="english-text">• &lt;head&gt; = Information about the page</div>
+                    <div class="thai-text">• &lt;body&gt; = เนื้อหาที่แสดงให้เห็น</div>
+                    <div class="english-text">• &lt;body&gt; = Visible content</div>
+                </div>
+            </div>
+
+            <!-- Slide 4: Common HTML Tags -->
+            <div class="slide">
+                <h2>แท็ก HTML ที่ใช้บ่อย / Common HTML Tags</h2>
+                <div class="split-content">
+                    <div class="content-section">
+                        <h3 class="thai-text">แท็กพื้นฐาน</h3>
+                        <div class="tag-demo">&lt;h1&gt; หัวข้อใหญ่</div>
+                        <div class="tag-demo">&lt;p&gt; ย่อหน้า</div>
+                        <div class="tag-demo">&lt;a&gt; ลิงก์</div>
+                        <div class="tag-demo">&lt;img&gt; รูปภาพ</div>
+                        <div class="tag-demo">&lt;div&gt; กล่องจัดกลุ่ม</div>
+                        <div class="tag-demo">&lt;span&gt; ข้อความย่อย</div>
+                    </div>
+                    <div class="content-section">
+                        <h3 class="english-text">Basic Tags</h3>
+                        <div class="tag-demo">&lt;h1&gt; Main Heading</div>
+                        <div class="tag-demo">&lt;p&gt; Paragraph</div>
+                        <div class="tag-demo">&lt;a&gt; Link</div>
+                        <div class="tag-demo">&lt;img&gt; Image</div>
+                        <div class="tag-demo">&lt;div&gt; Container</div>
+                        <div class="tag-demo">&lt;span&gt; Inline Text</div>
+                    </div>
+                </div>
+                <div class="code-block">
+&lt;h1&gt;ยินดีต้อนรับ / Welcome&lt;/h1&gt;
+&lt;p&gt;นี่คือย่อหน้า / This is a paragraph&lt;/p&gt;
+&lt;a href="https://example.com"&gt;คลิกที่นี่ / Click here&lt;/a&gt;</div>
+            </div>
+
+            <!-- Slide 5: What is CSS -->
+            <div class="slide">
+                <h2>CSS คืออะไร? / What is CSS?</h2>
+                <div class="split-content">
+                    <div class="content-section">
+                        <h3 class="thai-text">🎨 CSS (ไทย)</h3>
+                        <p><strong>Cascading Style Sheets</strong></p>
+                        <p>• ภาษาสำหรับจัดแต่งหน้าตาเว็บ</p>
+                        <p>• เหมือนการทาสี ตกแต่งบ้าน</p>
+                        <p>• ควบคุมสี ขนาด ตำแหน่ง</p>
+                        <p>• ทำให้เว็บสวยงาม น่าดู</p>
+                    </div>
+                    <div class="content-section">
+                        <h3 class="english-text">🎨 CSS (English)</h3>
+                        <p><strong>Cascading Style Sheets</strong></p>
+                        <p>• Language for styling web pages</p>
+                        <p>• Like painting and decorating a house</p>
+                        <p>• Controls colors, sizes, positions</p>
+                        <p>• Makes websites beautiful</p>
+                    </div>
+                </div>
+                <div class="interactive-demo">
+                    <div style="background: #ffcccc; padding: 10px; border-radius: 5px; margin: 5px;">
+                        HTML ไม่มี CSS = น่าเบื่อ / HTML without CSS = Boring
+                    </div>
+                    <div style="background: linear-gradient(45deg, #ff6b6b, #4ecdc4); color: white; padding: 15px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                        HTML + CSS = สวยงาม! / HTML + CSS = Beautiful!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: CSS Syntax -->
+            <div class="slide">
+                <h2>ไวยากรณ์ CSS / CSS Syntax</h2>
+                <div class="thai-text">รูปแบบการเขียน CSS</div>
+                <div class="english-text">How to write CSS</div>
+                <div class="code-block">
+/* Selector - เลือกองค์ประกอบ */
+h1 {
+    color: blue;        /* สี / Color */
+    font-size: 24px;    /* ขนาดตัวอักษร / Font Size */
+    text-align: center; /* จัดกึ่งกลาง / Center align */
+}</div>
+                <div class="split-content">
+                    <div class="content-section">
+                        <h3 class="thai-text">ส่วนประกอบ CSS</h3>
+                        <p>• <span class="highlight">Selector</span> = เลือกองค์ประกอบ</p>
+                        <p>• <span class="highlight">Property</span> = คุณสมบัติ</p>
+                        <p>• <span class="highlight">Value</span> = ค่า</p>
+                    </div>
+                    <div class="content-section">
+                        <h3 class="english-text">CSS Components</h3>
+                        <p>• <span class="highlight">Selector</span> = Choose element</p>
+                        <p>• <span class="highlight">Property</span> = What to change</p>
+                        <p>• <span class="highlight">Value</span> = How to change</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7: Live Example -->
+            <div class="slide">
+                <h2>ตัวอย่างจริง / Live Example</h2>
+                <div class="thai-text">ดูการทำงานของ HTML + CSS</div>
+                <div class="english-text">See HTML + CSS in action</div>
+                <div class="split-content">
+                    <div class="content-section">
+                        <h3>HTML Code:</h3>
+                        <div class="code-block" style="font-size: 0.9rem;">
+&lt;div class="card"&gt;
+  &lt;h2&gt;สวัสดี / Hello&lt;/h2&gt;
+  &lt;p&gt;CSS ทำให้สวย!&lt;/p&gt;
+&lt;/div&gt;</div>
+                        <h3>CSS Code:</h3>
+                        <div class="code-block" style="font-size: 0.9rem;">
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}</div>
+                    </div>
+                    <div class="content-section">
+                        <h3>ผลลัพธ์ / Result:</h3>
+                        <div class="demo-result">
+                            <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-align: center;">
+                                <h2 style="color: #667eea; margin-bottom: 10px;">สวัสดี / Hello</h2>
+                                <p style="color: #666;">CSS ทำให้สวย!<br>CSS makes it beautiful!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 8: Summary -->
+            <div class="slide">
+                <h2>สรุป / Summary</h2>
+                <div class="split-content">
+                    <div class="content-section">
+                        <h3 class="thai-text">🎯 สิ่งที่เรียนรู้แล้ว:</h3>
+                        <ul style="text-align: left;">
+                            <li>HTML = โครงสร้างเว็บ</li>
+                            <li>CSS = การจัดแต่ง</li>
+                            <li>แท็กพื้นฐาน HTML</li>
+                            <li>ไวยากรณ์ CSS</li>
+                            <li>การรวม HTML + CSS</li>
+                        </ul>
+                    </div>
+                    <div class="content-section">
+                        <h3 class="english-text">🎯 What we learned:</h3>
+                        <ul style="text-align: left;">
+                            <li>HTML = Web Structure</li>
+                            <li>CSS = Styling</li>
+                            <li>Basic HTML Tags</li>
+                            <li>CSS Syntax</li>
+                            <li>Combining HTML + CSS</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="interactive-demo">
+                    <h3>🚀 ขั้นตอนต่อไป / Next Steps:</h3>
+                    <p class="thai-text">ลองสร้างเว็บไซต์แรกของคุณ!</p>
+                    <p class="english-text">Try creating your first website!</p>
+                    <div style="margin-top: 1rem;">
+                        <strong>แหล่งเรียนรู้เพิ่มเติม / Additional Resources:</strong><br>
+                        MDN Web Docs, W3Schools, freeCodeCamp
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="prevBtn" onclick="changeSlide(-1)">← ก่อนหน้า / Previous</button>
+            <div class="slide-dots" id="dots"></div>
+            <button class="btn" id="nextBtn" onclick="changeSlide(1)">ถัดไป / Next →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const progressFill = document.querySelector('.progress-fill');
+        const currentSlideSpan = document.getElementById('current-slide');
+        const totalSlidesSpan = document.getElementById('total-slides');
+        const dotsContainer = document.getElementById('dots');
+
+        // Initialize
+        totalSlidesSpan.textContent = totalSlides;
+        
+        // Create dots
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            if (i === 0) dot.classList.add('active');
+            dot.onclick = () => goToSlide(i);
+            dotsContainer.appendChild(dot);
+        }
+
+        function updateSlide() {
+            // Hide all slides
+            slides.forEach((slide, index) => {
+                slide.classList.remove('active', 'prev');
+                if (index < currentSlide) {
+                    slide.classList.add('prev');
+                } else if (index === currentSlide) {
+                    slide.classList.add('active');
+                }
+            });
+
+            // Update progress
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressFill.style.width = progress + '%';
+            
+            // Update counter
+            currentSlideSpan.textContent = currentSlide + 1;
+            
+            // Update dots
+            document.querySelectorAll('.dot').forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+            
+            // Update buttons
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            if (newSlide >= 0 && newSlide < totalSlides) {
+                currentSlide = newSlide;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(slideIndex) {
+            if (slideIndex >= 0 && slideIndex < totalSlides) {
+                currentSlide = slideIndex;
+                updateSlide();
+            }
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        // Initialize
+        updateSlide();
+    </script>
+</body>
+</html>
