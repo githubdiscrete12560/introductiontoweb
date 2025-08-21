@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Matrix Multiplication: Dot Product Method</title>
+    
+    <!-- MathJax Configuration -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true,
+                macros: {
+                    'bmat': ['\\begin{bmatrix}#1\\end{bmatrix}', 1],
+                    'pmat': ['\\begin{pmatrix}#1\\end{pmatrix}', 1]
+                }
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            },
+            chtml: {
+                scale: 1.1,
+                minScale: 0.5
+            },
+            startup: {
+                ready: function () {
+                    console.log('MathJax loaded successfully');
+                    MathJax.startup.defaultReady();
+                }
+            }
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .slide {
+            display: none;
+            padding: 20px;
+            height: 100vh;
+            overflow-y: auto;
+            animation: slideIn 0.6s ease-in-out;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #ffd700;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+        }
+        
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #87ceeb;
+        }
+        
+        h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #98fb98;
+        }
+        
+        h4 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+            color: #ffa500;
+        }
+        
+        .math-container {
+            background: rgba(0,0,0,0.4);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 5px solid #ffd700;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .interactive-area {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .matrix-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .matrix-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .matrix {
+            display: grid;
+            gap: 5px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        
+        .matrix-2x2 {
+            grid-template-columns: repeat(2, 60px);
+            grid-template-rows: repeat(2, 40px);
+        }
+        
+        .matrix-3x3 {
+            grid-template-columns: repeat(3, 60px);
+            grid-template-rows: repeat(3, 40px);
+        }
+        
+        .matrix-2x3 {
+            grid-template-columns: repeat(3, 60px);
+            grid-template-rows: repeat(2, 40px);
+        }
+        
+        .matrix-3x2 {
+            grid-template-columns: repeat(2, 60px);
+            grid-template-rows: repeat(3, 40px);
+        }
+        
+        .matrix-element {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 5px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .matrix-element.input {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            outline: none;
+        }
+        
+        .matrix-element.input:focus {
+            background: rgba(255,255,255,0.3);
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+        
+        .matrix-element.highlighted-row {
+            background: rgba(255,99,71,0.7) !important;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255,99,71,0.8);
+        }
+        
+        .matrix-element.highlighted-col {
+            background: rgba(50,205,50,0.7) !important;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(50,205,50,0.8);
+        }
+        
+        .matrix-element.result-highlight {
+            background: rgba(255,215,0,0.8) !important;
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(255,215,0,0.9);
+            animation: pulse 1s ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1.2); }
+            50% { transform: scale(1.3); }
+        }
+        
+        .operator {
+            font-size: 2rem;
+            color: #ffd700;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+        }
+        
+        .calculation-display {
+            background: rgba(0,0,0,0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #ffd700;
+            min-height: 100px;
+        }
+        
+        .step-display {
+            background: rgba(0,100,200,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #4169e1;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #ffed4e, #ffd700);
+            transform: translateY(-2px) scale(1.05);
+        }
+        
+        button:disabled {
+            background: #666;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .preset-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .preset-btn {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            background: linear-gradient(135deg, #87ceeb, #4169e1);
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+        
+        .slide-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.6);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .info-box {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .example-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .size-selector {
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .size-selector select {
+            padding: 8px 15px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        /* MathJax styling */
+        .MathJax {
+            font-size: 1.1em !important;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .matrix-display {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .example-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="slide-counter">
+            <span id="current-slide">1</span> / <span id="total-slides">4</span>
+        </div>
+
+        <!-- Slide 1: Introduction -->
+        <div class="slide active">
+            <h1>Matrix Multiplication: Dot Product Method</h1>
+            
+            <div class="math-container">
+                <h3>🎯 The Core Concept</h3>
+                <p>Each element in the result matrix is computed as a <span class="highlight">dot product</span> between a row and a column</p>
+                $$C_{ij} = \text{(Row i of A)} \cdot \text{(Column j of B)}$$
+            </div>
+            
+            <div class="example-grid">
+                <div class="info-box">
+                    <h4>📏 Dot Product Reminder</h4>
+                    <p>For vectors $\mathbf{u} = [u_1, u_2, u_3]$ and $\mathbf{v} = [v_1, v_2, v_3]$:</p>
+                    <div class="math-container">
+                        $$\mathbf{u} \cdot \mathbf{v} = u_1v_1 + u_2v_2 + u_3v_3$$
+                    </div>
+                </div>
+                <div class="info-box">
+                    <h4>🔄 Matrix Multiplication Rule</h4>
+                    <p>To multiply $A_{m \times n} \times B_{n \times p}$:</p>
+                    <ul>
+                        <li>A must have same # of columns as B has rows</li>
+                        <li>Result is $m \times p$ matrix</li>
+                        <li>Each element requires $n$ multiplications</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="math-container">
+                <h4>Visual Formula</h4>
+                $$\bmat{a_{11} & a_{12} \\ a_{21} & a_{22}} \bmat{b_{11} & b_{12} \\ b_{21} & b_{22}} = \bmat{a_{11}b_{11}+a_{12}b_{21} & a_{11}b_{12}+a_{12}b_{22} \\ a_{21}b_{11}+a_{22}b_{21} & a_{21}b_{12}+a_{22}b_{22}}$$
+                <p>Notice: Each result element is a <span class="highlight">dot product</span>!</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Step-by-Step Example -->
+        <div class="slide">
+            <h1>Step-by-Step Walkthrough</h1>
+            
+            <div class="interactive-area">
+                <h3>🔍 Computing Element (1,2) of the Result</h3>
+                
+                <div class="matrix-display">
+                    <div class="matrix-container">
+                        <h4>Matrix A</h4>
+                        <div class="matrix matrix-2x2">
+                            <div class="matrix-element" id="demo-a11">2</div>
+                            <div class="matrix-element" id="demo-a12">3</div>
+                            <div class="matrix-element" id="demo-a21">1</div>
+                            <div class="matrix-element" id="demo-a22">4</div>
+                        </div>
+                    </div>
+                    
+                    <div class="operator">×</div>
+                    
+                    <div class="matrix-container">
+                        <h4>Matrix B</h4>
+                        <div class="matrix matrix-2x2">
+                            <div class="matrix-element" id="demo-b11">5</div>
+                            <div class="matrix-element" id="demo-b12">6</div>
+                            <div class="matrix-element" id="demo-b21">7</div>
+                            <div class="matrix-element" id="demo-b22">8</div>
+                        </div>
+                    </div>
+                    
+                    <div class="operator">=</div>
+                    
+                    <div class="matrix-container">
+                        <h4>Result C</h4>
+                        <div class="matrix matrix-2x2">
+                            <div class="matrix-element" id="demo-c11">?</div>
+                            <div class="matrix-element" id="demo-c12">?</div>
+                            <div class="matrix-element" id="demo-c21">?</div>
+                            <div class="matrix-element" id="demo-c22">?</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button onclick="demonstrateElement(0,0)">Show C₁₁</button>
+                    <button onclick="demonstrateElement(0,1)">Show C₁₂</button>
+                    <button onclick="demonstrateElement(1,0)">Show C₂₁</button>
+                    <button onclick="demonstrateElement(1,1)">Show C₂₂</button>
+                    <button onclick="demonstrateAll()">Show All Steps</button>
+                    <button onclick="resetDemo()">Reset</button>
+                </div>
+                
+                <div class="calculation-display" id="demo-calculation">
+                    <h4>Click a button above to see the dot product calculation!</h4>
+                    <p>We'll highlight the row and column being used, then show the step-by-step arithmetic.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Interactive Calculator -->
+        <div class="slide">
+            <h1>Interactive Matrix Calculator</h1>
+            
+            <div class="size-selector">
+                <label for="matrix-size">Choose matrix size: </label>
+                <select id="matrix-size" onchange="changeMatrixSize()">
+                    <option value="2x2">2×2 matrices</option>
+                    <option value="3x3">3×3 matrices</option>
+                    <option value="2x3">2×3 × 3×2 matrices</option>
+                    <option value="3x2">3×2 × 2×3 matrices</option>
+                </select>
+            </div>
+            
+            <div class="preset-buttons">
+                <button class="preset-btn" onclick="loadPreset('identity')">Identity Matrices</button>
+                <button class="preset-btn" onclick="loadPreset('rotation')">2D Rotation</button>
+                <button class="preset-btn" onclick="loadPreset('scaling')">Scaling Matrix</button>
+                <button class="preset-btn" onclick="loadPreset('random')">Random Values</button>
+                <button class="preset-btn" onclick="clearMatrices()">Clear All</button>
+            </div>
+            
+            <div class="interactive-area">
+                <div class="matrix-display" id="calculator-display">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+                
+                <div class="controls">
+                    <button onclick="calculateResult()">Calculate Result</button>
+                    <button onclick="animateCalculation()">Animate Step-by-Step</button>
+                    <button onclick="clearResult()">Clear Result</button>
+                </div>
+                
+                <div class="calculation-display" id="calculator-steps">
+                    <h4>💡 Instructions:</h4>
+                    <p>1. Enter values in the matrices above</p>
+                    <p>2. Click "Calculate Result" for instant answer</p>
+                    <p>3. Click "Animate Step-by-Step" to see each dot product calculation</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Advanced Examples -->
+        <div class="slide">
+            <h1>Real-World Applications</h1>
+            
+            <div class="example-grid">
+                <div class="info-box">
+                    <h4>🎮 3D Graphics: Transformation Chains</h4>
+                    <p>Multiple transformations combined through matrix multiplication:</p>
+                    <div class="math-container">
+                        $$\text{Final} = \text{Translation} \times \text{Rotation} \times \text{Scale}$$
+                    </div>
+                    <p>Each multiplication uses the dot product method!</p>
+                </div>
+                
+                <div class="info-box">
+                    <h4>🤖 Neural Networks: Forward Propagation</h4>
+                    <p>Layer outputs computed via matrix multiplication:</p>
+                    <div class="math-container">
+                        $$\text{Output} = \text{Weights} \times \text{Input} + \text{Bias}$$
+                    </div>
+                    <p>Millions of dot products in parallel!</p>
+                </div>
+            </div>
+            
+            <div class="interactive-area">
+                <h3>🔬 Advanced Example: 3×3 Rotation Matrix</h3>
+                
+                <div class="step-display">
+                    <h4>Rotate a 3D point (1,0,0) by 45° around Z-axis</h4>
+                    <div class="math-container">
+                        $$\bmat{\cos 45° & -\sin 45° & 0 \\ \sin 45° & \cos 45° & 0 \\ 0 & 0 & 1} \bmat{1 \\ 0 \\ 0} = \bmat{0.707 \\ 0.707 \\ 0}$$
+                    </div>
+                </div>
+                
+                <div class="step-display">
+                    <h4>Dot Product Breakdown:</h4>
+                    <ul>
+                        <li><strong>X-component:</strong> [0.707, -0.707, 0] · [1, 0, 0] = 0.707×1 + (-0.707)×0 + 0×0 = 0.707</li>
+                        <li><strong>Y-component:</strong> [0.707, 0.707, 0] · [1, 0, 0] = 0.707×1 + 0.707×0 + 0×0 = 0.707</li>
+                        <li><strong>Z-component:</strong> [0, 0, 1] · [1, 0, 0] = 0×1 + 0×0 + 1×0 = 0</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="math-container">
+                <h4>🎯 Key Takeaways</h4>
+                <ul style="text-align: left; max-width: 600px; margin: 0 auto;">
+                    <li><strong>Row × Column:</strong> Each result element is one dot product</li>
+                    <li><strong>Systematic Process:</strong> Work through each position methodically</li>
+                    <li><strong>Dimension Matching:</strong> Inner dimensions must match</li>
+                    <li><strong>Real Applications:</strong> Powers graphics, AI, physics simulations</li>
+                    <li><strong>Computational Cost:</strong> O(n³) operations for n×n matrices</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button id="prev-btn" onclick="previousSlide()">← Previous</button>
+            <button id="next-btn" onclick="nextSlide()">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('total-slides').textContent = totalSlides;
+        
+        // Slide navigation
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            
+            document.getElementById('prev-btn').disabled = currentSlide === 0;
+            document.getElementById('next-btn').disabled = currentSlide === totalSlides - 1;
+            
+            if (window.MathJax) {
+                MathJax.typesetPromise([slides[currentSlide]]);
+            }
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            }
+        }
+        
+        function previousSlide() {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+        
+        // Demo functions for slide 2
+        const demoA = [[2, 3], [1, 4]];
+        const demoB = [[5, 6], [7, 8]];
+        let demoResult = [[0, 0], [0, 0]];
+        
+        function demonstrateElement(row, col) {
+            // Reset highlights
+            resetDemo();
+            
+            // Highlight the row in A and column in B
+            for (let j = 0; j < 2; j++) {
+                document.getElementById(`demo-a${row+1}${j+1}`).classList.add('highlighted-row');
+            }
+            for (let i = 0; i < 2; i++) {
+                document.getElementById(`demo-b${i+1}${col+1}`).classList.add('highlighted-col');
+            }
+            
+            // Calculate the dot product
+            let rowA = demoA[row];
+            let colB = [demoB[0][col], demoB[1][col]];
+            let result = rowA[0] * colB[0] + rowA[1] * colB[1];
+            
+            // Update result matrix
+            demoResult[row][col] = result;
+            document.getElementById(`demo-c${row+1}${col+1}`).textContent = result;
+            document.getElementById(`demo-c${row+1}${col+1}`).classList.add('result-highlight');
+            
+            // Show calculation
+            const calcDiv = document.getElementById('demo-calculation');
+            calcDiv.innerHTML = `
+                <h4>Computing C₍${row+1},${col+1}₎:</h4>
+                <div class="step-display">
+                    <strong>Row ${row+1} of A:</strong> [${rowA.join(', ')}]<br>
+                    <strong>Column ${col+1} of B:</strong> [${colB.join(', ')}]
+                </div>
+                <div class="step-display">
+                    <strong>Dot Product:</strong><br>
+                    C₍${row+1},${col+1}₎ = ${rowA[0]} × ${colB[0]} + ${rowA[1]} × ${colB[1]}<br>
+                    C₍${row+1},${col+1}₎ = ${rowA[0] * colB[0]} + ${rowA[1] * colB[1]}<br>
+                    <strong>C₍${row+1},${col+1}₎ = ${result}</strong>
+                </div>
+            `;
+        }
+        
+        function demonstrateAll() {
+            resetDemo();
+            
+            let html = '<h4>Computing All Elements:</h4>';
+            
+            for (let i = 0; i < 2; i++) {
+                for (let j = 0; j < 2; j++) {
+                    let rowA = demoA[i];
+                    let colB = [demoB[0][j], demoB[1][j]];
+                    let result = rowA[0] * colB[0] + rowA[1] * colB[1];
+                    demoResult[i][j] = result;
+                    
+                    document.getElementById(`demo-c${i+1}${j+1}`).textContent = result;
+                    
+                    html += `
+                        <div class="step-display">
+                            <strong>C₍${i+1},${j+1}₎:</strong> [${rowA.join(', ')}] · [${colB.join(', ')}] = 
+                            ${rowA[0]}×${colB[0]} + ${rowA[1]}×${colB[1]} = ${result}
+                        </div>
+                    `;
+                }
+            }
+            
+            document.getElementById('demo-calculation').innerHTML = html;
+        }
+        
+        function resetDemo() {
+            // Clear all highlights
+            const elements = document.querySelectorAll('.matrix-element');
+            elements.forEach(el => {
+                el.classList.remove('highlighted-row', 'highlighted-col', 'result-highlight');
+            });
+            
+            // Reset result matrix display
+            for (let i = 1; i <= 2; i++) {
+                for (let j = 1; j <= 2; j++) {
+                    document.getElementById(`demo-c${i}${j}`).textContent = '?';
+                }
+            }
+            
+            // Reset calculation display
+            document.getElementById('demo-calculation').innerHTML = `
+                <h4>Click a button above to see the dot product calculation!</h4>
+                <p>We'll highlight the row and column being used, then show the step-by-step arithmetic.</p>
+            `;
+        }
+        
+        // Calculator functions for slide 3
+        let currentSize = '2x2';
+        let matrixA = [];
+        let matrixB = [];
+        let resultMatrix = [];
+        
+        function changeMatrixSize() {
+            currentSize = document.getElementById('matrix-size').value;
+            setupCalculator();
+        }
+        
+        function setupCalculator() {
+            const display = document.getElementById('calculator-display');
+            
+            let sizeA, sizeB, sizeResult;
+            switch (currentSize) {
+                case '2x2':
+                    sizeA = sizeB = sizeResult = 'matrix-2x2';
+                    matrixA = [[0,0],[0,0]];
+                    matrixB = [[0,0],[0,0]];
+                    resultMatrix = [[0,0],[0,0]];
+                    break;
+                case '3x3':
+                    sizeA = sizeB = sizeResult = 'matrix-3x3';
+                    matrixA = [[0,0,0],[0,0,0],[0,0,0]];
+                    matrixB = [[0,0,0],[0,0,0],[0,0,0]];
+                    resultMatrix = [[0,0,0],[0,0,0],[0,0,0]];
+                    break;
+                case '2x3':
+                    sizeA = 'matrix-2x3';
+                    sizeB = 'matrix-3x2';
+                    sizeResult = 'matrix-2x2';
+                    matrixA = [[0,0,0],[0,0,0]];
+                    matrixB = [[0,0],[0,0],[0,0]];
+                    resultMatrix = [[0,0],[0,0]];
+                    break;
+                case '3x2':
+                    sizeA = 'matrix-3x2';
+                    sizeB = 'matrix-2x3';
+                    sizeResult = 'matrix-3x3';
+                    matrixA = [[0,0],[0,0],[0,0]];
+                    matrixB = [[0,0,0],[0,0,0]];
+                    resultMatrix = [[0,0,0],[0,0,0],[0,0,0]];
+                    break;
+            }
+            
+            display.innerHTML = `
+                <div class="matrix-container">
+                    <h4>Matrix A</h4>
+                    <div class="matrix ${sizeA}" id="matrix-a">
+                        ${generateMatrixInputs('a', matrixA)}
+                    </div>
+                </div>
+                
+                <div class="operator">×</div>
+                
+                <div class="matrix-container">
+                    <h4>Matrix B</h4>
+                    <div class="matrix ${sizeB}" id="matrix-b">
+                        ${generateMatrixInputs('b', matrixB)}
+                    </div>
+                </div>
+                
+                <div class="operator">=</div>
+                
+                <div class="matrix-container">
+                    <h4>Result</h4>
+                    <div class="matrix ${sizeResult}" id="matrix-result">
+                        ${generateMatrixOutputs(resultMatrix)}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function generateMatrixInputs(prefix, matrix) {
+            let html = '';
+            for (let i = 0; i < matrix.length; i++) {
+                for (let j = 0; j < matrix[i].length; j++) {
+                    html += `<input type="number" class="matrix-element input" 
+                             id="${prefix}-${i}-${j}" value="${matrix[i][j]}" 
+                             oninput="updateMatrix('${prefix}', ${i}, ${j}, this.value)">`;
+                }
+            }
+            return html;
+        }
+        
+        function generateMatrixOutputs(matrix) {
+            let html = '';
+            for (let i = 0; i < matrix.length; i++) {
+                for (let j = 0; j < matrix[i].length; j++) {
+                    html += `<div class="matrix-element" id="result-${i}-${j}">?</div>`;
+                }
+            }
+            return html;
+        }
+        
+        function updateMatrix(prefix, row, col, value) {
+            const numValue = parseFloat(value) || 0;
+            if (prefix === 'a') {
+                matrixA[row][col] = numValue;
+            } else {
+                matrixB[row][col] = numValue;
+            }
+        }
+        
+        function calculateResult() {
+            // Perform matrix multiplication
+            const aRows = matrixA.length;
+            const aCols = matrixA[0].length;
+            const bCols = matrixB[0].length;
+            
+            resultMatrix = [];
+            for (let i = 0; i < aRows; i++) {
+                resultMatrix[i] = [];
+                for (let j = 0; j < bCols; j++) {
+                    let sum = 0;
+                    for (let k = 0; k < aCols; k++) {
+                        sum += matrixA[i][k] * matrixB[k][j];
+                    }
+                    resultMatrix[i][j] = Math.round(sum * 1000) / 1000; // Round to 3 decimals
+                    document.getElementById(`result-${i}-${j}`).textContent = resultMatrix[i][j];
+                }
+            }
+            
+            document.getElementById('calculator-steps').innerHTML = `
+                <h4>✅ Calculation Complete!</h4>
+                <p>Each element was computed using the dot product method.</p>
+                <p>Click "Animate Step-by-Step" to see how each element was calculated.</p>
+            `;
+        }
+        
+        function animateCalculation() {
+            calculateResult(); // Ensure we have results
+            
+            const aRows = matrixA.length;
+            const bCols = matrixB[0].length;
+            const aCols = matrixA[0].length;
+            
+            let stepHtml = '<h4>🎬 Step-by-Step Animation:</h4>';
+            
+            for (let i = 0; i < aRows; i++) {
+                for (let j = 0; j < bCols; j++) {
+                    let rowA = matrixA[i];
+                    let colB = [];
+                    for (let k = 0; k < aCols; k++) {
+                        colB.push(matrixB[k][j]);
+                    }
+                    
+                    let calculation = '';
+                    let sum = 0;
+                    for (let k = 0; k < aCols; k++) {
+                        if (k > 0) calculation += ' + ';
+                        calculation += `${rowA[k]}×${colB[k]}`;
+                        sum += rowA[k] * colB[k];
+                    }
+                    
+                    stepHtml += `
+                        <div class="step-display">
+                            <strong>Element (${i+1},${j+1}):</strong><br>
+                            Row ${i+1}: [${rowA.join(', ')}] · Column ${j+1}: [${colB.join(', ')}]<br>
+                            = ${calculation} = ${Math.round(sum * 1000) / 1000}
+                        </div>
+                    `;
+                }
+            }
+            
+            document.getElementById('calculator-steps').innerHTML = stepHtml;
+        }
+        
+        function clearResult() {
+            const resultElements = document.querySelectorAll('[id^="result-"]');
+            resultElements.forEach(el => el.textContent = '?');
+            
+            document.getElementById('calculator-steps').innerHTML = `
+                <h4>💡 Instructions:</h4>
+                <p>1. Enter values in the matrices above</p>
+                <p>2. Click "Calculate Result" for instant answer</p>
+                <p>3. Click "Animate Step-by-Step" to see each dot product calculation</p>
+            `;
+        }
+        
+        function loadPreset(type) {
+            switch (type) {
+                case 'identity':
+                    if (currentSize === '2x2') {
+                        setMatrixValues([[1,0],[0,1]], [[1,0],[0,1]]);
+                    } else if (currentSize === '3x3') {
+                        setMatrixValues([[1,0,0],[0,1,0],[0,0,1]], [[1,0,0],[0,1,0],[0,0,1]]);
+                    }
+                    break;
+                case 'rotation':
+                    if (currentSize === '2x2') {
+                        setMatrixValues([[0.707,-0.707],[0.707,0.707]], [[1],[0]]);
+                    }
+                    break;
+                case 'scaling':
+                    if (currentSize === '2x2') {
+                        setMatrixValues([[2,0],[0,3]], [[1,1],[1,1]]);
+                    }
+                    break;
+                case 'random':
+                    generateRandomValues();
+                    break;
+            }
+        }
+        
+        function setMatrixValues(a, b) {
+            if (a) {
+                for (let i = 0; i < a.length; i++) {
+                    for (let j = 0; j < a[i].length; j++) {
+                        document.getElementById(`a-${i}-${j}`).value = a[i][j];
+                        matrixA[i][j] = a[i][j];
+                    }
+                }
+            }
+            if (b) {
+                for (let i = 0; i < b.length; i++) {
+                    for (let j = 0; j < b[i].length; j++) {
+                        document.getElementById(`b-${i}-${j}`).value = b[i][j];
+                        matrixB[i][j] = b[i][j];
+                    }
+                }
+            }
+        }
+        
+        function generateRandomValues() {
+            for (let i = 0; i < matrixA.length; i++) {
+                for (let j = 0; j < matrixA[i].length; j++) {
+                    const val = Math.floor(Math.random() * 10) - 5;
+                    document.getElementById(`a-${i}-${j}`).value = val;
+                    matrixA[i][j] = val;
+                }
+            }
+            for (let i = 0; i < matrixB.length; i++) {
+                for (let j = 0; j < matrixB[i].length; j++) {
+                    const val = Math.floor(Math.random() * 10) - 5;
+                    document.getElementById(`b-${i}-${j}`).value = val;
+                    matrixB[i][j] = val;
+                }
+            }
+        }
+        
+        function clearMatrices() {
+            setMatrixValues(
+                Array(matrixA.length).fill().map(() => Array(matrixA[0].length).fill(0)),
+                Array(matrixB.length).fill().map(() => Array(matrixB[0].length).fill(0))
+            );
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                previousSlide();
+            } else if (e.key === 'ArrowRight') {
+                nextSlide();
+            }
+        });
+        
+        // Initialize
+        showSlide(0);
+        
+        // Setup calculator when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                setupCalculator();
+                if (window.MathJax) {
+                    MathJax.typesetPromise([document.body]);
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

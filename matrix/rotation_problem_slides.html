@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rotation Problem: Gimbal Lock Interactive Demo</title>
+    
+    <!-- MathJax Configuration -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true,
+                macros: {
+                    'R': ['\\mathbf{R}', 0],
+                    'bmat': ['\\begin{bmatrix}#1\\end{bmatrix}', 1],
+                    'pmat': ['\\begin{pmatrix}#1\\end{pmatrix}', 1],
+                    'th': ['\\theta', 0],
+                    'ph': ['\\phi', 0],
+                    'ps': ['\\psi', 0]
+                }
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+            },
+            chtml: {
+                scale: 1.1,
+                minScale: 0.5
+            },
+            startup: {
+                ready: function () {
+                    console.log('MathJax loaded successfully');
+                    MathJax.startup.defaultReady();
+                }
+            }
+        };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        .container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .slide {
+            display: none;
+            padding: 30px;
+            height: 100vh;
+            overflow-y: auto;
+            animation: slideIn 0.6s ease-in-out;
+        }
+        
+        .slide.active {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            text-align: center;
+            margin-bottom: 25px;
+            color: #ffd700;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+        }
+        
+        h2 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+            color: #87ceeb;
+        }
+        
+        h3 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            color: #98fb98;
+        }
+        
+        h4 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #ffa500;
+        }
+        
+        .math-container {
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 5px solid #ffd700;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .matrix-display {
+            background: linear-gradient(135deg, rgba(0,0,0,0.6), rgba(0,0,0,0.4));
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 15px;
+            border: 2px solid #3498db;
+            backdrop-filter: blur(10px);
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 25px 0;
+        }
+        
+        .case-box {
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        .normal-case {
+            border-color: #2ecc71;
+            box-shadow: 0 0 20px rgba(46, 204, 113, 0.3);
+        }
+        
+        .gimbal-lock-case {
+            border-color: #e74c3c;
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.3);
+        }
+        
+        .interactive-controls {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .slider-group {
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .slider-group label {
+            font-weight: bold;
+            min-width: 80px;
+            color: #ffd700;
+        }
+        
+        .slider {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.2);
+            outline: none;
+            appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffd700;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffd700;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+        
+        .value-display {
+            min-width: 60px;
+            background: rgba(255,255,255,0.1);
+            padding: 5px 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, rgba(231,76,60,0.3), rgba(231,76,60,0.1));
+            border: 2px solid #e74c3c;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .success-box {
+            background: linear-gradient(135deg, rgba(46,204,113,0.3), rgba(46,204,113,0.1));
+            border: 2px solid #2ecc71;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .step-by-step {
+            background: rgba(0,0,255,0.1);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #4169e1;
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+        
+        button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        button:hover {
+            background: linear-gradient(135deg, #ffed4e, #ffd700);
+            transform: translateY(-2px) scale(1.05);
+        }
+        
+        button:disabled {
+            background: #666;
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            background: rgba(0,0,0,0.6);
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.1);
+        }
+        
+        .matrix-step {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #98fb98;
+        }
+        
+        .calculation {
+            font-family: 'Courier New', monospace;
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+        }
+        
+        /* MathJax styling */
+        .MathJax {
+            font-size: 1.2em !important;
+        }
+        
+        .MathJax_Display {
+            margin: 1em 0 !important;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .slide {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="slide-counter">
+            <span id="current-slide">1</span> / <span id="total-slides">6</span>
+        </div>
+
+        <!-- Slide 1: Introduction -->
+        <div class="slide active">
+            <h1>The Rotation Problem: Gimbal Lock</h1>
+            
+            <div class="success-box">
+                <h3>🎯 What We'll Explore</h3>
+                <p>How 3D rotations using Euler angles can lose degrees of freedom, demonstrated through <strong>concrete matrix calculations</strong></p>
+            </div>
+            
+            <div class="math-container">
+                <h3>Euler Rotation Sequence (Roll-Pitch-Yaw)</h3>
+                $$\R_{\text{total}} = \R_z(\text{yaw}) \cdot \R_y(\text{pitch}) \cdot \R_x(\text{roll})$$
+                <p>This seems like we have 3 independent degrees of freedom... but do we always?</p>
+            </div>
+            
+            <div class="comparison-grid">
+                <div class="case-box normal-case">
+                    <h4>✅ Normal Case: Pitch = 0°</h4>
+                    <p>All three rotations are independent</p>
+                    <p>We can freely adjust roll, pitch, and yaw</p>
+                </div>
+                <div class="case-box gimbal-lock-case">
+                    <h4>⚠️ Problem Case: Pitch = 90°</h4>
+                    <p>Roll and yaw axes become aligned!</p>
+                    <p>We lose one degree of freedom</p>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <h3>🚨 The Critical Question</h3>
+                <p>Why does this happen? Let's look at the <span class="highlight">actual matrix multiplications</span> to see exactly how the degrees of freedom collapse!</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Individual Rotation Matrices -->
+        <div class="slide">
+            <h1>Individual 3×3 Rotation Matrices</h1>
+            
+            <div class="math-container">
+                <h3>The Building Blocks</h3>
+                <p>Before we multiply them together, let's see each individual rotation matrix:</p>
+            </div>
+            
+            <div class="matrix-display">
+                <h4>Roll (X-axis rotation):</h4>
+                $$\R_x(\text{roll}) = \bmat{1 & 0 & 0 \\ 0 & \cos(\text{roll}) & -\sin(\text{roll}) \\ 0 & \sin(\text{roll}) & \cos(\text{roll})}$$
+            </div>
+            
+            <div class="matrix-display">
+                <h4>Pitch (Y-axis rotation):</h4>
+                $$\R_y(\text{pitch}) = \bmat{\cos(\text{pitch}) & 0 & \sin(\text{pitch}) \\ 0 & 1 & 0 \\ -\sin(\text{pitch}) & 0 & \cos(\text{pitch})}$$
+            </div>
+            
+            <div class="matrix-display">
+                <h4>Yaw (Z-axis rotation):</h4>
+                $$\R_z(\text{yaw}) = \bmat{\cos(\text{yaw}) & -\sin(\text{yaw}) & 0 \\ \sin(\text{yaw}) & \cos(\text{yaw}) & 0 \\ 0 & 0 & 1}$$
+            </div>
+            
+            <div class="step-by-step">
+                <h4>🔑 Key Insight</h4>
+                <p>Each matrix rotates around one axis while leaving the other two coordinates coupled. The magic (and problem) happens when we <strong>multiply these matrices together</strong>.</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: Normal Case - Pitch = 0° -->
+        <div class="slide">
+            <h1>Case 1: Normal Operation (Pitch = 0°)</h1>
+            
+            <div class="success-box">
+                <h3>Let's calculate: Roll=30°, Pitch=0°, Yaw=45°</h3>
+            </div>
+            
+            <div class="matrix-step">
+                <h4>Step 1: Substitute values into individual matrices</h4>
+                
+                <div class="calculation">
+                    <strong>Roll = 30°:</strong> cos(30°) = 0.866, sin(30°) = 0.500
+                    $$\R_x(30°) = \bmat{1 & 0 & 0 \\ 0 & 0.866 & -0.500 \\ 0 & 0.500 & 0.866}$$
+                </div>
+                
+                <div class="calculation">
+                    <strong>Pitch = 0°:</strong> cos(0°) = 1, sin(0°) = 0
+                    $$\R_y(0°) = \bmat{1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1}$$
+                </div>
+                
+                <div class="calculation">
+                    <strong>Yaw = 45°:</strong> cos(45°) = 0.707, sin(45°) = 0.707
+                    $$\R_z(45°) = \bmat{0.707 & -0.707 & 0 \\ 0.707 & 0.707 & 0 \\ 0 & 0 & 1}$$
+                </div>
+            </div>
+            
+            <div class="matrix-step">
+                <h4>Step 2: Multiply Pitch × Roll first</h4>
+                <div class="calculation">
+                    $$\R_y(0°) \cdot \R_x(30°) = \bmat{1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1} \bmat{1 & 0 & 0 \\ 0 & 0.866 & -0.500 \\ 0 & 0.500 & 0.866}$$
+                    $$= \bmat{1 & 0 & 0 \\ 0 & 0.866 & -0.500 \\ 0 & 0.500 & 0.866}$$
+                </div>
+            </div>
+            
+            <div class="matrix-step">
+                <h4>Step 3: Final multiplication with Yaw</h4>
+                <div class="calculation">
+                    $$\R_{\text{final}} = \bmat{0.707 & -0.707 & 0 \\ 0.707 & 0.707 & 0 \\ 0 & 0 & 1} \bmat{1 & 0 & 0 \\ 0 & 0.866 & -0.500 \\ 0 & 0.500 & 0.866}$$
+                    $$= \bmat{0.707 & -0.612 & 0.354 \\ 0.707 & 0.612 & -0.354 \\ 0 & 0.500 & 0.866}$$
+                </div>
+            </div>
+            
+            <div class="success-box">
+                <h4>✅ Result Analysis</h4>
+                <p>All 9 matrix elements are unique and meaningful. Each of the 3 rotation angles contributes independently to the final result.</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: Problem Case - Pitch = 90° -->
+        <div class="slide">
+            <h1>Case 2: Gimbal Lock (Pitch = 90°)</h1>
+            
+            <div class="warning-box">
+                <h3>Let's calculate: Roll=30°, Pitch=90°, Yaw=45°</h3>
+            </div>
+            
+            <div class="matrix-step">
+                <h4>Step 1: Substitute values into individual matrices</h4>
+                
+                <div class="calculation">
+                    <strong>Roll = 30°:</strong> (same as before)
+                    $$\R_x(30°) = \bmat{1 & 0 & 0 \\ 0 & 0.866 & -0.500 \\ 0 & 0.500 & 0.866}$$
+                </div>
+                
+                <div class="calculation">
+                    <strong>Pitch = 90°:</strong> cos(90°) = 0, sin(90°) = 1
+                    $$\R_y(90°) = \bmat{0 & 0 & 1 \\ 0 & 1 & 0 \\ -1 & 0 & 0}$$
+                </div>
+                
+                <div class="calculation">
+                    <strong>Yaw = 45°:</strong> (same as before)
+                    $$\R_z(45°) = \bmat{0.707 & -0.707 & 0 \\ 0.707 & 0.707 & 0 \\ 0 & 0 & 1}$$
+                </div>
+            </div>
+            
+            <div class="matrix-step">
+                <h4>Step 2: Multiply Pitch × Roll</h4>
+                <div class="calculation">
+                    $$\R_y(90°) \cdot \R_x(30°) = \bmat{0 & 0 & 1 \\ 0 & 1 & 0 \\ -1 & 0 & 0} \bmat{1 & 0 & 0 \\ 0 & 0.866 & -0.500 \\ 0 & 0.500 & 0.866}$$
+                    $$= \bmat{0 & 0.500 & 0.866 \\ 0 & 0.866 & -0.500 \\ -1 & 0 & 0}$$
+                </div>
+            </div>
+            
+            <div class="matrix-step">
+                <h4>Step 3: Final multiplication with Yaw</h4>
+                <div class="calculation">
+                    $$\R_{\text{final}} = \bmat{0.707 & -0.707 & 0 \\ 0.707 & 0.707 & 0 \\ 0 & 0 & 1} \bmat{0 & 0.500 & 0.866 \\ 0 & 0.866 & -0.500 \\ -1 & 0 & 0}$$
+                    $$= \bmat{0 & -0.259 & 0.966 \\ 0 & 0.966 & 0.259 \\ -1 & 0 & 0}$$
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                <h4>🚨 The Problem Revealed!</h4>
+                <p>Notice the first column: <span class="highlight">[0, 0, -1]</span></p>
+                <p>This means the X-axis always points in the negative Z direction, regardless of roll and yaw values!</p>
+            </div>
+        </div>
+
+        <!-- Slide 5: Interactive Demonstration -->
+        <div class="slide">
+            <h1>Interactive Matrix Calculator</h1>
+            
+            <div class="interactive-controls">
+                <h3>🎮 Adjust the Euler Angles</h3>
+                
+                <div class="slider-group">
+                    <label>Roll:</label>
+                    <input type="range" class="slider" id="roll-slider" min="0" max="360" value="30" step="5">
+                    <div class="value-display" id="roll-value">30°</div>
+                </div>
+                
+                <div class="slider-group">
+                    <label>Pitch:</label>
+                    <input type="range" class="slider" id="pitch-slider" min="0" max="360" value="0" step="5">
+                    <div class="value-display" id="pitch-value">0°</div>
+                </div>
+                
+                <div class="slider-group">
+                    <label>Yaw:</label>
+                    <input type="range" class="slider" id="yaw-slider" min="0" max="360" value="45" step="5">
+                    <div class="value-display" id="yaw-value">45°</div>
+                </div>
+            </div>
+            
+            <div class="comparison-grid">
+                <div class="case-box">
+                    <h4>Individual Matrices</h4>
+                    <div id="individual-matrices">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="case-box">
+                    <h4>Final Result Matrix</h4>
+                    <div id="final-matrix">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <div id="gimbal-warning" class="warning-box" style="display: none;">
+                <h4>⚠️ Gimbal Lock Detected!</h4>
+                <p>Pitch is near ±90°. Notice how changing roll and yaw produces similar effects!</p>
+            </div>
+            
+            <div id="normal-status" class="success-box">
+                <h4>✅ Normal Operation</h4>
+                <p>All three axes are independent. Try changing pitch to 90° to see gimbal lock!</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: Solutions and Summary -->
+        <div class="slide">
+            <h1>Solutions and Summary</h1>
+            
+            <div class="warning-box">
+                <h3>🚨 The Problem: Gimbal Lock</h3>
+                <p>When pitch = ±90°, the roll and yaw axes become <span class="highlight">mathematically aligned</span>, causing us to lose one degree of freedom.</p>
+            </div>
+            
+            <div class="matrix-display">
+                <h4>Why This Happens (Mathematical Insight)</h4>
+                <p>At pitch = 90°, the rotation matrix structure forces certain patterns:</p>
+                <div class="calculation">
+                    <p><strong>Key observation:</strong> The first column becomes [0, 0, ±1] regardless of roll/yaw</p>
+                    <p><strong>This means:</strong> We can't freely orient the X-axis independently</p>
+                </div>
+            </div>
+            
+            <div class="comparison-grid">
+                <div class="case-box">
+                    <h4>🔧 Solution 1: Quaternions</h4>
+                    <p>Use 4D quaternions instead of Euler angles</p>
+                    <ul>
+                        <li>No gimbal lock</li>
+                        <li>Smooth interpolation</li>
+                        <li>More complex math</li>
+                    </ul>
+                </div>
+                
+                <div class="case-box">
+                    <h4>🔧 Solution 2: Axis-Angle</h4>
+                    <p>Represent rotation as axis + angle</p>
+                    <ul>
+                        <li>No singularities</li>
+                        <li>Intuitive for some applications</li>
+                        <li>Requires normalization</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="success-box">
+                <h3>🎯 Key Takeaways</h3>
+                <ul>
+                    <li><strong>Matrix multiplication reveals the problem:</strong> Certain configurations create dependencies</li>
+                    <li><strong>Euler angles have limitations:</strong> Not all orientations are equally accessible</li>
+                    <li><strong>Solution exists:</strong> Alternative representations avoid these issues</li>
+                    <li><strong>Understanding matters:</strong> Knowing when problems occur helps choose the right tool</li>
+                </ul>
+            </div>
+            
+            <div class="math-container">
+                <h4>The Bottom Line</h4>
+                <p>Mathematics doesn't lie – the matrix calculations show exactly why and when rotations become problematic!</p>
+                $$\text{Knowledge} + \text{Math} = \text{Better Solutions}$$
+            </div>
+        </div>
+
+        <div class="navigation">
+            <button id="prev-btn" onclick="previousSlide()">← Previous</button>
+            <button id="next-btn" onclick="nextSlide()">Next →</button>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('total-slides').textContent = totalSlides;
+        
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            
+            // Update navigation buttons
+            document.getElementById('prev-btn').disabled = currentSlide === 0;
+            document.getElementById('next-btn').disabled = currentSlide === totalSlides - 1;
+            
+            // Re-render MathJax for new slide
+            if (window.MathJax) {
+                MathJax.typesetPromise([slides[currentSlide]]).then(() => {
+                    console.log('MathJax rendered for slide', currentSlide + 1);
+                }).catch((err) => console.log('MathJax error:', err));
+            }
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            }
+        }
+        
+        function previousSlide() {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+        
+        // Interactive calculator functions
+        function degToRad(deg) {
+            return deg * Math.PI / 180;
+        }
+        
+        function cos(deg) {
+            return Math.cos(degToRad(deg));
+        }
+        
+        function sin(deg) {
+            return Math.sin(degToRad(deg));
+        }
+        
+        function formatNumber(num) {
+            return Math.abs(num) < 1e-10 ? 0 : parseFloat(num.toFixed(3));
+        }
+        
+        function createRotationMatrixX(roll) {
+            const c = cos(roll);
+            const s = sin(roll);
+            return [
+                [1, 0, 0],
+                [0, c, -s],
+                [0, s, c]
+            ];
+        }
+        
+        function createRotationMatrixY(pitch) {
+            const c = cos(pitch);
+            const s = sin(pitch);
+            return [
+                [c, 0, s],
+                [0, 1, 0],
+                [-s, 0, c]
+            ];
+        }
+        
+        function createRotationMatrixZ(yaw) {
+            const c = cos(yaw);
+            const s = sin(yaw);
+            return [
+                [c, -s, 0],
+                [s, c, 0],
+                [0, 0, 1]
+            ];
+        }
+        
+        function multiplyMatrices(A, B) {
+            const result = [[0,0,0], [0,0,0], [0,0,0]];
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    for (let k = 0; k < 3; k++) {
+                        result[i][j] += A[i][k] * B[k][j];
+                    }
+                }
+            }
+            return result;
+        }
+        
+        function matrixToString(matrix, name) {
+            let str = `<h5>${name}</h5>`;
+            str += '<div class="calculation">$$\\begin{bmatrix}';
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    str += formatNumber(matrix[i][j]);
+                    if (j < 2) str += ' & ';
+                }
+                if (i < 2) str += ' \\\\ ';
+            }
+            str += '\\end{bmatrix}$$</div>';
+            return str;
+        }
+        
+        function updateCalculations() {
+            const roll = parseFloat(document.getElementById('roll-slider').value);
+            const pitch = parseFloat(document.getElementById('pitch-slider').value);
+            const yaw = parseFloat(document.getElementById('yaw-slider').value);
+            
+            // Update display values
+            document.getElementById('roll-value').textContent = roll + '°';
+            document.getElementById('pitch-value').textContent = pitch + '°';
+            document.getElementById('yaw-value').textContent = yaw + '°';
+            
+            // Calculate matrices
+            const Rx = createRotationMatrixX(roll);
+            const Ry = createRotationMatrixY(pitch);
+            const Rz = createRotationMatrixZ(yaw);
+            
+            // Calculate final matrix: Rz * Ry * Rx
+            const RyRx = multiplyMatrices(Ry, Rx);
+            const final = multiplyMatrices(Rz, RyRx);
+            
+            // Update individual matrices display
+            const individualHtml = 
+                matrixToString(Rx, `R_x(${roll}°)`) +
+                matrixToString(Ry, `R_y(${pitch}°)`) +
+                matrixToString(Rz, `R_z(${yaw}°)`);
+            document.getElementById('individual-matrices').innerHTML = individualHtml;
+            
+            // Update final matrix display
+            const finalHtml = matrixToString(final, 'Final Result = R_z × R_y × R_x');
+            document.getElementById('final-matrix').innerHTML = finalHtml;
+            
+            // Check for gimbal lock
+            const isGimbalLock = Math.abs(pitch - 90) < 5 || Math.abs(pitch - 270) < 5 || Math.abs(pitch + 90) < 5;
+            
+            document.getElementById('gimbal-warning').style.display = isGimbalLock ? 'block' : 'none';
+            document.getElementById('normal-status').style.display = isGimbalLock ? 'none' : 'block';
+            
+            // Re-render MathJax
+            if (window.MathJax) {
+                MathJax.typesetPromise([
+                    document.getElementById('individual-matrices'),
+                    document.getElementById('final-matrix')
+                ]);
+            }
+        }
+        
+        // Set up event listeners
+        document.getElementById('roll-slider').addEventListener('input', updateCalculations);
+        document.getElementById('pitch-slider').addEventListener('input', updateCalculations);
+        document.getElementById('yaw-slider').addEventListener('input', updateCalculations);
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') {
+                previousSlide();
+            } else if (e.key === 'ArrowRight') {
+                nextSlide();
+            }
+        });
+        
+        // Initialize
+        showSlide(0);
+        
+        // Initialize calculations when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                updateCalculations();
+                if (window.MathJax) {
+                    MathJax.typesetPromise([document.body]);
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
