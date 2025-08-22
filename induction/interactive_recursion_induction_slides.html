@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recursion, Trees, and Mathematical Induction | การเรียกซ้ำ ต้นไม้ และการพิสูจน์เหนี่ยวนำ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Noto Sans Thai', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.5s ease-in-out;
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        h1 {
+            color: #2c3e50;
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        h2 {
+            color: #34495e;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        h3 {
+            color: #e74c3c;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .thai {
+            color: #8e44ad;
+            font-weight: 600;
+        }
+
+        .english {
+            color: #2c3e50;
+            font-style: italic;
+        }
+
+        p, li {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: #2c3e50;
+            margin-bottom: 0.8rem;
+        }
+
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        ul li:before {
+            content: "→ ";
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            margin: 1rem 0;
+            width: 100%;
+            max-width: 600px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            z-index: 1000;
+        }
+
+        .tree-visual {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            margin: 1rem 0;
+            white-space: pre;
+        }
+
+        .highlight {
+            background: #f39c12;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .interactive-demo {
+            background: #ecf0f1;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 1rem 0;
+        }
+
+        .demo-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+            transition: background 0.3s;
+        }
+
+        .demo-btn:hover {
+            background: #c0392b;
+        }
+
+        .result {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #27ae60;
+        }
+
+        .connection-box {
+            background: linear-gradient(45deg, #3498db, #9b59b6);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .proof-step {
+            background: #e8f6f3;
+            border-left: 4px solid #1abc9c;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 4px;
+        }
+
+        .step-title {
+            color: #16a085;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .bilingual-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .lang-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 1000;
+        }
+
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            .slide {
+                padding: 1rem;
+            }
+        }
+
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+            font-size: 0.95rem;
+        }
+
+        td {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .table-header {
+            background: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <div class="bilingual-title">
+                <h1 class="thai">การเรียกซ้ำ ต้นไม้ และการพิสูจน์เหนี่ยวนำ</h1>
+                <h1 class="english">Recursion, Trees, and Mathematical Induction</h1>
+            </div>
+            <p style="font-size: 1.2rem; text-align: center; max-width: 900px; line-height: 1.8;">
+                <span class="thai">การเดินทางแบบโต้ตอบผ่านสามแนวคิดที่เชื่อมโยงกัน ซึ่งเป็นรากฐานของวิทยาการคอมพิวเตอร์และการใช้เหตุผลเชิงคณิตศาสตร์</span><br>
+                <span class="english">An interactive journey through three interconnected concepts that form the backbone of computer science and mathematical reasoning.</span>
+            </p>
+            
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 0.8rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid #3498db;">
+                <p style="font-size: 1rem; margin: 0; text-align: center;">
+                    <strong>🤖 <span class="thai">สร้างโดย | </span><span class="english">Created by</span> Claude.ai</strong><br>
+                    <span style="font-size: 0.9rem; color: #7f8c8d;">
+                        <span class="thai">ปัญญาประดิษฐ์สำหรับการศึกษาและการเรียนรู้ | </span>
+                        <span class="english">AI for Education and Learning</span>
+                    </span>
+                </p>
+            </div>
+
+            <div class="interactive-demo">
+                <h3><span class="thai">คุณจะได้เรียนรู้อะไร? | </span><span class="english">What will you learn?</span></h3>
+                <ul style="text-align: left; max-width: 700px;">
+                    <li><span class="thai">การเรียกซ้ำ (Recursion) ใช้แก้ปัญหาที่ซับซ้อนอย่างสง่างาม | </span><span class="english">How recursion elegantly solves complex problems</span></li>
+                    <li><span class="thai">โครงสร้างข้อมูลต้นไม้และอัลกอริทึมแบบเรียกซ้ำ | </span><span class="english">Tree data structures and recursive algorithms</span></li>
+                    <li><span class="thai">การพิสูจน์เหนี่ยวนำทางคณิตศาสตร์ | </span><span class="english">Mathematical induction for proving properties</span></li>
+                    <li><span class="thai">ความเชื่อมโยงที่สวยงามระหว่างทั้งสามแนวคิด | </span><span class="english">The beautiful connection between all three concepts</span></li>
+                </ul>
+            </div>
+
+            <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin-top: 1.5rem; font-size: 0.9rem;">
+                <h4 style="color: #2c3e50; margin-bottom: 0.8rem; font-size: 1rem;">
+                    📚 <span class="thai">เอกสารอ้างอิง | </span><span class="english">References</span>
+                </h4>
+                <div style="text-align: left; max-width: 900px;">
+                    <p style="margin-bottom: 0.4rem; font-size: 0.85rem; line-height: 1.4;">
+                        • Cormen, T. H., Leiserson, C. E., Rivest, R. L., & Stein, C. (2022). <em>Introduction to Algorithms</em> (4th ed.). MIT Press.
+                    </p>
+                    <p style="margin-bottom: 0.4rem; font-size: 0.85rem; line-height: 1.4;">
+                        • Epp, S. S. (2020). <em>Discrete Mathematics with Applications</em> (5th ed.). Cengage Learning.
+                    </p>
+                    <p style="margin-bottom: 0.4rem; font-size: 0.85rem; line-height: 1.4;">
+                        • Weiss, M. A. (2014). <em>Data Structures and Algorithm Analysis in Java</em> (3rd ed.). Pearson.
+                    </p>
+                    <p style="margin-bottom: 0.4rem; font-size: 0.85rem; line-height: 1.4;">
+                        • Rosen, K. H. (2019). <em>Discrete Mathematics and Its Applications</em> (8th ed.). McGraw-Hill Education.
+                    </p>
+                    <p style="margin-bottom: 0; font-size: 0.85rem; line-height: 1.4;">
+                        • Sedgewick, R., & Wayne, K. (2011). <em>Algorithms</em> (4th ed.). Addison-Wesley Professional.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: What is Recursion? -->
+        <div class="slide">
+            <div class="bilingual-title">
+                <h2 class="thai">การเรียกซ้ำคืออะไร?</h2>
+                <h2 class="english">What is Recursion?</h2>
+            </div>
+            <p style="text-align: center; font-size: 1.15rem; max-width: 900px; line-height: 1.8;">
+                <span class="thai"><span class="highlight">การเรียกซ้ำ (Recursion)</span> คือเทคนิคการแก้ปัญหาที่ฟังก์ชันเรียกตัวเองเพื่อแก้ปัญหาเวอร์ชันที่เล็กกว่าของปัญหาเดียวกัน</span><br>
+                <span class="english"><span class="highlight">Recursion</span> is a problem-solving technique where a function calls itself to solve smaller versions of the same problem.</span>
+            </p>
+            
+            <div class="two-column">
+                <div>
+                    <h3><span class="thai">คุณลักษณะสำคัญ | </span><span class="english">Key Characteristics</span></h3>
+                    <ul>
+                        <li><span class="thai">ฟังก์ชันที่เรียกตัวเอง | </span><span class="english">A function that calls itself</span></li>
+                        <li><span class="thai">แบ่งปัญหาเป็นปัญหาย่อยที่เล็กกว่า | </span><span class="english">Breaks problems into smaller subproblems</span></li>
+                        <li><span class="thai">ไปถึงกรณีพื้นฐานที่ง่าย | </span><span class="english">Eventually reaches a simple base case</span></li>
+                        <li><span class="thai">สร้างคำตอบจากกรณีพื้นฐาน | </span><span class="english">Builds up the solution from base cases</span></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3><span class="thai">การเปรียบเทียบในชีวิตจริง | </span><span class="english">Real-world Analogy</span></h3>
+                    <p><span class="thai">การหากุญแจในบ้าน | </span><span class="english">Looking for your keys in a house</span>:</p>
+                    <ul>
+                        <li><span class="thai">ตรวจห้องปัจจุบัน (กรณีพื้นฐาน) | </span><span class="english">Check current room (base case)</span></li>
+                        <li><span class="thai">หากไม่พบ ค้นหาในแต่ละห้องย่อย | </span><span class="english">If not found, search each sub-room</span></li>
+                        <li><span class="thai">แต่ละห้องย่อยใช้กลยุทธ์เดียวกัน | </span><span class="english">Each sub-room uses same strategy</span></li>
+                        <li><span class="thai">รวมผลจากทุกห้อง | </span><span class="english">Combine results from all rooms</span></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="connection-box">
+                💡 <strong><span class="thai">คิดถึงตุ๊กตาไม้รัสเซีย (Matryoshka) - แต่ละตัวมีตัวที่เล็กกว่าอยู่ข้างใน! | </span><span class="english">Think of Russian nesting dolls (Matryoshka) - each doll contains a smaller version of itself!</span></strong>
+            </div>
+        </div>
+
+        <!-- Slide 3: Anatomy of Recursive Functions -->
+        <div class="slide">
+            <div class="bilingual-title">
+                <h2 class="thai">โครงสร้างของฟังก์ชันแบบเรียกซ้ำ</h2>
+                <h2 class="english">Anatomy of a Recursive Function</h2>
+            </div>
+            
+            <div class="code-block">
+def recursive_function(parameters):
+    # 🛑 BASE CASE - กรณีพื้นฐาน (เงื่อนไขหยุด)
+    # 🛑 BASE CASE - Stop condition
+    if simple_condition:
+        return simple_solution
+    
+    # 🔄 RECURSIVE CASE - กรณีเรียกซ้ำ (เรียกตัวเองด้วยปัญหาที่ง่ายกว่า)
+    # 🔄 RECURSIVE CASE - Call self with simpler problem
+    return combine(recursive_function(simpler_parameters))
+            </div>
+
+            <div class="two-column">
+                <div class="proof-step">
+                    <div class="step-title"><span class="thai">1. กรณีพื้นฐาน (Base Case) | </span><span class="english">1. Base Case(s)</span></div>
+                    <p><span class="thai">เวอร์ชันที่ง่ายที่สุดที่สามารถแก้ได้โดยตรง | </span><span class="english">The simplest version that can be solved directly</span></p>
+                    <p><strong><span class="thai">สำคัญ: ป้องกันการเรียกซ้ำไม่สิ้นสุด | </span><span class="english">Critical: Prevents infinite recursion</span></strong></p>
+                </div>
+                
+                <div class="proof-step">
+                    <div class="step-title"><span class="thai">2. กรณีเรียกซ้ำ (Recursive Case) | </span><span class="english">2. Recursive Case</span></div>
+                    <p><span class="thai">เรียกตัวเองด้วยข้อมูลนำเข้าที่ง่ายกว่า | </span><span class="english">Calls itself with simpler input</span></p>
+                    <p><strong><span class="thai">ต้อง: เดินหน้าไปสู่กรณีพื้นฐาน | </span><span class="english">Must: Progress toward base case</span></strong></p>
+                </div>
+            </div>
+
+            <div class="interactive-demo">
+                <h3><span class="thai">ตัวอย่างโต้ตอบ: การนับถอยหลัง | </span><span class="english">Interactive Example: Countdown</span></h3>
+                <button class="demo-btn" onclick="runCountdown()"><span class="thai">เรียกใช้การนับถอยหลังจาก 5 | </span><span class="english">Run Countdown from 5</span></button>
+                <div id="countdown-result" class="result"></div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Simple Recursion Examples -->
+        <div class="slide">
+            <div class="bilingual-title">
+                <h2 class="thai">ตัวอย่างการเรียกซ้ำแบบง่าย</h2>
+                <h2 class="english">Simple Recursion Examples</h2>
+            </div>
+            
+            <div class="two-column">
+                <div>
+                    <h3><span class="thai">แฟกทอเรียล: n! = n × (n-1)! | </span><span class="english">Factorial: n! = n × (n-1)!</span></h3>
+                    <div class="code-block">
+def factorial(n):
+    # Base case - กรณีพื้นฐาน
+    if n <= 1:
+        return 1
+    
+    # Recursive case - กรณีเรียกซ้ำ
+    return n * factorial(n - 1)
+                    </div>
+                    
+                    <div class="interactive-demo">
+                        <button class="demo-btn" onclick="calculateFactorial()"><span class="thai">คำนวณ 5! | </span><span class="english">Calculate 5!</span></button>
+                        <div id="factorial-result" class="result"></div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3><span class="thai">ฟีโบนัชชี: F(n) = F(n-1) + F(n-2) | </span><span class="english">Fibonacci: F(n) = F(n-1) + F(n-2)</span></h3>
+                    <div class="code-block">
+def fibonacci(n):
+    # Base cases - กรณีพื้นฐาน
+    if n <= 1:
+        return n
+    
+    # Recursive case - กรณีเรียกซ้ำ
+    return fibonacci(n-1) + fibonacci(n-2)
+                    </div>
+                    
+                    <div class="interactive-demo">
+                        <button class="demo-btn" onclick="calculateFibonacci()"><span class="thai">คำนวณ F(7) | </span><span class="english">Calculate F(7)</span></button>
+                        <div id="fibonacci-result" class="result"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Tree Data Structure Introduction -->
+        <div class="slide">
+            <div class="bilingual-title">
+                <h2 class="thai">ต้นไม้: เหมาะสำหรับการเรียกซ้ำ</h2>
+                <h2 class="english">Trees: Perfect for Recursion</h2>
+            </div>
+            
+            <p style="text-align: center; font-size: 1.2rem;">
+                <span class="thai">ต้นไม้เป็นโครงสร้างแบบ</span> <span class="highlight">เรียกซ้ำตามธรรมชาติ</span> <span class="thai">| </span><span class="english">Trees are <span class="highlight">naturally recursive</span> structures!</span>
+            </p>
+            
+            <div class="tree-visual">
+      1
+     / \
+    2   3
+   / \
+  4   5
+            </div>
+            
+            <div class="two-column">
+                <div>
+                    <h3><span class="thai">คำนิยามของต้นไม้ | </span><span class="english">Tree Definition</span></h3>
+                    <div class="code-block">
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val = val      # ค่า | value
+        self.left = left    # ซ้าย | left
+        self.right = right  # ขวา | right
+                    </div>
+                </div>
+                
+                <div>
+                    <h3><span class="thai">ทำไมต้นไม้ ♥ การเรียกซ้ำ | </span><span class="english">Why Trees ♥ Recursion</span></h3>
+                    <ul>
+                        <li><span class="thai">แต่ละต้นไม้ย่อยก็เป็นต้นไม้ | </span><span class="english">Each subtree is also a tree</span></li>
+                        <li><span class="thai">กรณีพื้นฐาน: ต้นไม้ว่าง (None) | </span><span class="english">Base case: empty tree (None)</span></li>
+                        <li><span class="thai">กรณีเรียกซ้ำ: ประมวลผลต้นไม้ย่อย | </span><span class="english">Recursive case: process subtrees</span></li>
+                        <li><span class="thai">โครงสร้างแบ่งแยกและเอาชนะตามธรรมชาติ | </span><span class="english">Natural divide-and-conquer structure</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Tree Traversal Examples -->
+        <div class="slide">
+            <div class="bilingual-title">
+                <h2 class="thai">การสำรวจต้นไม้ด้วยการเรียกซ้ำ</h2>
+                <h2 class="english">Tree Traversal with Recursion</h2>
+            </div>
+            
+            <div class="tree-visual">
+ต้นไม้ตัวอย่าง | Example Tree:    1
+                                 / \
+                                2   3
+                               / \
+                              4   5
+            </div>
+            
+            <div class="two-column">
+                <div>
+                    <h3><span class="thai">Pre-order (ราก → ซ้าย → ขวา) | </span><span class="english">Pre-order (Root → Left → Right)</span></h3>
+                    <div class="code-block">
+def preorder(root):
+    if root is None:  # Base case
+        return []
+    
+    result = [root.val]
+    result.extend(preorder(root.left))
+    result.extend(preorder(root.right))
+    return result
+                    </div>
+                    <p><strong><span class="thai">ผลลัพธ์ | </span><span class="english">Output</span>:</strong> [1, 2, 4, 5, 3]</p>
+                </div>
+                
+                <div>
+                    <h3><span class="thai">In-order (ซ้าย → ราก → ขวา) | </span><span class="english">In-order (Left → Root → Right)</span></h3>
+                    <div class="code-block">
+def inorder(root):
+    if root is None:  # Base case
+        return []
+    
+    result = []
+    result.extend(inorder(root.left))
+    result.append(root.val)
+    result.extend(inorder(root.right))
+    return result
+                    </div>
+                    <p><strong><span class="thai">ผลลัพธ์ | </span><span class="english">Output</span>:</strong> [4, 2, 5, 1, 3]</p>
+                </div>
+            </div>
+            
+            <div class="interactive-demo">
+                <button class="demo-btn" onclick="runTraversal('preorder')">Pre-order</button>
+                <button class="demo-btn" onclick="runTraversal('inorder')">In-order</button>
+                <button class="demo-btn" onclick="runTraversal('postorder')">Post-order</button>
+                <div id="traversal-result" class="result"></div>
+            </div>
+        </div>
+
+        <!-- Slide 7: More Tree Recursion Examples -->
+        <div class="slide">
+            <div class="bilingual-title">
+                <h2 class="thai">อัลกอริทึมต้นไม้เพิ่มเติม</h2>
+                <h2 class="english">More Tree Algorithms</h2>
+            </div>
+            
+            <div class="two-column">
+                <div>
+                    <h3><span class="thai">ความสูงของต้นไม้ | </span><span class="english">Tree Height</span></h3>
+                    <div class="code-block">
+def tree_height(root):
+    if root is None:
+        return -1
+    
+    left_height = tree_height(root.left)
+    right_height = tree_height(root.right)
+    return 1 + max(left_height, right_height)
+                    </div>
+                </div>
+                
+                <div>
+                    <h3><span class="thai">นับจำนวนโหนด | </span><span class="english">Count Nodes</span></h3>
+                    <div class="code-block">
+def count_nodes(root):
+    if root is None:
+        return 0
+    
+    return 1 + count_nodes(root.left) + \
+               count_nodes(root.right)
+                    </div>
+                </div>
+            </div>
+            
+            <div class="two-column">
+                <div>
+                    <h3><span class="thai">หาค่าสูงสุด | </span><span class="english">Find Maximum</span></h3>
+                    <div class="code-block">
+def find_max(root):
+    if root is None:
+        return float('-inf')
+    
+    left_max = find_max(root.left)
+    right_max = find_max(root.right)
+    return max(root.val, left_max, right_max)
+                    </div>
+                </div>
+                
+                <div>
+                    <h3><span class="thai">ค้นหาใน BST | </span><span class="english">Binary Search Tree Search</span></h3>
+                    <div class="code-block">
+def search_bst(root, target):
+    if root is None or root.val == target:
+        return root
+    
+    if target < root.val:
+        return search_bst(root.left, target)
+    else:
+        return search_bst(root.right, target)
+                    </div>
+                </div>
+            </div>
+            
+            <div class="interactive-demo">
+                <p><span class="thai">สำหรับต้นไม้ตัวอย่างของเรา: ความสูง = </span><span class="english">For our example tree: Height = </span><span id="height-demo">2</span><span class="thai">, โหนด = </span><span class="english">, Nodes = </span><span id="nodes-demo">5</span><span class="thai">, สูงสุด = </span><span class="english">, Max = </span><span id="max-demo">5</span></p>
+            </div>
+        </div>
+
+        <!-- Slide 8: Introduction to Mathematical Induction -->
+        <div class="slide">
+            <div class="bilingual-title">
+                <h2 class="thai">การพิสูจน์เหนี่ยวนำทางคณิตศาสตร์</h2>
+                <h2 class="english">Mathematical Induction</h2>
+            </div>
+            
+            <p style="text-align: center; font-size: 1.15rem; line-height: 1.8;">
+                <span class="thai">การพิสูจน์เหนี่ยวนำทางคณิตศาสตร์เป็น</span> <span class="highlight">เทคนิคการพิสูจน์</span> <span class="thai">ที่ใช้สำหรับสร้างความเป็นจริงของข้อความสำหรับทุกองค์ประกอบในเซตที่มีลำดับที่ดี</span><br>
+                <span class="english">Mathematical induction is a <span class="highlight">proof technique</span> used to establish that a statement is true for all elements in a well-ordered set.</span>
+            </p>
+            
+            <div class="connection-box">
+                🎯 <strong><span class="thai">เป้าหมาย: พิสูจน์ข้อความ P(n) เป็นจริงสำหรับทุก n ≥ ค่าพื้นฐานบางค่า | </span><span class="english">Goal: Prove a statement P(n) is true for all n ≥ some base value</span></strong>
+            </div>
+            
+            <div class="two-column">
+                <div>
+                    <h3><span class="thai">การเปรียบเทียบในชีวิตจริง | </span><span class="english">Real-world Analogy</span></h3>
+                    <p><strong><span class="thai">โดมิโนล้ม | </span><span class="english">Dominoes falling</span>:</strong></p>
+                    <ul>
+                        <li><span class="thai">โดมิโนแรกล้ม (กรณีพื้นฐาน) | </span><span class="english">First domino falls (base case)</span></li>
+                        <li><span class="thai">หากโดมิโนใดล้ม ตัวถัดไปจะล้ม | </span><span class="english">If any domino falls, next one falls</span></li>
+                        <li><span class="thai">ดังนั้น โดมิโนทั้งหมดจะล้ม | </span><span class="english">Therefore, all dominoes fall</span></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3><span class="thai">ทำไมมันใช้ได้ | </span><span class="english">Why It Works</span></h3>
+                    <ul>
+                        <li><span class="thai">สร้างความจริงจากกรณีง่าย ๆ | </span><span class="english">Builds truth from simple cases</span></li>
+                        <li><span class="thai">ใช้ลูกโซ่เหตุผลเชิงตรรกะ | </span><span class="english">Uses logical chain of reasoning</span></li>
+                        <li><span class="thai">รับประกันไม่มีช่องว่างในการพิสูจน์ | </span><span class="english">Ensures no gaps in the proof</span></li>
+                        <li><span class="thai">รากฐานของการพิสูจน์วิทยาการคอมพิวเตอร์ | </span><span class="english">Foundation of computer science proofs</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Induction Proof Structure -->
+        <div class="slide">
+            <div class="bilingual-title">
+                <h2 class="thai">โครงสร้างของการพิสูจน์เหนี่ยวนำ</h2>
+                <h2 class="english">Structure of Inductive Proof</h2>
+            </div>
+            
+            <div class="proof-step">
+                <div class="step-title"><span class="thai">1. กรณีพื้นฐาน (Base Case) | </span><span class="english">1. Base Case</span></div>
+                <p><span class="thai">พิสูจน์ข้อความเป็นจริงสำหรับค่าที่เล็กที่สุด (มักจะเป็น n = 0 หรือ n = 1) | </span><span class="english">Prove the statement holds for the smallest value (usually n = 0 or n = 1)</span></p>
+                <p><strong><span class="thai">ตัวอย่าง: แสดงว่า P(1) เป็นจริง | </span><span class="english">Example: Show P(1) is true</span></strong></p>
+            </div>
+            
+            <div class="proof-step">
+                <div class="step-title"><span class="thai">2. สมมติฐานเหนี่ยวนำ (Inductive Hypothesis) | </span><span class="english">2. Inductive Hypothesis</span></div>
+                <p><span class="thai">สมมติว่าข้อความเป็นจริงสำหรับค่า k ใด ๆ | </span><span class="english">Assume the statement holds for some arbitrary value k</span></p>
+                <p><strong><span class="thai">ตัวอย่าง: สมมติว่า P(k) เป็นจริงสำหรับ k ≥ 1 บางค่า | </span><span class="english">Example: Assume P(k) is true for some k ≥ 1</span></strong></p>
+            </div>
+            
+            <div class="proof-step">
+                <div class="step-title"><span class="thai">3. ขั้นตอนเหนี่ยวนำ (Inductive Step) | </span><span class="english">3. Inductive Step</span></div>
+                <p><span class="thai">พิสูจน์ว่าหาก P(k) เป็นจริง แล้ว P(k+1) ต้องเป็นจริงด้วย | </span><span class="english">Prove that if P(k) is true, then P(k+1) must also be true</span></p>
+                <p><strong><span class="thai">ตัวอย่าง: แสดงว่า P(k) → P(k+1) | </span><span class="english">Example: Show P(k) → P(k+1)</span></strong></p>
+            </div>
+            
+            <div class="connection-box">
+                💡 <strong><span class="thai">สรุป: ด้วยการพิสูจน์เหนี่ยวนำทางคณิตศาสตร์ P(n) เป็นจริงสำหรับทุก n ≥ ค่าพื้นฐาน | </span><span class="english">Conclusion: By mathematical induction, P(n) is true for all n ≥ base value</span></strong>
+            </div>
+            
+            <div class="code-block">
+เทมเพลตการพิสูจน์เหนี่ยวนำ | Inductive Proof Template:
+1. Base Case: ตรวจสอบ P(base_value) | Verify P(base_value)
+2. Inductive Hypothesis: สมมติ P(k) สำหรับ k ใด ๆ | Assume P(k) for arbitrary k
+3. Inductive Step: พิสูจน์ P(k) → P(k+1) | Prove P(k) → P(k+1)
+4. Conclusion: P(n) เป็นจริงสำหรับทุก n ≥ base_value | P(n) true for all n ≥ base_value
+            </div>
+        </div>
+
+        <!-- Slide 10: Tree Induction Examples -->
+        <div class="slide">
+            <div class="bilingual-title">
+                <h2 class="thai">การพิสูจน์เหนี่ยวนำกับต้นไม้</h2>
+                <h2 class="english">Induction with Trees</h2>
+            </div>
+            
+            <h3><span class="thai">ตัวอย่าง: คุณสมบัติความสูงของต้นไม้ไบนารี | </span><span class="english">Example: Binary Tree Height Property</span></h3>
+            <p><strong><span class="thai">ข้อความ: สำหรับต้นไม้ไบนารีใด ๆ ที่มี n โหนด ความสูง h ≥ ⌊log₂(n)⌋ | </span><span class="english">Statement: For any binary tree with n nodes, height h ≥ ⌊log₂(n)⌋</span></strong></p>
+            
+            <div class="proof-step">
+                <div class="step-title"><span class="thai">กรณีพื้นฐาน (n = 1) | </span><span class="english">Base Case (n = 1)</span></div>
+                <p><span class="thai">ต้นไม้โหนดเดียว: ความสูง = 0, ⌊log₂(1)⌋ = 0 | </span><span class="english">Single node tree: height = 0, ⌊log₂(1)⌋ = 0</span></p>
+                <p>✅ 0 ≥ 0</p>
+            </div>
+            
+            <div class="proof-step">
+                <div class="step-title"><span class="thai">สมมติฐานเหนี่ยวนำ | </span><span class="english">Inductive Hypothesis</span></div>
+                <p><span class="thai">สมมติว่าคุณสมบัติเป็นจริงสำหรับต้นไม้ทั้งหมดที่มี k < n โหนด | </span><span class="english">Assume property holds for all trees with k < n nodes</span></p>
+            </div>
+            
+            <div class="proof-step">
+                <div class="step-title"><span class="thai">ขั้นตอนเหนี่ยวนำ | </span><span class="english">Inductive Step</span></div>
+                <p><span class="thai">พิจารณาต้นไม้ T ที่มี n โหนด | </span><span class="english">Consider tree T with n nodes</span>:</p>
+                <ul>
+                    <li><span class="thai">T มีราก + ต้นไม้ย่อยซ้าย L + ต้นไม้ย่อยขวา R | </span><span class="english">T has root + left subtree L + right subtree R</span></li>
+                    <li>n = n<sub>L</sub> + n<sub>R</sub> + 1</li>
+                    <li><span class="thai">ตามสมมติฐาน: height(L) ≥ ⌊log₂(n<sub>L</sub>)⌋, height(R) ≥ ⌊log₂(n<sub>R</sub>)⌋ | </span><span class="english">By hypothesis: height(L) ≥ ⌊log₂(n<sub>L</sub>)⌋, height(R) ≥ ⌊log₂(n<sub>R</sub>)⌋</span></li>
+                    <li>height(T) = 1 + max(height(L), height(R)) ≥ 1 + ⌊log₂(max(n<sub>L</sub>, n<sub>R</sub>))⌋</li>
+                    <li><span class="thai">เนื่องจาก max(n<sub>L</sub>, n<sub>R</sub>) ≥ (n-1)/2 เราได้ height(T) ≥ ⌊log₂(n)⌋ ✅ | </span><span class="english">Since max(n<sub>L</sub>, n<sub>R</sub>) ≥ (n-1)/2, we get height(T) ≥ ⌊log₂(n)⌋ ✅</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 11: More Tree Induction -->
+        <div class="slide">
+            <div class="bilingual-title">
+                <h2 class="thai">ตัวอย่างการพิสูจน์เหนี่ยวนำต้นไม้เพิ่มเติม</h2>
+                <h2 class="english">More Tree Induction Examples</h2>
+            </div>
+            
+            <div class="two-column">
+                <div>
+                    <h3><span class="thai">โหนดในต้นไม้ไบนารีสมบูรณ์ | </span><span class="english">Complete Binary Tree Nodes</span></h3>
+                    <p><strong><span class="thai">ข้อความ: ต้นไม้ไบนารีสมบูรณ์ความสูง h มี 2^(h+1) - 1 โหนด | </span><span class="english">Statement: Complete binary tree of height h has 2^(h+1) - 1 nodes</span></strong></p>
+                    
+                    <div class="proof-step">
+                        <div class="step-title"><span class="thai">กรณีพื้นฐาน (h = 0) | </span><span class="english">Base Case (h = 0)</span></div>
+                        <p><span class="thai">โหนดเดียว: 2^1 - 1 = 1 ✅ | </span><span class="english">Single node: 2^1 - 1 = 1 ✅</span></p>
+                    </div>
+                    
+                    <div class="proof-step">
+                        <div class="step-title"><span class="thai">ขั้นตอนเหนี่ยวนำ | </span><span class="english">Inductive Step</span></div>
+                        <p><span class="thai">ความสูง h = k+1 | </span><span class="english">Height h = k+1</span>:</p>
+                        <ul>
+                            <li><span class="thai">ต้นไม้ย่อยซ้าย/ขวา: ความสูง k | </span><span class="english">Left/right subtrees: height k</span></li>
+                            <li><span class="thai">แต่ละอันมี 2^(k+1) - 1 โหนด | </span><span class="english">Each has 2^(k+1) - 1 nodes</span></li>
+                            <li><span class="thai">รวม: 1 + 2(2^(k+1) - 1) = 2^(k+2) - 1 ✅ | </span><span class="english">Total: 1 + 2(2^(k+1) - 1) = 2^(k+2) - 1 ✅</span></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3><span class="thai">คุณสมบัติ In-order ของ BST | </span><span class="english">BST In-order Property</span></h3>
+                    <p><strong><span class="thai">ข้อความ: การสำรวจ In-order ของ BST เยี่ยมโหนดในลำดับที่เรียง | </span><span class="english">Statement: In-order traversal of BST visits nodes in sorted order</span></strong></p>
+                    
+                    <div class="proof-step">
+                        <div class="step-title"><span class="thai">กรณีพื้นฐาน | </span><span class="english">Base Case</span></div>
+                        <p><span class="thai">ต้นไม้ว่าง/โหนดเดียว: เรียงตามธรรมชาติ ✅ | </span><span class="english">Empty/single node: trivially sorted ✅</span></p>
+                    </div>
+                    
+                    <div class="proof-step">
+                        <div class="step-title"><span class="thai">ขั้นตอนเหนี่ยวนำ | </span><span class="english">Inductive Step</span></div>
+                        <p><span class="thai">BST ที่มีราก r | </span><span class="english">BST with root r</span>:</p>
+                        <ul>
+                            <li><span class="thai">ต้นไม้ย่อยซ้าย L, ต้นไม้ย่อยขวา R | </span><span class="english">Left subtree L, right subtree R</span></li>
+                            <li><span class="thai">คุณสมบัติ BST: L < r < R | </span><span class="english">BST property: L < r < R</span></li>
+                            <li><span class="thai">ตามสมมติฐาน: in-order(L), in-order(R) เรียงแล้ว | </span><span class="english">By hypothesis: in-order(L), in-order(R) sorted</span></li>
+                            <li>in-order(T) = in-order(L) + [r] + in-order(R)</li>
+                            <li><span class="thai">เนื่องจาก max(L) < r < min(R) ผลลัพธ์จึงเรียงแล้ว ✅ | </span><span class="english">Since max(L) < r < min(R), result is sorted ✅</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Connection Between Recursion and Induction -->
+        <div class="slide">
+            <div class="bilingual-title">
+                <h2 class="thai">ความเชื่อมโยงที่สวยงาม</h2>
+                <h2 class="english">The Beautiful Connection</h2>
+            </div>
+            
+            <div class="connection-box">
+                🌟 <strong><span class="thai">การเรียกซ้ำและการพิสูจน์เหนี่ยวนำเป็นภาพสะท้อนของกันและกัน! | </span><span class="english">Recursion and Induction are Mirror Images!</span></strong>
+            </div>
+            
+            <div class="two-column">
+                <div>
+                    <h3><span class="thai">การเรียกซ้ำ (บนลงล่าง) | </span><span class="english">Recursion (Top-down)</span></h3>
+                    <ul>
+                        <li><span class="highlight"><span class="thai">แบ่งแยก</span></span> <span class="thai">ปัญหาที่ซับซ้อน | </span><span class="highlight">Break down</span> <span class="english">complex problems</span></li>
+                        <li><span class="highlight"><span class="thai">สมมติ</span></span> <span class="thai">ปัญหาย่อยแก้ได้ถูกต้อง | </span><span class="highlight">Assume</span> <span class="english">subproblems solve correctly</span></li>
+                        <li><span class="highlight"><span class="thai">รวม</span></span> <span class="thai">คำตอบ | </span><span class="highlight">Combine</span> <span class="english">solutions</span></li>
+                        <li><span class="highlight"><span class="thai">กรณีพื้นฐาน</span></span> <span class="thai">หยุดการเรียกซ้ำ | </span><span class="highlight">Base case</span> <span class="english">stops recursion</span></li>
+                    </ul>
+                    
+                    <div class="code-block">
+def tree_height(root):
+    if root is None:      # Base case
+        return -1
+    
+    # Trust recursion works for subtrees
+    # เชื่อมั่นว่าการเรียกซ้ำใช้ได้กับต้นไม้ย่อย
+    left_h = tree_height(root.left)
+    right_h = tree_height(root.right)
+    
+    # Combine solutions - รวมคำตอบ
+    return 1 + max(left_h, right_h)
+                    </div>
+                </div>
+                
+                <div>
+                    <h3><span class="thai">การพิสูจน์เหนี่ยวนำ (ล่างขึ้นบน) | </span><span class="english">Induction (Bottom-up)</span></h3>
+                    <ul>
+                        <li><span class="highlight"><span class="thai">สร้างขึ้น</span></span> <span class="thai">จากกรณีง่าย ๆ | </span><span class="highlight">Build up</span> <span class="english">from simple cases</span></li>
+                        <li><span class="highlight"><span class="thai">สมมติ</span></span> <span class="thai">คุณสมบัติเป็นจริงสำหรับกรณีที่เล็กกว่า | </span><span class="highlight">Assume</span> <span class="english">property holds for smaller cases</span></li>
+                        <li><span class="highlight"><span class="thai">พิสูจน์</span></span> <span class="thai">ว่าขยายไปสู่กรณีที่ใหญ่กว่า | </span><span class="highlight">Prove</span> <span class="english">it extends to larger cases</span></li>
+                        <li><span class="highlight"><span class="thai">กรณีพื้นฐาน</span></span> <span class="thai">เริ่มต้นการพิสูจน์ | </span><span class="highlight">Base case</span> <span class="english">starts the proof</span></li>
+                    </ul>
+                    
+                    <div class="proof-step">
+                        <div class="step-title"><span class="thai">การพิสูจน์ว่า tree_height ใช้ได้ | </span><span class="english">Proving tree_height works</span>:</div>
+                        <p><strong><span class="thai">พื้นฐาน | </span><span class="english">Base</span>:</strong> height(None) = -1 ✅</p>
+                        <p><strong><span class="thai">สมมติฐาน | </span><span class="english">Hypothesis</span>:</strong> <span class="thai">สมมติว่า height ใช้ได้กับต้นไม้ย่อย | </span><span class="english">Assume height works for subtrees</span></p>
+                        <p><strong><span class="thai">ขั้นตอน | </span><span class="english">Step</span>:</strong> height(root) = 1 + max(height(left), height(right)) <span class="thai">ให้ผลลัพธ์ที่ถูกต้อง | </span><span class="english">gives correct result</span> ✅</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="interactive-demo">
+                <h3><span class="thai">ตารางความสอดคล้อง | </span><span class="english">Correspondence Table</span></h3>
+                <table>
+                    <tr class="table-header">
+                        <td><strong><span class="thai">การเรียกซ้ำ | </span><span class="english">Recursion</span></strong></td>
+                        <td><strong><span class="thai">การพิสูจน์เหนี่ยวนำ | </span><span class="english">Induction</span></strong></td>
+                    </tr>
+                    <tr>
+                        <td><span class="thai">กรณีพื้นฐาน (เงื่อนไขหยุด) | </span><span class="english">Base case (stop condition)</span></td>
+                        <td><span class="thai">กรณีพื้นฐาน (ความจริงเริ่มต้น) | </span><span class="english">Base case (initial truth)</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="thai">การเรียกซ้ำ (เชื่อว่าใช้ได้) | </span><span class="english">Recursive call (trust it works)</span></td>
+                        <td><span class="thai">สมมติฐานเหนี่ยวนำ (สมมติว่าเป็นจริง) | </span><span class="english">Inductive hypothesis (assume it's true)</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="thai">การรวมผลลัพธ์ | </span><span class="english">Combining results</span></td>
+                        <td><span class="thai">ขั้นตอนเหนี่ยวนำ (ขยายความจริง) | </span><span class="english">Inductive step (extend truth)</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="thai">ความถูกต้องของอัลกอริทึม | </span><span class="english">Algorithm correctness</span></td>
+                        <td><span class="thai">การพิสูจน์ทางคณิตศาสตร์ | </span><span class="english">Mathematical proof</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Slide 13: Summary -->
+        <div class="slide">
+            <div class="bilingual-title">
+                <h1 class="thai">สรุป</h1>
+                <h1 class="english">Summary</h1>
+            </div>
+            
+            <div class="two-column">
+                <div>
+                    <h3>🔄 <span class="thai">การเรียกซ้ำ | </span><span class="english">Recursion</span></h3>
+                    <ul>
+                        <li><span class="thai">เทคนิคการแก้ปัญหาที่สง่างาม | </span><span class="english">Elegant problem-solving technique</span></li>
+                        <li><span class="thai">เหมาะสำหรับโครงสร้างต้นไม้ | </span><span class="english">Perfect for tree structures</span></li>
+                        <li><span class="thai">ต้องมีกรณีพื้นฐาน + กรณีเรียกซ้ำ | </span><span class="english">Requires base case + recursive case</span></li>
+                        <li><span class="thai">สะท้อนการคิดทางคณิตศาสตร์ | </span><span class="english">Mirrors mathematical thinking</span></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3>🌳 <span class="thai">ต้นไม้ | </span><span class="english">Trees</span></h3>
+                    <ul>
+                        <li><span class="thai">โครงสร้างข้อมูลแบบเรียกซ้ำตามธรรมชาติ | </span><span class="english">Naturally recursive data structures</span></li>
+                        <li><span class="thai">ทำให้อัลกอริทึมแบบเรียกซ้ำสง่างาม | </span><span class="english">Enable elegant recursive algorithms</span></li>
+                        <li><span class="thai">รากฐานของแนวคิดหลายอย่างในวิทยาการคอมพิวเตอร์ | </span><span class="english">Foundation for many CS concepts</span></li>
+                        <li><span class="thai">สะพานที่สมบูรณ์แบบระหว่างการเรียกซ้ำและการพิสูจน์เหนี่ยวนำ | </span><span class="english">Perfect bridge between recursion and induction</span></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="two-column">
+                <div>
+                    <h3>📊 <span class="thai">การพิสูจน์เหนี่ยวนำทางคณิตศาสตร์ | </span><span class="english">Mathematical Induction</span></h3>
+                    <ul>
+                        <li><span class="thai">เทคนิคการพิสูจน์สำหรับเซตอนันต์ | </span><span class="english">Proof technique for infinite sets</span></li>
+                        <li><span class="thai">กรณีพื้นฐาน + ขั้นตอนเหนี่ยวนำ | </span><span class="english">Base case + inductive step</span></li>
+                        <li><span class="thai">พิสูจน์ความถูกต้องของอัลกอริทึม | </span><span class="english">Proves algorithm correctness</span></li>
+                        <li><span class="thai">รากฐานของทฤษฎีวิทยาการคอมพิวเตอร์ | </span><span class="english">Foundation of computer science theory</span></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3>🔗 <span class="thai">ความเชื่อมโยง | </span><span class="english">The Connection</span></h3>
+                    <ul>
+                        <li><span class="thai">โครงสร้างเชิงตรรกะเดียวกัน | </span><span class="english">Same logical structure</span></li>
+                        <li><span class="thai">การเรียกซ้ำ ↔ การออกแบบอัลกอริทึม | </span><span class="english">Recursion ↔ Algorithm design</span></li>
+                        <li><span class="thai">การพิสูจน์เหนี่ยวนำ ↔ การพิสูจน์ความถูกต้อง | </span><span class="english">Induction ↔ Correctness proof</span></li>
+                        <li><span class="thai">ทั้งคู่ช่วยให้แก้ปัญหาได้อย่างทรงพลัง | </span><span class="english">Both enable powerful problem-solving</span></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="connection-box">
+                🎯 <strong><span class="thai">ข้อสำคัญ: การเข้าใจการเรียกซ้ำช่วยให้คุณเข้าใจการพิสูจน์เหนี่ยวนำ และในทางกลับกัน ต้นไม้เป็นพื้นที่ฝึกหัดที่สมบูรณ์แบบสำหรับสำรวจทั้งสองแนวคิดและเห็นความเชื่อมโยงที่ลึกซึ้งในการปฏิบัติ! | </span><span class="english">Key Insight: Understanding recursion helps you understand induction, and vice versa. Trees provide the perfect playground to explore both concepts and see their deep connection in action!</span></strong>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-counter">
+        <span class="thai">สไลด์ | </span><span class="english">Slide</span> <span id="current-slide">1</span> <span class="thai">จาก | </span><span class="english">of</span> <span id="total-slides">13</span>
+    </div>
+
+    <div class="lang-toggle">
+        🇹🇭🇺🇸 Thai-English
+    </div>
+
+    <div class="navigation">
+        <button class="nav-btn" id="prev-btn" onclick="previousSlide()">← <span class="thai">ก่อนหน้า | </span><span class="english">Previous</span></button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()"><span class="thai">ถัดไป | </span><span class="english">Next</span> →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('total-slides').textContent = totalSlides;
+        
+        function showSlide(n) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = n;
+            slides[currentSlide].classList.add('active');
+            
+            document.getElementById('current-slide').textContent = currentSlide + 1;
+            
+            // Update navigation buttons
+            document.getElementById('prev-btn').disabled = currentSlide === 0;
+            document.getElementById('next-btn').disabled = currentSlide === totalSlides - 1;
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            }
+        }
+        
+        function previousSlide() {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowRight' || event.key === ' ') {
+                nextSlide();
+            } else if (event.key === 'ArrowLeft') {
+                previousSlide();
+            }
+        });
+        
+        // Interactive demo functions
+        function runCountdown() {
+            const result = document.getElementById('countdown-result');
+            result.innerHTML = '';
+            
+            function countdown(n, depth = 0) {
+                const indent = '  '.repeat(depth);
+                result.innerHTML += `${indent}countdown(${n})<br>`;
+                
+                if (n === 0) {
+                    result.innerHTML += `${indent}→ Blast off! | ระเบิด!<br>`;
+                    return;
+                }
+                
+                setTimeout(() => {
+                    countdown(n - 1, depth + 1);
+                    result.innerHTML += `${indent}← Back to ${n} | กลับไป ${n}<br>`;
+                }, 500);
+            }
+            
+            countdown(5);
+        }
+        
+        function calculateFactorial() {
+            const result = document.getElementById('factorial-result');
+            
+            function factorial(n) {
+                if (n <= 1) return 1;
+                return n * factorial(n - 1);
+            }
+            
+            const answer = factorial(5);
+            result.innerHTML = `5! = ${answer}`;
+        }
+        
+        function calculateFibonacci() {
+            const result = document.getElementById('fibonacci-result');
+            
+            function fibonacci(n) {
+                if (n <= 1) return n;
+                return fibonacci(n - 1) + fibonacci(n - 2);
+            }
+            
+            const answer = fibonacci(7);
+            result.innerHTML = `F(7) = ${answer}`;
+        }
+        
+        function runTraversal(type) {
+            const result = document.getElementById('traversal-result');
+            
+            // Example tree: [1, 2, 3, 4, 5]
+            const outputs = {
+                'preorder': '[1, 2, 4, 5, 3]',
+                'inorder': '[4, 2, 5, 1, 3]',
+                'postorder': '[4, 5, 2, 3, 1]'
+            };
+            
+            result.innerHTML = `${type}: ${outputs[type]}`;
+        }
+        
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>
