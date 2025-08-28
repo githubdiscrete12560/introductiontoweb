@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eigenvalues & Eigenvectors + PCA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
+        }
+        
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .slide {
+            background: white;
+            width: 90%;
+            max-width: 1200px;
+            height: 85%;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            padding: 40px;
+            box-sizing: border-box;
+            display: none;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .slide.active {
+            display: block;
+            animation: slideIn 0.5s ease-in-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .slide-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 20px;
+        }
+        
+        .slide-title {
+            font-size: 2.5rem;
+            color: #333;
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        .slide-subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin: 10px 0 0 0;
+            font-style: italic;
+        }
+        
+        .bilingual-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 20px 0;
+        }
+        
+        .thai-content, .english-content {
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .thai-content {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .english-content {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .math-box {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        
+        .interactive-area {
+            background: #fff;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        canvas {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 10px;
+            background: white;
+        }
+        
+        .controls {
+            margin: 15px 0;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-btn {
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: white;
+            transform: translateY(-2px);
+        }
+        
+        .slide-counter {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #667eea;
+        }
+        
+        .example-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .concept-highlight {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 1.1rem;
+        }
+        
+        .data-table th, .data-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .data-table th {
+            background: #667eea;
+            color: white;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 10px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .step.active {
+            background: #667eea;
+        }
+        
+        .step.completed {
+            background: #00b894;
+        }
+        
+        .quiz-option {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+        
+        .quiz-option:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+        
+        .quiz-option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .quiz-option.correct {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        
+        .quiz-option.incorrect {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+        
+        .derivation-step {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        
+        .derivation-highlight {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Slide 1: Title -->
+    <div class="slide-container">
+        <div class="slide active">
+            <div class="slide-counter">1 / 10</div>
+            <div class="slide-header">
+                <h1 class="slide-title">Eigenvalues & Eigenvectors</h1>
+                <h2 class="slide-subtitle">ค่าลักษณะเฉพาะและเวกเตอร์ลักษณะเฉพาะ</h2>
+            </div>
+            
+            <div class="bilingual-content">
+                <div class="thai-content">
+                    <h3>🎯 เป้าหมายการเรียนรู้</h3>
+                    <ul>
+                        <li>เข้าใจความหมายของ Eigenvalue และ Eigenvector</li>
+                        <li>เรียนรู้การคำนวณและการตีความ</li>
+                        <li>ประยุกต์ใช้ใน Principal Component Analysis (PCA)</li>
+                        <li>วิเคราะห์ข้อมูล 4 จุดด้วย PCA</li>
+                    </ul>
+                </div>
+                
+                <div class="english-content">
+                    <h3>🎯 Learning Objectives</h3>
+                    <ul>
+                        <li>Understand the meaning of Eigenvalues & Eigenvectors</li>
+                        <li>Learn calculation methods and interpretation</li>
+                        <li>Apply to Principal Component Analysis (PCA)</li>
+                        <li>Analyze 4 data points using PCA</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="concept-highlight">
+                🚀 พร้อมที่จะสำรวจโลกของ Linear Algebra กันหรือยัง? / Ready to explore the world of Linear Algebra?
+            </div>
+        </div>
+        
+        <!-- Slide 2: Basic Concepts -->
+        <div class="slide">
+            <div class="slide-counter">2 / 10</div>
+            <div class="slide-header">
+                <h1 class="slide-title">Basic Concepts / แนวคิดพื้นฐาน</h1>
+            </div>
+            
+            <div class="bilingual-content">
+                <div class="thai-content">
+                    <h3>💡 Eigenvalue และ Eigenvector คืออะไร?</h3>
+                    <p><strong>Eigenvector</strong> คือเวกเตอร์พิเศษที่เมื่อถูกคูณด้วยเมทริกซ์ A แล้ว จะได้เวกเตอร์ที่มีทิศทางเดิม แต่ขนาดอาจเปลี่ยน</p>
+                    <p><strong>Eigenvalue</strong> คือตัวเลขที่บอกว่าเวกเตอร์นั้นถูกขยายหรือหดเท่าไหร่</p>
+                </div>
+                
+                <div class="english-content">
+                    <h3>💡 What are Eigenvalues & Eigenvectors?</h3>
+                    <p><strong>Eigenvector</strong> is a special vector that, when multiplied by matrix A, results in a vector with the same direction but possibly different magnitude</p>
+                    <p><strong>Eigenvalue</strong> is the number that tells us how much the vector is scaled</p>
+                </div>
+            </div>
+            
+            <div class="math-box">
+                <strong>สมการพื้นฐาน / Fundamental Equation:</strong><br><br>
+                <strong>Av = λv</strong><br><br>
+                A = เมทริกซ์ / Matrix<br>
+                v = Eigenvector / เวกเตอร์ลักษณะเฉพาะ<br>
+                λ = Eigenvalue / ค่าลักษณะเฉพาะ
+            </div>
+            
+            <div class="interactive-area">
+                <h4>🎮 Interactive Visualization</h4>
+                <canvas id="basicConcept" width="400" height="300"></canvas>
+                <div class="controls">
+                    <button onclick="showTransformation()">แสดงการแปลง / Show Transformation</button>
+                    <button onclick="resetVisualization()">รีเซ็ต / Reset</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 3: Mathematical Calculation -->
+        <div class="slide">
+            <div class="slide-counter">3 / 10</div>
+            <div class="slide-header">
+                <h1 class="slide-title">Calculation Methods / วิธีการคำนวณ</h1>
+            </div>
+            
+            <div class="bilingual-content">
+                <div class="thai-content">
+                    <h3>🧮 ขั้นตอนการคำนวณ</h3>
+                    <ol>
+                        <li>หา Characteristic Equation: det(A - λI) = 0</li>
+                        <li>แก้สมการเพื่อหา Eigenvalue (λ)</li>
+                        <li>แทน λ กลับเข้าไปใน (A - λI)v = 0</li>
+                        <li>แก้หา Eigenvector (v)</li>
+                    </ol>
+                </div>
+                
+                <div class="english-content">
+                    <h3>🧮 Calculation Steps</h3>
+                    <ol>
+                        <li>Find Characteristic Equation: det(A - λI) = 0</li>
+                        <li>Solve equation to find Eigenvalue (λ)</li>
+                        <li>Substitute λ back into (A - λI)v = 0</li>
+                        <li>Solve for Eigenvector (v)</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="example-grid">
+                <div class="math-box">
+                    <strong>ตัวอย่าง / Example:</strong><br>
+                    A = [3  1]<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;[0  2]<br><br>
+                    det(A - λI) = det([3-λ  1  ])<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[ 0   2-λ])<br><br>
+                    = (3-λ)(2-λ) - 0 = 0<br>
+                    λ₁ = 3, λ₂ = 2
+                </div>
+                
+                <div class="interactive-area">
+                    <h4>🔧 Calculator</h4>
+                    <canvas id="calculationViz" width="350" height="250"></canvas>
+                    <div class="controls">
+                        <button onclick="calculateExample()">คำนวณตัวอย่าง / Calculate Example</button>
+                        <button onclick="stepByStep()">ทีละขั้นตอน / Step by Step</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 4: Derivation of Formula -->
+        <div class="slide">
+            <div class="slide-counter">4 / 10</div>
+            <div class="slide-header">
+                <h1 class="slide-title">Formula Derivation / การหาสูตร</h1>
+                <h2 class="slide-subtitle">How do we get det(A - λI) = 0?</h2>
+            </div>
+            
+            <div class="bilingual-content">
+                <div class="thai-content">
+                    <h3>🧠 เราได้สูตรนี้มาอย่างไร?</h3>
+                    <p>มาดูการพิสูจน์ทีละขั้นตอนกัน:</p>
+                </div>
+                
+                <div class="english-content">
+                    <h3>🧠 How do we derive this formula?</h3>
+                    <p>Let's see the step-by-step derivation:</p>
+                </div>
+            </div>
+            
+            <div class="interactive-area">
+                <h4>🎯 Step-by-Step Derivation</h4>
+                <div class="step-indicator">
+                    <div class="step" id="derivationStep1">1</div>
+                    <div class="step" id="derivationStep2">2</div>
+                    <div class="step" id="derivationStep3">3</div>
+                    <div class="step" id="derivationStep4">4</div>
+                    <div class="step" id="derivationStep5">5</div>
+                </div>
+                
+                <div class="example-grid">
+                    <div class="math-box" id="derivationFormula">
+                        <strong>Click "Next Step" to start derivation</strong><br>
+                        กดปุ่ม "ขั้นตอนถัดไป" เพื่อเริ่มการพิสูจน์
+                    </div>
+                    
+                    <div>
+                        <canvas id="derivationViz" width="350" height="300"></canvas>
+                        <div class="controls">
+                            <button onclick="nextDerivationStep()">ขั้นตอนถัดไป / Next Step</button>
+                            <button onclick="prevDerivationStep()">ขั้นตอนก่อน / Previous</button>
+                            <button onclick="resetDerivation()">เริ่มใหม่ / Reset</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bilingual-content">
+                    <div class="thai-content">
+                        <div id="derivationThaiExplanation">
+                            <h4>📝 คำอธิบาย</h4>
+                            <p>พร้อมที่จะเรียนรู้การหาสูตร eigenvalue แล้วหรือยัง?</p>
+                        </div>
+                    </div>
+                    
+                    <div class="english-content">
+                        <div id="derivationEnglishExplanation">
+                            <h4>📝 Explanation</h4>
+                            <p>Ready to learn how to derive the eigenvalue formula?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Geometric Interpretation -->
+        <div class="slide">
+            <div class="slide-counter">5 / 10</div>
+            <div class="slide-header">
+                <h1 class="slide-title">Geometric Interpretation / การตีความเชิงเรขาคณิต</h1>
+            </div>
+            
+            <div class="bilingual-content">
+                <div class="thai-content">
+                    <h3>📐 มุมมองเชิงเรขาคณิต</h3>
+                    <ul>
+                        <li><strong>Eigenvector</strong> = ทิศทางที่ไม่เปลี่ยนแปลง</li>
+                        <li><strong>Eigenvalue > 1</strong> = ขยายความยาว</li>
+                        <li><strong>0 < Eigenvalue < 1</strong> = หดความยาว</li>
+                        <li><strong>Eigenvalue < 0</strong> = กลับทิศ + ขยาย/หด</li>
+                    </ul>
+                </div>
+                
+                <div class="english-content">
+                    <h3>📐 Geometric Perspective</h3>
+                    <ul>
+                        <li><strong>Eigenvector</strong> = Direction that doesn't change</li>
+                        <li><strong>Eigenvalue > 1</strong> = Stretches length</li>
+                        <li><strong>0 < Eigenvalue < 1</strong> = Shrinks length</li>
+                        <li><strong>Eigenvalue < 0</strong> = Flips direction + stretch/shrink</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="interactive-area">
+                <h4>🎨 Interactive Geometric Visualization</h4>
+                <canvas id="geometricViz" width="500" height="350"></canvas>
+                <div class="controls">
+                    <label>Eigenvalue 1: <input type="range" id="lambda1" min="-3" max="3" step="0.1" value="2" oninput="updateGeometric()"></label>
+                    <span id="lambda1Value">2.0</span><br>
+                    <label>Eigenvalue 2: <input type="range" id="lambda2" min="-3" max="3" step="0.1" value="0.5" oninput="updateGeometric()"></label>
+                    <span id="lambda2Value">0.5</span><br>
+                    <button onclick="animateTransformation()">แสดงการแปลง / Animate Transformation</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 6: Introduction to PCA -->
+        <div class="slide">
+            <div class="slide-counter">6 / 10</div>
+            <div class="slide-header">
+                <h1 class="slide-title">Principal Component Analysis (PCA)</h1>
+                <h2 class="slide-subtitle">การวิเคราะห์องค์ประกอบหลัก</h2>
+            </div>
+            
+            <div class="bilingual-content">
+                <div class="thai-content">
+                    <h3>🔍 PCA คืออะไร?</h3>
+                    <p>PCA เป็นเทคนิคที่ใช้ Eigenvalue และ Eigenvector เพื่อ:</p>
+                    <ul>
+                        <li>ลดมิติข้อมูล (Dimensionality Reduction)</li>
+                        <li>หาทิศทางที่ข้อมูลกระจายมากที่สุด</li>
+                        <li>กำจัดข้อมูลที่ไม่สำคัญออก</li>
+                        <li>สร้าง Principal Components</li>
+                    </ul>
+                </div>
+                
+                <div class="english-content">
+                    <h3>🔍 What is PCA?</h3>
+                    <p>PCA is a technique that uses Eigenvalues and Eigenvectors to:</p>
+                    <ul>
+                        <li>Reduce data dimensionality</li>
+                        <li>Find directions of maximum data variance</li>
+                        <li>Remove unimportant information</li>
+                        <li>Create Principal Components</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="concept-highlight">
+                🎯 เป้าหมาย: ใช้ข้อมูल 2 มิติ แทนด้วยเพียง 1 มิติ โดยเสียข้อมูลน้อยที่สุด<br>
+                🎯 Goal: Represent 2D data with just 1D while losing minimum information
+            </div>
+            
+            <div class="step-indicator">
+                <div class="step active">1</div>
+                <div class="step">2</div>
+                <div class="step">3</div>
+                <div class="step">4</div>
+                <div class="step">5</div>
+            </div>
+            
+            <div class="math-box">
+                <strong>ขั้นตอน PCA / PCA Steps:</strong><br>
+                1️⃣ Center the data (ข้อมูลให้อยู่ตรงกลาง)<br>
+                2️⃣ Calculate covariance matrix (หาเมทริกซ์ความแปรปรวนร่วม)<br>
+                3️⃣ Find eigenvalues & eigenvectors (หา eigenvalue และ eigenvector)<br>
+                4️⃣ Sort by eigenvalue (เรียงตาม eigenvalue)<br>
+                5️⃣ Project data (ฉายข้อมูลลงใน principal components)
+            </div>
+        </div>
+        
+        <!-- Slide 7: PCA with 4 Data Points - Setup -->
+        <div class="slide">
+            <div class="slide-counter">7 / 10</div>
+            <div class="slide-header">
+                <h1 class="slide-title">PCA Example: 4 Data Points</h1>
+                <h2 class="slide-subtitle">ตัวอย่าง PCA ด้วยข้อมูล 4 จุด</h2>
+            </div>
+            
+            <div class="bilingual-content">
+                <div class="thai-content">
+                    <h3>📊 ข้อมูลตัวอย่าง</h3>
+                    <p>เรามีข้อมูลคะแนนสอบของนักเรียน 4 คน:</p>
+                    <ul>
+                        <li>แกน X = คะแนนคณิตศาสตร์</li>
+                        <li>แกน Y = คะแนนวิทยาศาสตร์</li>
+                    </ul>
+                </div>
+                
+                <div class="english-content">
+                    <h3>📊 Sample Data</h3>
+                    <p>We have test scores for 4 students:</p>
+                    <ul>
+                        <li>X-axis = Math Score</li>
+                        <li>Y-axis = Science Score</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="example-grid">
+                <div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Student / นักเรียน</th>
+                                <th>Math / คณิต</th>
+                                <th>Science / วิทย์</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>A</td><td id="dataPoint1X">2</td><td id="dataPoint1Y">3</td></tr>
+                            <tr><td>B</td><td id="dataPoint2X">4</td><td id="dataPoint2Y">5</td></tr>
+                            <tr><td>C</td><td id="dataPoint3X">6</td><td id="dataPoint3Y">7</td></tr>
+                            <tr><td>D</td><td id="dataPoint4X">8</td><td id="dataPoint4Y">9</td></tr>
+                        </tbody>
+                    </table>
+                    
+                    <div class="controls">
+                        <button onclick="randomizeData()">สุ่มข้อมูลใหม่ / Randomize Data</button>
+                        <button onclick="resetToDefault()">ข้อมูลเดิม / Default Data</button>
+                    </div>
+                </div>
+                
+                <div class="interactive-area">
+                    <h4>📈 Data Visualization</h4>
+                    <canvas id="dataPoints" width="350" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 8: PCA Calculation Steps -->
+        <div class="slide">
+            <div class="slide-counter">8 / 10</div>
+            <div class="slide-header">
+                <h1 class="slide-title">PCA Step-by-Step Calculation</h1>
+                <h2 class="slide-subtitle">การคำนวณ PCA ทีละขั้นตอน</h2>
+            </div>
+            
+            <div class="step-indicator">
+                <div class="step" id="step1">1</div>
+                <div class="step" id="step2">2</div>
+                <div class="step" id="step3">3</div>
+                <div class="step" id="step4">4</div>
+                <div class="step" id="step5">5</div>
+            </div>
+            
+            <div class="example-grid">
+                <div class="interactive-area">
+                    <h4>🎯 Visualization</h4>
+                    <canvas id="pcaSteps" width="400" height="320"></canvas>
+                    <div class="controls">
+                        <button onclick="nextPCAStep()">ขั้นตอนถัดไป / Next Step</button>
+                        <button onclick="prevPCAStep()">ขั้นตอนก่อน / Previous Step</button>
+                        <button onclick="resetPCASteps()">เริ่มใหม่ / Reset</button>
+                    </div>
+                </div>
+                
+                <div id="pcaCalculations" class="math-box">
+                    <strong>Click "Next Step" to begin calculation</strong><br>
+                    กดปุ่ม "ขั้นตอนถัดไป" เพื่อเริ่มการคำนวณ
+                </div>
+            </div>
+            
+            <div class="bilingual-content">
+                <div class="thai-content">
+                    <div id="thaiExplanation">
+                        <h4>📝 คำอธิบาย</h4>
+                        <p>พร้อมที่จะเริ่มการคำนวณ PCA แล้วหรือยัง? กดปุ่มข้างบนเพื่อดูขั้นตอนทีละขั้นตอน</p>
+                    </div>
+                </div>
+                
+                <div class="english-content">
+                    <div id="englishExplanation">
+                        <h4>📝 Explanation</h4>
+                        <p>Ready to start PCA calculation? Click the buttons above to see step-by-step process</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 9: Quiz -->
+        <div class="slide">
+            <div class="slide-counter">9 / 10</div>
+            <div class="slide-header">
+                <h1 class="slide-title">Quiz Time! / เวลาทำควิซ!</h1>
+                <h2 class="slide-subtitle">Test your understanding / ทดสอบความเข้าใจ</h2>
+            </div>
+            
+            <div class="interactive-area">
+                <div class="concept-highlight">
+                    🧠 Question <span id="currentQuestion">1</span> of 5 / คำถามที่ <span id="currentQuestionThai">1</span> จาก 5 ข้อ
+                </div>
+                
+                <div id="quizContainer">
+                    <div class="math-box" id="questionBox">
+                        <div id="questionText">Loading quiz...</div>
+                    </div>
+                    
+                    <div id="answersBox" class="controls">
+                        <!-- Quiz answers will be inserted here -->
+                    </div>
+                    
+                    <div class="bilingual-content" style="margin-top: 20px;">
+                        <div class="thai-content" id="explanationThai" style="display: none;">
+                            <!-- Thai explanation will appear here -->
+                        </div>
+                        <div class="english-content" id="explanationEnglish" style="display: none;">
+                            <!-- English explanation will appear here -->
+                        </div>
+                    </div>
+                    
+                    <div class="controls" style="margin-top: 20px;">
+                        <button id="nextQuizBtn" onclick="nextQuestion()" style="display: none;">คำถามถัดไป / Next Question</button>
+                        <button id="showResultsBtn" onclick="showQuizResults()" style="display: none;">ดูผลลัพธ์ / Show Results</button>
+                        <button onclick="resetQuiz()">เริ่มใหม่ / Reset Quiz</button>
+                    </div>
+                </div>
+                
+                <div id="quizResults" style="display: none;">
+                    <div class="concept-highlight">
+                        🎯 Quiz Results / ผลการทำควิซ
+                    </div>
+                    <div class="math-box">
+                        <div id="finalScore"></div>
+                        <div id="scoreBreakdown"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Results and Conclusion -->
+        <div class="slide">
+            <div class="slide-counter">10 / 10</div>
+            <div class="slide-header">
+                <h1 class="slide-title">Results & Conclusion</h1>
+                <h2 class="slide-subtitle">ผลลัพธ์และสรุป</h2>
+            </div>
+            
+            <div class="example-grid">
+                <div class="interactive-area">
+                    <h4>🎨 Final PCA Visualization</h4>
+                    <canvas id="finalPCA" width="400" height="320"></canvas>
+                    <div class="controls">
+                        <button onclick="showOriginalData()">ข้อมูลเดิม / Original Data</button>
+                        <button onclick="showPCAProjection()">ข้อมูล PCA / PCA Projection</button>
+                        <button onclick="showComparison()">เปรียบเทียบ / Compare</button>
+                    </div>
+                </div>
+                
+                <div id="finalResults" class="math-box">
+                    <strong>📊 Final Results:</strong><br>
+                    <div id="varianceExplained">Loading...</div>
+                </div>
+            </div>
+            
+            <div class="bilingual-content">
+                <div class="thai-content">
+                    <h3>🎯 สรุปสำคัญ</h3>
+                    <ul>
+                        <li><strong>Eigenvalue</strong> บอกความสำคัญของแต่ละ Principal Component</li>
+                        <li><strong>Eigenvector</strong> บอกทิศทางของ Principal Component</li>
+                        <li><strong>PCA</strong> ช่วยลดมิติข้อมูลโดยเก็บข้อมูลสำคัญไว้</li>
+                        <li>Principal Component แรกเก็บความผันแปรมากที่สุด</li>
+                    </ul>
+                </div>
+                
+                <div class="english-content">
+                    <h3>🎯 Key Takeaways</h3>
+                    <ul>
+                        <li><strong>Eigenvalue</strong> indicates importance of each Principal Component</li>
+                        <li><strong>Eigenvector</strong> shows direction of Principal Component</li>
+                        <li><strong>PCA</strong> reduces dimensionality while preserving important information</li>
+                        <li>First Principal Component captures maximum variance</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="concept-highlight">
+                🚀 ตอนนี้คุณเข้าใจ Eigenvalue, Eigenvector และ PCA แล้ว!<br>
+                🚀 Now you understand Eigenvalues, Eigenvectors, and PCA!
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation -->
+    <div class="navigation">
+        <button class="nav-btn" onclick="previousSlide()">← ก่อนหน้า / Previous</button>
+        <button class="nav-btn" onclick="nextSlide()">ถัดไป / Next →</button>
+    </div>
+    
+    <script>
+        let currentSlide = 0;
+        let totalSlides = 10;
+        let pcaStep = 0;
+        let animationId = null;
+        let derivationStep = 0;
+        let quizStep = 0;
+        let userAnswers = [];
+        let currentQuizQuestion = 0;
+        
+        // Sample data points
+        let dataPoints = [
+            {x: 2, y: 3},
+            {x: 4, y: 5},
+            {x: 6, y: 7},
+            {x: 8, y: 9}
+        ];
+        
+        let centeredData = [];
+        let covMatrix = [];
+        let eigenvalues = [];
+        let eigenvectors = [];
+        let principalComponents = [];
+        
+        // Quiz questions
+        const quizQuestions = [
+            {
+                questionThai: "หาก A เป็นเมทริกซ์ v เป็น eigenvector และ λ เป็น eigenvalue แล้วสมการใดต่อไปนี้ถูกต้อง?",
+                questionEnglish: "If A is a matrix, v is an eigenvector, and λ is an eigenvalue, which equation is correct?",
+                options: ["Av = v + λ", "Av = λv", "A + v = λ", "Aλ = v"],
+                correct: 1,
+                explanationThai: "สมการพื้นฐานของ eigenvalue และ eigenvector คือ Av = λv หมายความว่า เมื่อเมทริกซ์ A คูณกับ eigenvector v จะได้ผลลัพธ์เท่ากับ eigenvalue λ คูณกับ v",
+                explanationEnglish: "The fundamental equation for eigenvalues and eigenvectors is Av = λv, meaning when matrix A multiplies eigenvector v, the result equals eigenvalue λ times v"
+            },
+            {
+                questionThai: "เมทริกซ์ A = [[3, 0], [0, 2]] มี eigenvalue เท่าไหร่?",
+                questionEnglish: "What are the eigenvalues of matrix A = [[3, 0], [0, 2]]?",
+                options: ["λ₁ = 3, λ₂ = 2", "λ₁ = 5, λ₂ = 6", "λ₁ = 1, λ₂ = 1", "λ₁ = 0, λ₂ = 0"],
+                correct: 0,
+                explanationThai: "สำหรับเมทริกซ์แนวทแยง (diagonal matrix) eigenvalue คือค่าบนเส้นทแยงมุม ดังนั้น eigenvalue คือ 3 และ 2",
+                explanationEnglish: "For a diagonal matrix, the eigenvalues are simply the diagonal elements. Therefore, eigenvalues are 3 and 2"
+            },
+            {
+                questionThai: "Eigenvector คืออะไร?",
+                questionEnglish: "What is an eigenvector?",
+                options: [
+                    "เวกเตอร์ที่เปลี่ยนทิศทางเมื่อถูกคูณด้วยเมทริกซ์ / Vector that changes direction when multiplied by a matrix",
+                    "เวกเตอร์ที่ไม่เปลี่ยนทิศทางเมื่อถูกคูณด้วยเมทริกซ์ / Vector that doesn't change direction when multiplied by a matrix", 
+                    "เวกเตอร์หนึ่งหน่วย / Unit vector",
+                    "เวกเตอร์ที่มีค่าเป็นศูนย์ / Zero vector"
+                ],
+                correct: 1,
+                explanationThai: "Eigenvector คือเวกเตอร์พิเศษที่เมื่อถูกคูณด้วยเมทริกซ์แล้ว จะไม่เปลี่ยนทิศทาง แต่อาจเปลี่ยนความยาว (ขยายหรือหด)",
+                explanationEnglish: "An eigenvector is a special vector that doesn't change direction when multiplied by a matrix, though its magnitude may change (stretch or shrink)"
+            },
+            {
+                questionThai: "ถ้า eigenvalue λ = -2 หมายความว่าอย่างไร?",
+                questionEnglish: "If eigenvalue λ = -2, what does this mean?",
+                options: [
+                    "เวกเตอร์ขยาย 2 เท่า / Vector stretches by factor of 2",
+                    "เวกเตอร์หด 2 เท่า / Vector shrinks by factor of 2", 
+                    "เวกเตอร์กลับทิศและขยาย 2 เท่า / Vector flips direction and stretches by 2",
+                    "เวกเตอร์หายไป / Vector disappears"
+                ],
+                correct: 2,
+                explanationThai: "Eigenvalue ที่เป็นลบ หมายความว่า eigenvector จะกลับทิศทาง (180 องศา) และขนาดจะเปลี่ยนตามค่าสัมบูรณ์ของ eigenvalue",
+                explanationEnglish: "A negative eigenvalue means the eigenvector flips direction (180 degrees) and changes magnitude by the absolute value of the eigenvalue"
+            },
+            {
+                questionThai: "ใน PCA Principal Component แรก (PC1) คืออะไร?",
+                questionEnglish: "In PCA, what is the first Principal Component (PC1)?",
+                options: [
+                    "ทิศทางที่มีความผันแปรน้อยที่สุด / Direction with least variance",
+                    "ทิศทางที่มีความผันแปรมากที่สุด / Direction with maximum variance",
+                    "ทิศทางที่ตั้งฉากกับข้อมูล / Direction perpendicular to data", 
+                    "ทิศทางแรกที่เราเลือก / First direction we choose"
+                ],
+                correct: 1,
+                explanationThai: "PC1 คือทิศทางที่ข้อมูลมีความผันแปรสูงที่สุด ซึ่งก็คือ eigenvector ที่สอดคล้องกับ eigenvalue ที่ใหญ่ที่สุด",
+                explanationEnglish: "PC1 is the direction of maximum variance in the data, which corresponds to the eigenvector with the largest eigenvalue"
+            }
+        ];
+        
+        // Slide navigation
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[n].classList.add('active');
+        }
+        
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+            }
+        }
+        
+        function previousSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        }
+        
+        // Basic concept visualization
+        function showTransformation() {
+            const canvas = document.getElementById('basicConcept');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw coordinate system
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(200, 0);
+            ctx.lineTo(200, 300);
+            ctx.moveTo(0, 150);
+            ctx.lineTo(400, 150);
+            ctx.stroke();
+            
+            // Original vector
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(200, 150);
+            ctx.lineTo(280, 100);
+            ctx.stroke();
+            
+            // Draw arrow head
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath();
+            ctx.moveTo(280, 100);
+            ctx.lineTo(275, 95);
+            ctx.lineTo(275, 105);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Transformed vector (eigenvalue = 2)
+            ctx.strokeStyle = '#3498db';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(200, 150);
+            ctx.lineTo(360, 50);
+            ctx.stroke();
+            
+            // Draw arrow head
+            ctx.fillStyle = '#3498db';
+            ctx.beginPath();
+            ctx.moveTo(360, 50);
+            ctx.lineTo(350, 45);
+            ctx.lineTo(350, 55);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Labels
+            ctx.fillStyle = '#333';
+            ctx.font = '14px Arial';
+            ctx.fillText('v (original)', 285, 95);
+            ctx.fillText('Av = 2v', 365, 45);
+            ctx.fillText('eigenvalue λ = 2', 50, 30);
+        }
+        
+        function resetVisualization() {
+            const canvas = document.getElementById('basicConcept');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw coordinate system only
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(200, 0);
+            ctx.lineTo(200, 300);
+            ctx.moveTo(0, 150);
+            ctx.lineTo(400, 150);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#666';
+            ctx.font = '14px Arial';
+            ctx.fillText('Click "Show Transformation" to see eigenvalue effect', 50, 280);
+            ctx.fillText('กด "แสดงการแปลง" เพื่อดูผลของ eigenvalue', 50, 260);
+        }
+        
+        // Calculation example
+        function calculateExample() {
+            const canvas = document.getElementById('calculationViz');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#333';
+            ctx.font = '14px Arial';
+            ctx.fillText('Matrix A = [3  1]', 50, 30);
+            ctx.fillText('          [0  2]', 50, 50);
+            ctx.fillText('', 50, 70);
+            ctx.fillText('Eigenvalues: λ₁ = 3, λ₂ = 2', 50, 90);
+            ctx.fillText('', 50, 110);
+            ctx.fillText('For λ₁ = 3:', 50, 130);
+            ctx.fillText('Eigenvector v₁ = [1, 0]', 50, 150);
+            ctx.fillText('', 50, 170);
+            ctx.fillText('For λ₂ = 2:', 50, 190);
+            ctx.fillText('Eigenvector v₂ = [1, -1]', 50, 210);
+        }
+        
+        function stepByStep() {
+            calculateExample();
+        }
+        
+        // Geometric visualization
+        function updateGeometric() {
+            const lambda1 = parseFloat(document.getElementById('lambda1').value);
+            const lambda2 = parseFloat(document.getElementById('lambda2').value);
+            
+            document.getElementById('lambda1Value').textContent = lambda1.toFixed(1);
+            document.getElementById('lambda2Value').textContent = lambda2.toFixed(1);
+            
+            const canvas = document.getElementById('geometricViz');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // Draw coordinate system
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(canvas.width, centerY);
+            ctx.stroke();
+            
+            // Draw unit vectors
+            const scale = 80;
+            
+            // Original eigenvectors
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX + scale, centerY);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX, centerY - scale);
+            ctx.stroke();
+            
+            // Transformed eigenvectors
+            ctx.strokeStyle = '#3498db';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX + lambda1 * scale, centerY);
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(centerX, centerY);
+            ctx.lineTo(centerX, centerY - lambda2 * scale);
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.fillText(`λ₁ = ${lambda1}`, centerX + lambda1 * scale + 10, centerY - 10);
+            ctx.fillText(`λ₂ = ${lambda2}`, centerX + 10, centerY - lambda2 * scale - 10);
+        }
+        
+        function animateTransformation() {
+            updateGeometric();
+        }
+        
+        // Data points management
+        function updateDataTable() {
+            document.getElementById('dataPoint1X').textContent = dataPoints[0].x;
+            document.getElementById('dataPoint1Y').textContent = dataPoints[0].y;
+            document.getElementById('dataPoint2X').textContent = dataPoints[1].x;
+            document.getElementById('dataPoint2Y').textContent = dataPoints[1].y;
+            document.getElementById('dataPoint3X').textContent = dataPoints[2].x;
+            document.getElementById('dataPoint3Y').textContent = dataPoints[2].y;
+            document.getElementById('dataPoint4X').textContent = dataPoints[3].x;
+            document.getElementById('dataPoint4Y').textContent = dataPoints[3].y;
+            
+            plotDataPoints();
+        }
+        
+        function randomizeData() {
+            for (let i = 0; i < 4; i++) {
+                dataPoints[i].x = Math.floor(Math.random() * 8) + 2;
+                dataPoints[i].y = Math.floor(Math.random() * 8) + 2;
+            }
+            updateDataTable();
+        }
+        
+        function resetToDefault() {
+            dataPoints = [
+                {x: 2, y: 3},
+                {x: 4, y: 5},
+                {x: 6, y: 7},
+                {x: 8, y: 9}
+            ];
+            updateDataTable();
+        }
+        
+        function plotDataPoints() {
+            const canvas = document.getElementById('dataPoints');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw axes
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(50, canvas.height - 50);
+            ctx.lineTo(canvas.width - 20, canvas.height - 50);
+            ctx.moveTo(50, 20);
+            ctx.lineTo(50, canvas.height - 50);
+            ctx.stroke();
+            
+            // Plot points
+            const maxVal = Math.max(...dataPoints.map(p => Math.max(p.x, p.y))) + 1;
+            const scaleX = (canvas.width - 70) / maxVal;
+            const scaleY = (canvas.height - 70) / maxVal;
+            
+            dataPoints.forEach((point, i) => {
+                const x = 50 + point.x * scaleX;
+                const y = canvas.height - 50 - point.y * scaleY;
+                
+                ctx.fillStyle = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12'][i];
+                ctx.beginPath();
+                ctx.arc(x, y, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#333';
+                ctx.font = '12px Arial';
+                ctx.fillText(['A', 'B', 'C', 'D'][i], x + 12, y - 12);
+                ctx.fillText(`(${point.x}, ${point.y})`, x + 12, y + 5);
+            });
+            
+            // Labels
+            ctx.fillStyle = '#333';
+            ctx.font = '14px Arial';
+            ctx.fillText('Math Score / คณิต', canvas.width / 2 - 50, canvas.height - 10);
+            ctx.save();
+            ctx.translate(15, canvas.height / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('Science Score / วิทย์', 0, 0);
+            ctx.restore();
+        }
+        
+        // PCA calculation steps
+        function calculatePCA() {
+            // Step 1: Center the data
+            const meanX = dataPoints.reduce((sum, p) => sum + p.x, 0) / dataPoints.length;
+            const meanY = dataPoints.reduce((sum, p) => sum + p.y, 0) / dataPoints.length;
+            
+            centeredData = dataPoints.map(p => ({
+                x: p.x - meanX,
+                y: p.y - meanY
+            }));
+            
+            // Step 2: Calculate covariance matrix
+            let covXX = 0, covXY = 0, covYY = 0;
+            
+            for (let point of centeredData) {
+                covXX += point.x * point.x;
+                covXY += point.x * point.y;
+                covYY += point.y * point.y;
+            }
+            
+            covXX /= (dataPoints.length - 1);
+            covXY /= (dataPoints.length - 1);
+            covYY /= (dataPoints.length - 1);
+            
+            covMatrix = [[covXX, covXY], [covXY, covYY]];
+            
+            // Step 3: Calculate eigenvalues and eigenvectors
+            const trace = covMatrix[0][0] + covMatrix[1][1];
+            const det = covMatrix[0][0] * covMatrix[1][1] - covMatrix[0][1] * covMatrix[1][0];
+            const discriminant = trace * trace - 4 * det;
+            
+            if (discriminant >= 0) {
+                const lambda1 = (trace + Math.sqrt(discriminant)) / 2;
+                const lambda2 = (trace - Math.sqrt(discriminant)) / 2;
+                
+                eigenvalues = [lambda1, lambda2];
+                
+                // Calculate eigenvectors
+                let v1x, v1y, v2x, v2y;
+                
+                if (Math.abs(covMatrix[0][1]) > 1e-10) {
+                    v1x = 1;
+                    v1y = (lambda1 - covMatrix[0][0]) / covMatrix[0][1];
+                    v2x = 1;
+                    v2y = (lambda2 - covMatrix[0][0]) / covMatrix[0][1];
+                } else {
+                    v1x = 1; v1y = 0;
+                    v2x = 0; v2y = 1;
+                }
+                
+                // Normalize
+                const norm1 = Math.sqrt(v1x * v1x + v1y * v1y);
+                const norm2 = Math.sqrt(v2x * v2x + v2y * v2y);
+                
+                eigenvectors = [
+                    [v1x / norm1, v1y / norm1],
+                    [v2x / norm2, v2y / norm2]
+                ];
+            }
+            
+            // Step 4: Project data onto principal components
+            principalComponents = centeredData.map(point => ({
+                pc1: point.x * eigenvectors[0][0] + point.y * eigenvectors[0][1],
+                pc2: point.x * eigenvectors[1][0] + point.y * eigenvectors[1][1]
+            }));
+        }
+        
+        function nextPCAStep() {
+            if (pcaStep < 5) {
+                pcaStep++;
+                updatePCAVisualization();
+                updateStepIndicators();
+            }
+        }
+        
+        function prevPCAStep() {
+            if (pcaStep > 0) {
+                pcaStep--;
+                updatePCAVisualization();
+                updateStepIndicators();
+            }
+        }
+        
+        function resetPCASteps() {
+            pcaStep = 0;
+            updatePCAVisualization();
+            updateStepIndicators();
+        }
+        
+        function updateStepIndicators() {
+            for (let i = 1; i <= 5; i++) {
+                const step = document.getElementById(`step${i}`);
+                if (i < pcaStep) {
+                    step.className = 'step completed';
+                } else if (i === pcaStep) {
+                    step.className = 'step active';
+                } else {
+                    step.className = 'step';
+                }
+            }
+        }
+        
+        function updatePCAVisualization() {
+            const canvas = document.getElementById('pcaSteps');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = 30;
+            
+            // Draw axes
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(canvas.width, centerY);
+            ctx.stroke();
+            
+            let explanationThai = "";
+            let explanationEnglish = "";
+            let calculation = "";
+            
+            if (pcaStep >= 1) {
+                // Step 1: Show original data
+                dataPoints.forEach((point, i) => {
+                    const x = centerX + (point.x - 5) * scale;
+                    const y = centerY - (point.y - 6) * scale;
+                    
+                    ctx.fillStyle = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12'][i];
+                    ctx.beginPath();
+                    ctx.arc(x, y, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.fillStyle = '#333';
+                    ctx.font = '10px Arial';
+                    ctx.fillText(['A', 'B', 'C', 'D'][i], x + 8, y - 8);
+                });
+                
+                explanationThai = "แสดงข้อมูลเดิม 4 จุด";
+                explanationEnglish = "Show original 4 data points";
+                calculation = "Original Data:<br>A(2,3), B(4,5), C(6,7), D(8,9)";
+            }
+            
+            if (pcaStep >= 2) {
+                // Step 2: Center the data
+                calculatePCA();
+                
+                const meanX = dataPoints.reduce((sum, p) => sum + p.x, 0) / dataPoints.length;
+                const meanY = dataPoints.reduce((sum, p) => sum + p.y, 0) / dataPoints.length;
+                
+                // Show mean point
+                const meanPx = centerX + (meanX - 5) * scale;
+                const meanPy = centerY - (meanY - 6) * scale;
+                
+                ctx.fillStyle = '#000';
+                ctx.beginPath();
+                ctx.arc(meanPx, meanPy, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#fff';
+                ctx.font = '10px Arial';
+                ctx.fillText('μ', meanPx - 3, meanPy + 3);
+                
+                explanationThai = "หาจุดกึ่งกลาง (mean) และทำให้ข้อมูลอยู่ตรงกลาง";
+                explanationEnglish = "Find mean and center the data";
+                calculation = `Mean: μ = (${meanX}, ${meanY})<br>Centered data calculated`;
+            }
+            
+            if (pcaStep >= 3) {
+                // Step 3: Show covariance matrix
+                explanationThai = "คำนวณเมทริกซ์ความแปรปรวนร่วม (covariance matrix)";
+                explanationEnglish = "Calculate covariance matrix";
+                calculation = `Covariance Matrix:<br>[${covMatrix[0][0].toFixed(3)} ${covMatrix[0][1].toFixed(3)}]<br>[${covMatrix[1][0].toFixed(3)} ${covMatrix[1][1].toFixed(3)}]`;
+            }
+            
+            if (pcaStep >= 4) {
+                // Step 4: Show eigenvalues and eigenvectors
+                explanationThai = "หา eigenvalue และ eigenvector";
+                explanationEnglish = "Find eigenvalues and eigenvectors";
+                calculation += `<br><br>Eigenvalues:<br>λ₁ = ${eigenvalues[0].toFixed(3)}<br>λ₂ = ${eigenvalues[1].toFixed(3)}`;
+                
+                // Draw eigenvectors
+                const meanX = dataPoints.reduce((sum, p) => sum + p.x, 0) / dataPoints.length;
+                const meanY = dataPoints.reduce((sum, p) => sum + p.y, 0) / dataPoints.length;
+                const meanPx = centerX + (meanX - 5) * scale;
+                const meanPy = centerY - (meanY - 6) * scale;
+                
+                // First eigenvector (PC1)
+                ctx.strokeStyle = '#e74c3c';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(meanPx - eigenvectors[0][0] * 60, meanPy + eigenvectors[0][1] * 60);
+                ctx.lineTo(meanPx + eigenvectors[0][0] * 60, meanPy - eigenvectors[0][1] * 60);
+                ctx.stroke();
+                
+                // Second eigenvector (PC2)
+                ctx.strokeStyle = '#3498db';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(meanPx - eigenvectors[1][0] * 40, meanPy + eigenvectors[1][1] * 40);
+                ctx.lineTo(meanPx + eigenvectors[1][0] * 40, meanPy - eigenvectors[1][1] * 40);
+                ctx.stroke();
+                
+                // Labels
+                ctx.fillStyle = '#e74c3c';
+                ctx.font = '12px Arial';
+                ctx.fillText('PC1', meanPx + eigenvectors[0][0] * 70, meanPy - eigenvectors[0][1] * 70);
+                ctx.fillStyle = '#3498db';
+                ctx.fillText('PC2', meanPx + eigenvectors[1][0] * 50, meanPy - eigenvectors[1][1] * 50);
+            }
+            
+            if (pcaStep >= 5) {
+                // Step 5: Show projection
+                explanationThai = "ฉายข้อมูลลงบน Principal Components";
+                explanationEnglish = "Project data onto Principal Components";
+                
+                const variance1 = eigenvalues[0];
+                const variance2 = eigenvalues[1];
+                const totalVariance = variance1 + variance2;
+                const explained1 = (variance1 / totalVariance * 100).toFixed(1);
+                const explained2 = (variance2 / totalVariance * 100).toFixed(1);
+                
+                calculation += `<br><br>Variance Explained:<br>PC1: ${explained1}%<br>PC2: ${explained2}%`;
+            }
+            
+            // Update explanations
+            document.getElementById('thaiExplanation').innerHTML = `<h4>📝 คำอธิบาย</h4><p>${explanationThai}</p>`;
+            document.getElementById('englishExplanation').innerHTML = `<h4>📝 Explanation</h4><p>${explanationEnglish}</p>`;
+            document.getElementById('pcaCalculations').innerHTML = calculation;
+        }
+        
+        // Final results
+        function showOriginalData() {
+            const canvas = document.getElementById('finalPCA');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const scale = 30;
+            
+            // Draw axes
+            ctx.strokeStyle = '#ddd';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.moveTo(0, centerY);
+            ctx.lineTo(canvas.width, centerY);
+            ctx.stroke();
+            
+            // Plot original points
+            dataPoints.forEach((point, i) => {
+                const x = centerX + (point.x - 5) * scale;
+                const y = centerY - (point.y - 6) * scale;
+                
+                ctx.fillStyle = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12'][i];
+                ctx.beginPath();
+                ctx.arc(x, y, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#333';
+                ctx.font = '12px Arial';
+                ctx.fillText(['A', 'B', 'C', 'D'][i], x + 12, y - 12);
+            });
+            
+            ctx.fillStyle = '#333';
+            ctx.font = '14px Arial';
+            ctx.fillText('Original 2D Data', 10, 30);
+        }
+        
+        function showPCAProjection() {
+            calculatePCA();
+            
+            const canvas = document.getElementById('finalPCA');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            
+            // Draw PC1 axis (horizontal)
+            ctx.strokeStyle = '#e74c3c';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(50, centerY);
+            ctx.lineTo(canvas.width - 50, centerY);
+            ctx.stroke();
+            
+            ctx.fillStyle = '#e74c3c';
+            ctx.font = '14px Arial';
+            ctx.fillText('PC1 (1D Projection)', 10, 30);
+            
+            // Project and plot points on PC1
+            const scale = 80;
+            principalComponents.forEach((point, i) => {
+                const x = centerX + point.pc1 * scale;
+                const y = centerY;
+                
+                ctx.fillStyle = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12'][i];
+                ctx.beginPath();
+                ctx.arc(x, y, 8, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.fillStyle = '#333';
+                ctx.font = '12px Arial';
+                ctx.fillText(['A', 'B', 'C', 'D'][i], x, y - 15);
+                ctx.fillText(point.pc1.toFixed(2), x - 15, y + 25);
+            });
+        }
+        
+        function showComparison() {
+            calculatePCA();
+            
+            const variance1 = eigenvalues[0];
+            const variance2 = eigenvalues[1];
+            const totalVariance = variance1 + variance2;
+            const explained = (variance1 / totalVariance * 100).toFixed(1);
+            
+            document.getElementById('varianceExplained').innerHTML = `
+                <strong>📊 PCA Results:</strong><br>
+                Total Variance: ${totalVariance.toFixed(3)}<br>
+                PC1 Variance: ${variance1.toFixed(3)} (${explained}%)<br>
+                PC2 Variance: ${variance2.toFixed(3)} (${(100-explained).toFixed(1)}%)<br><br>
+                <strong>Dimension Reduction:</strong><br>
+                2D → 1D with ${explained}% information retained
+            `;
+            
+            showPCAProjection();
+        }
+        
+        // Initialize everything
+        function initialize() {
+            resetVisualization();
+            updateGeometric();
+            updateDataTable();
+            calculatePCA();
+            updatePCAVisualization();
+            updateStepIndicators();
+            showOriginalData();
+            showComparison();
+            updateDerivation();
+            startQuiz();
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === 'Space') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                previousSlide();
+            }
+        });
+        
+        // Initialize on page load
+        window.onload = initialize;
+        
+        // Derivation functions
+        function nextDerivationStep() {
+            if (derivationStep < 5) {
+                derivationStep++;
+                updateDerivation();
+            }
+        }
+        
+        function prevDerivationStep() {
+            if (derivationStep > 0) {
+                derivationStep--;
+                updateDerivation();
+            }
+        }
+        
+        function resetDerivation() {
+            derivationStep = 0;
+            updateDerivation();
+        }
+        
+        function updateDerivation() {
+            // Update step indicators
+            for (let i = 1; i <= 5; i++) {
+                const step = document.getElementById(`derivationStep${i}`);
+                if (i < derivationStep) {
+                    step.className = 'step completed';
+                } else if (i === derivationStep) {
+                    step.className = 'step active';
+                } else {
+                    step.className = 'step';
+                }
+            }
+            
+            let formula = "";
+            let thaiExplanation = "";
+            let englishExplanation = "";
+            
+            const canvas = document.getElementById('derivationViz');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            switch(derivationStep) {
+                case 0:
+                    formula = "<strong>Click 'Next Step' to start derivation</strong><br>กดปุ่ม 'ขั้นตอนถัดไป' เพื่อเริ่มการพิสูจน์";
+                    thaiExplanation = "พร้อมที่จะเรียนรู้การหาสูตร eigenvalue แล้วหรือยัง?";
+                    englishExplanation = "Ready to learn how to derive the eigenvalue formula?";
+                    break;
+                    
+                case 1:
+                    formula = "<strong>Step 1:</strong> เริ่มจากสมการพื้นฐาน<br><br><strong>Av = λv</strong>";
+                    thaiExplanation = "เริ่มจากคำนิยาม: เมื่อเมทริกซ์ A คูณกับ eigenvector v จะได้ λv";
+                    englishExplanation = "Start with the definition: Matrix A times eigenvector v equals λv";
+                    
+                    // Draw basic equation visually
+                    ctx.fillStyle = '#333';
+                    ctx.font = '20px Arial';
+                    ctx.fillText('A', 80, 120);
+                    ctx.fillText('v', 150, 120);
+                    ctx.fillText('= λ', 200, 120);
+                    ctx.fillText('v', 260, 120);
+                    
+                    // Draw matrix and vectors
+                    ctx.strokeStyle = '#666';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(70, 100, 30, 30);
+                    ctx.strokeRect(140, 100, 20, 30);
+                    ctx.strokeRect(250, 100, 20, 30);
+                    break;
+                    
+                case 2:
+                    formula = "<strong>Step 2:</strong> จัดรูปสมการใหม่<br><br><strong>Av - λv = 0</strong><br><br>ย้าย λv ไปด้านซ้าย";
+                    thaiExplanation = "ย้ายพจน์ λv ไปด้านซ้ายของสมการ";
+                    englishExplanation = "Move the λv term to the left side of the equation";
+                    
+                    ctx.fillStyle = '#333';
+                    ctx.font = '18px Arial';
+                    ctx.fillText('Av - λv = 0', 120, 150);
+                    break;
+                    
+                case 3:
+                    formula = "<strong>Step 3:</strong> แยกตัวประกอบ<br><br><strong>(A - λI)v = 0</strong><br><br>โดยที่ I คือ identity matrix";
+                    thaiExplanation = "แยก v ออกมา โดยใช้ identity matrix I เพื่อให้ λI มีขนาดเท่ากับ A";
+                    englishExplanation = "Factor out v using identity matrix I so that λI has the same size as A";
+                    
+                    ctx.fillStyle = '#333';
+                    ctx.font = '18px Arial';
+                    ctx.fillText('(A - λI)v = 0', 100, 120);
+                    
+                    ctx.font = '14px Arial';
+                    ctx.fillText('Identity matrix I:', 50, 180);
+                    ctx.fillText('[1 0]', 50, 200);
+                    ctx.fillText('[0 1]', 50, 220);
+                    break;
+                    
+                case 4:
+                    formula = "<strong>Step 4:</strong> เงื่อนไขสำหรับ non-trivial solution<br><br>เพื่อให้ v ≠ 0 จำเป็นต้องมี:<br><br><strong>det(A - λI) = 0</strong>";
+                    thaiExplanation = "เพื่อให้มี eigenvector ที่ไม่ใช่ zero vector เมทริกซ์ (A - λI) ต้อง singular";
+                    englishExplanation = "For non-zero eigenvector solutions, matrix (A - λI) must be singular";
+                    
+                    ctx.fillStyle = '#e74c3c';
+                    ctx.font = '20px Arial';
+                    ctx.fillText('det(A - λI) = 0', 80, 150);
+                    
+                    ctx.fillStyle = '#333';
+                    ctx.font = '14px Arial';
+                    ctx.fillText('This is the characteristic equation!', 60, 200);
+                    ctx.fillText('นี่คือสมการลักษณะเฉพาะ!', 60, 220);
+                    break;
+                    
+                case 5:
+                    formula = "<strong>Step 5:</strong> สรุป<br><br>1. แก้ <strong>det(A - λI) = 0</strong> หา eigenvalue λ<br>2. แทน λ กลับใน <strong>(A - λI)v = 0</strong> หา eigenvector v";
+                    thaiExplanation = "ตอนนี้เรามีขั้นตอนการหา eigenvalue และ eigenvector แล้ว!";
+                    englishExplanation = "Now we have the complete process for finding eigenvalues and eigenvectors!";
+                    
+                    ctx.fillStyle = '#28a745';
+                    ctx.font = '16px Arial';
+                    ctx.fillText('Complete Formula Derivation!', 70, 100);
+                    ctx.fillText('การพิสูจน์สูตรเสร็จสิ้น!', 70, 120);
+                    
+                    ctx.fillStyle = '#333';
+                    ctx.font = '14px Arial';
+                    ctx.fillText('1. Solve: det(A - λI) = 0', 50, 160);
+                    ctx.fillText('2. Substitute: (A - λI)v = 0', 50, 180);
+                    break;
+            }
+            
+            document.getElementById('derivationFormula').innerHTML = formula;
+            document.getElementById('derivationThaiExplanation').innerHTML = `<h4>📝 คำอธิบาย</h4><p>${thaiExplanation}</p>`;
+            document.getElementById('derivationEnglishExplanation').innerHTML = `<h4>📝 Explanation</h4><p>${englishExplanation}</p>`;
+        }
+        
+        // Quiz functions
+        function startQuiz() {
+            currentQuizQuestion = 0;
+            userAnswers = [];
+            showQuestion();
+        }
+        
+        function showQuestion() {
+            const question = quizQuestions[currentQuizQuestion];
+            document.getElementById('currentQuestion').textContent = currentQuizQuestion + 1;
+            document.getElementById('currentQuestionThai').textContent = currentQuizQuestion + 1;
+            
+            document.getElementById('questionText').innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    <strong>🇹🇭 Thai:</strong> ${question.questionThai}
+                </div>
+                <div>
+                    <strong>🇬🇧 English:</strong> ${question.questionEnglish}
+                </div>
+            `;
+            
+            let optionsHTML = '';
+            question.options.forEach((option, index) => {
+                optionsHTML += `
+                    <div class="quiz-option" onclick="selectAnswer(${index})">
+                        ${String.fromCharCode(65 + index)}. ${option}
+                    </div>
+                `;
+            });
+            
+            document.getElementById('answersBox').innerHTML = optionsHTML;
+            
+            // Hide explanations and next button
+            document.getElementById('explanationThai').style.display = 'none';
+            document.getElementById('explanationEnglish').style.display = 'none';
+            document.getElementById('nextQuizBtn').style.display = 'none';
+            document.getElementById('showResultsBtn').style.display = 'none';
+        }
+        
+        function selectAnswer(selectedIndex) {
+            const question = quizQuestions[currentQuizQuestion];
+            const options = document.querySelectorAll('.quiz-option');
+            
+            // Remove previous selections
+            options.forEach(option => {
+                option.classList.remove('selected', 'correct', 'incorrect');
+            });
+            
+            // Mark selected answer
+            options[selectedIndex].classList.add('selected');
+            
+            // Store user's answer
+            userAnswers[currentQuizQuestion] = selectedIndex;
+            
+            // Show correct/incorrect after a delay
+            setTimeout(() => {
+                options.forEach((option, index) => {
+                    if (index === question.correct) {
+                        option.classList.add('correct');
+                    } else if (index === selectedIndex && index !== question.correct) {
+                        option.classList.add('incorrect');
+                    }
+                });
+                
+                // Show explanation
+                document.getElementById('explanationThai').innerHTML = `<h4>📝 คำอธิบาย</h4><p>${question.explanationThai}</p>`;
+                document.getElementById('explanationEnglish').innerHTML = `<h4>📝 Explanation</h4><p>${question.explanationEnglish}</p>`;
+                document.getElementById('explanationThai').style.display = 'block';
+                document.getElementById('explanationEnglish').style.display = 'block';
+                
+                // Show next button or results button
+                if (currentQuizQuestion < quizQuestions.length - 1) {
+                    document.getElementById('nextQuizBtn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('showResultsBtn').style.display = 'inline-block';
+                }
+            }, 500);
+        }
+        
+        function nextQuestion() {
+            if (currentQuizQuestion < quizQuestions.length - 1) {
+                currentQuizQuestion++;
+                showQuestion();
+            }
+        }
+        
+        function showQuizResults() {
+            let correct = 0;
+            let breakdown = '';
+            
+            userAnswers.forEach((answer, index) => {
+                if (answer === quizQuestions[index].correct) {
+                    correct++;
+                    breakdown += `Question ${index + 1}: ✅ Correct<br>`;
+                } else {
+                    breakdown += `Question ${index + 1}: ❌ Incorrect<br>`;
+                }
+            });
+            
+            const percentage = Math.round((correct / quizQuestions.length) * 100);
+            let grade = '';
+            if (percentage >= 80) grade = 'Excellent! / ممتاز!';
+            else if (percentage >= 60) grade = 'Good! / ดี!';
+            else grade = 'Keep learning! / เรียนต่อไป!';
+            
+            document.getElementById('finalScore').innerHTML = `
+                <h3>🎯 Your Score / คะแนนของคุณ: ${correct}/${quizQuestions.length} (${percentage}%)</h3>
+                <h4>${grade}</h4>
+            `;
+            
+            document.getElementById('scoreBreakdown').innerHTML = breakdown;
+            
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('quizResults').style.display = 'block';
+        }
+        
+        function resetQuiz() {
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('quizResults').style.display = 'none';
+            startQuiz();
+        }
+    </script>
+</body>
+</html>
