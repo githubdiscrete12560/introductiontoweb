@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strong Induction Proof: Tree Edges = Nodes - 1</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow: hidden;
+        }
+        
+        .presentation-container {
+            display: flex;
+            height: 100vh;
+            position: relative;
+        }
+        
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            box-sizing: border-box;
+            background: white;
+            margin: 20px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+        
+        .slide.active {
+            display: flex;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+        
+        h2 {
+            color: #3498db;
+            font-size: 2em;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        
+        .math {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.8em;
+            color: #e74c3c;
+            margin: 20px 0;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+        
+        .theorem-box {
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.3em;
+            font-weight: 500;
+        }
+        
+        .step-content {
+            max-width: 900px;
+            text-align: left;
+            line-height: 1.8;
+            font-size: 1.2em;
+        }
+        
+        .step-content ul {
+            padding-left: 30px;
+        }
+        
+        .step-content li {
+            margin: 15px 0;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 3px 8px;
+            border-radius: 5px;
+            color: #856404;
+            font-weight: 600;
+        }
+        
+        .tree-diagram {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+        }
+        
+        .vertex {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin: 10px;
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+        
+        .nav-btn {
+            padding: 12px 24px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+        
+        .nav-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+        }
+        
+        .nav-btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .slide-counter {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .calculation-steps {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .calculation-steps div {
+            margin: 10px 0;
+            font-size: 1.1em;
+            font-family: monospace;
+        }
+        
+        .conclusion-box {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <h1>Strong Induction Proof</h1>
+            <div class="theorem-box">
+                For any tree T: |E| = |V| - 1
+            </div>
+            <p style="font-size: 1.3em; margin-top: 40px;">
+                An Interactive Mathematical Proof
+            </p>
+        </div>
+        
+        <!-- Slide 2: Theorem Statement -->
+        <div class="slide">
+            <h2>Theorem Statement</h2>
+            <div class="step-content">
+                <div class="theorem-box">
+                    <strong>Theorem:</strong> For any tree T with n vertices, T has exactly n-1 edges.
+                </div>
+                <p><strong>Method:</strong> We'll prove this using <span class="highlight">strong induction on n</span></p>
+                <p><strong>Why strong induction?</strong> Because when we decompose a tree into subtrees, we get components of various sizes - not just (n-1). We need our hypothesis to work for <em>all</em> smaller sizes.</p>
+            </div>
+        </div>
+        
+        <!-- Slide 3: Base Case -->
+        <div class="slide">
+            <h2>Base Case (n = 1)</h2>
+            <div class="step-content">
+                <div class="tree-diagram">
+                    <div class="vertex">v</div>
+                </div>
+                <div class="math">
+                    A single-vertex tree has 0 edges<br>
+                    |E| = 0 = 1 - 1 ✓
+                </div>
+                <p>The base case is trivially satisfied.</p>
+            </div>
+        </div>
+        
+        <!-- Slide 4: Inductive Hypothesis -->
+        <div class="slide">
+            <h2>Strong Inductive Hypothesis</h2>
+            <div class="step-content">
+                <div class="theorem-box">
+                    Assume for some k ≥ 1 that every tree with m vertices satisfies<br>
+                    |E| = m - 1 for all <strong>1 ≤ m ≤ k</strong>
+                </div>
+                <p><strong>Key point:</strong> This is <span class="highlight">strong induction</span> because we assume the theorem holds for <em>all</em> tree sizes from 1 up to k, not just size k.</p>
+                <p>This gives us the flexibility to apply our hypothesis to subtrees of any size ≤ k.</p>
+            </div>
+        </div>
+        
+        <!-- Slide 5: Inductive Step Setup -->
+        <div class="slide">
+            <h2>Inductive Step Setup</h2>
+            <div class="step-content">
+                <p><strong>Goal:</strong> Prove the theorem for trees with k+1 vertices</p>
+                <div class="math">
+                    Let T be any tree with |V(T)| = k + 1
+                </div>
+                <ul>
+                    <li><strong>Root T</strong> at an arbitrary vertex r</li>
+                    <li>Let the <strong>subtrees hanging from r</strong> be T₁, T₂, ..., Tₜ</li>
+                    <li>Write nᵢ = |V(Tᵢ)| for each subtree i</li>
+                </ul>
+                <p>This decomposition is the key to applying strong induction!</p>
+            </div>
+        </div>
+        
+        <!-- Slide 6: Key Observations -->
+        <div class="slide">
+            <h2>Key Observations</h2>
+            <div class="step-content">
+                <div class="math">
+                    Each nᵢ ≥ 1
+                </div>
+                <div class="math">
+                    Σ(i=1 to t) nᵢ = k
+                </div>
+                <p><strong>Why?</strong> Because T has k+1 vertices total, and one of them is the root r.</p>
+                <p><strong>Crucial insight:</strong> Each subtree Tᵢ is a tree with nᵢ ≤ k vertices, so we can apply our inductive hypothesis to each one!</p>
+            </div>
+        </div>
+        
+        <!-- Slide 7: Applying Inductive Hypothesis -->
+        <div class="slide">
+            <h2>Applying Inductive Hypothesis</h2>
+            <div class="step-content">
+                <div class="theorem-box">
+                    Since each Tᵢ has nᵢ ≤ k vertices,<br>
+                    by the inductive hypothesis:<br><br>
+                    |E(Tᵢ)| = nᵢ - 1 for each i
+                </div>
+                <p>This is where <span class="highlight">strong induction</span> is essential! We're applying our hypothesis to multiple subtrees of different sizes simultaneously.</p>
+            </div>
+        </div>
+        
+        <!-- Slide 8: Counting Total Edges -->
+        <div class="slide">
+            <h2>Counting Total Edges</h2>
+            <div class="step-content">
+                <p><strong>The edges of T consist of:</strong></p>
+                <ul>
+                    <li>All edges inside the subtrees T₁, T₂, ..., Tₜ</li>
+                    <li>Plus the t edges connecting root r to its children</li>
+                </ul>
+                <div class="math">
+                    |E(T)| = Σ|E(Tᵢ)| + t
+                </div>
+                <p>Now we substitute what we know from the inductive hypothesis...</p>
+            </div>
+        </div>
+        
+        <!-- Slide 9: The Calculation -->
+        <div class="slide">
+            <h2>The Calculation</h2>
+            <div class="step-content">
+                <div class="calculation-steps">
+                    <div>|E(T)| = Σ|E(Tᵢ)| + t</div>
+                    <div>      = Σ(nᵢ - 1) + t    <span style="color: #666;">[by inductive hypothesis]</span></div>
+                    <div>      = (Σnᵢ) - t + t</div>
+                    <div>      = Σnᵢ</div>
+                    <div>      = k                <span style="color: #666;">[from our observation]</span></div>
+                </div>
+                <div class="math">
+                    Since |V(T)| = k + 1, we have:<br>
+                    |E(T)| = k = (k + 1) - 1 = |V(T)| - 1 ✓
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 10: Conclusion -->
+        <div class="slide">
+            <h2>Conclusion</h2>
+            <div class="step-content">
+                <div class="conclusion-box">
+                    ✓ By strong induction, the statement holds for all n ≥ 1
+                </div>
+                <p><strong>Why was strong induction the right choice?</strong></p>
+                <ul>
+                    <li>We decomposed the tree into <em>multiple</em> subtrees of <em>different</em> sizes</li>
+                    <li>We needed our hypothesis to apply to <em>all</em> these different sizes</li>
+                    <li>Strong induction gave us that flexibility</li>
+                </ul>
+                <p style="text-align: center; font-size: 1.4em; margin-top: 40px;">
+                    <strong>The proof is complete! 🎉</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="slide-counter">
+        <span id="current-slide">1</span> / <span id="total-slides">10</span>
+    </div>
+    
+    <div class="navigation">
+        <button class="nav-btn" id="prev-btn" onclick="changeSlide(-1)">← Previous</button>
+        <button class="nav-btn" id="next-btn" onclick="changeSlide(1)">Next →</button>
+    </div>
+    
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        
+        document.getElementById('total-slides').textContent = totalSlides;
+        
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[n].classList.add('active');
+            
+            document.getElementById('current-slide').textContent = n + 1;
+            document.getElementById('prev-btn').disabled = n === 0;
+            document.getElementById('next-btn').disabled = n === totalSlides - 1;
+        }
+        
+        function changeSlide(direction) {
+            const newSlide = currentSlide + direction;
+            if (newSlide >= 0 && newSlide < totalSlides) {
+                currentSlide = newSlide;
+                showSlide(currentSlide);
+            }
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                changeSlide(-1);
+            } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                changeSlide(1);
+            }
+        });
+        
+        // Initialize
+        showSlide(0);
+    </script>
+</body>
+</html>
