@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introduction to Matrices Presentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js">
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .slide-container {
+            width: 100%;
+            max-width: 900px;
+            height: 550px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div id="presentation-container" class="bg-white rounded-xl shadow-2xl w-full max-w-4xl">
+        <div class="slide-container mx-auto p-8 md:p-12 text-center">
+            <!-- Slide 1 -->
+            <div class="slide w-full">
+                <h1 class="text-5xl font-bold text-gray-800">An Introduction to Matrices</h1>
+                <h2 class="text-2xl mt-4 text-gray-600">Understanding the Building Blocks of Linear Algebra</h2>
+            </div>
+
+            <!-- Slide 2 -->
+            <div class="slide w-full hidden">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">What is a Matrix? Three Perspectives</h2>
+                <p class="text-lg text-gray-700 mb-4">A matrix is a rectangular grid of numbers arranged in rows and columns. It's a fundamental tool for representing and manipulating data and transformations.</p>
+                <ul class="text-lg text-left list-disc list-inside mx-auto max-w-md space-y-2 mb-6">
+                    <li><strong>Row View:</strong> A stack of row vectors.</li>
+                    <li><strong>Column View:</strong> A collection of column vectors.</li>
+                    <li><strong>Basis Vector View:</strong> A description of a linear transformation.</li>
+                </ul>
+                <p class="text-2xl">$$ A = \begin{bmatrix} a & b & c \\ d & e & f \end{bmatrix} $$</p>
+            </div>
+            
+            <!-- Slide 3 -->
+            <div class="slide w-full hidden">
+                 <h2 class="text-4xl font-bold text-gray-800 mb-6">The Row and Column Views</h2>
+                 <div class="grid md:grid-cols-2 gap-8 text-left">
+                     <div>
+                         <h3 class="text-2xl font-semibold mb-2">Row View</h3>
+                         <p class="mb-4">Think of the matrix as a set of horizontal vectors stacked on top of each other.</p>
+                         <p class="text-2xl">$$ A = \begin{bmatrix} \mathbf{r_1} \\ \mathbf{r_2} \end{bmatrix} = \begin{bmatrix} [a, b, c] \\ [d, e, f] \end{bmatrix} $$</p>
+                     </div>
+                     <div>
+                         <h3 class="text-2xl font-semibold mb-2">Column View</h3>
+                         <p class="mb-4">Think of the matrix as a set of vertical vectors placed side-by-side.</p>
+                          <p class="text-2xl">$$ A = \begin{bmatrix} \mathbf{c_1} & \mathbf{c_2} & \mathbf{c_3} \end{bmatrix} = \begin{bmatrix} \begin{pmatrix} a \\ d \end{pmatrix} & \begin{pmatrix} b \\ e \end{pmatrix} & \begin{pmatrix} c \\ f \end{pmatrix} \end{bmatrix} $$</p>
+                     </div>
+                 </div>
+            </div>
+            
+            <!-- Slide 4 -->
+            <div class="slide w-full hidden">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">The Basis Vector View</h2>
+                <p class="text-lg mb-4">A matrix can be seen as a recipe for transforming space. The columns of the matrix tell us where the <strong>basis vectors</strong> of the original space land after the transformation.</p>
+                 <p class="text-lg mb-4">In 2D Cartesian space, the standard basis vectors are: $\hat{i} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}$ and $\hat{j} = \begin{pmatrix} 0 \\ 1 \end{pmatrix}$.</p>
+                <p class="text-lg">If we have a matrix $M = \begin{bmatrix} 2 & 1 \\ 1 & 3 \end{bmatrix}$:</p>
+                <ul class="text-lg text-left list-disc list-inside mx-auto max-w-lg mt-4">
+                    <li>The first column $\begin{pmatrix} 2 \\ 1 \end{pmatrix}$ is the new position of $\hat{i}$.</li>
+                    <li>The second column $\begin{pmatrix} 1 \\ 3 \end{pmatrix}$ is the new position of $\hat{j}$.</li>
+                </ul>
+            </div>
+
+            <!-- Slide 5 -->
+            <div class="slide w-full hidden">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">Matrix-Vector Multiplication (Column View)</h2>
+                <p class="text-lg mb-4">Multiplying a matrix `A` by a vector `x` can be interpreted as taking a <strong>linear combination of the columns of A</strong>. The components of the vector `x` act as the weights.</p>
+                <p class="text-lg mb-6">Let $A = \begin{bmatrix} \mathbf{c_1} & \mathbf{c_2} \end{bmatrix}$ and $\mathbf{x} = \begin{pmatrix} x_1 \\ x_2 \end{pmatrix}$. Then, $A\mathbf{x} = x_1\mathbf{c_1} + x_2\mathbf{c_2}$.</p>
+                <p class="text-lg"><strong>Example:</strong></p>
+                <p class="text-2xl">$$ \begin{bmatrix} 2 & -1 \\ 1 & 3 \end{bmatrix} \begin{pmatrix} 4 \\ 5 \end{pmatrix} = 4 \begin{pmatrix} 2 \\ 1 \end{pmatrix} + 5 \begin{pmatrix} -1 \\ 3 \end{pmatrix} = \begin{pmatrix} 3 \\ 19 \end{pmatrix} $$</p>
+            </div>
+            
+            <!-- Slide 6 -->
+            <div class="slide w-full hidden">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">Matrix-Vector Multiplication (Row View)</h2>
+                <p class="text-lg mb-4">Alternatively, we can see multiplication as a series of <strong>dot products</strong>. Each element in the resulting vector is the dot product of a <strong>row from the matrix A</strong> and the vector `x`.</p>
+                 <p class="text-lg mb-6">Let $A = \begin{bmatrix} \mathbf{r_1} \\ \mathbf{r_2} \end{bmatrix}$ and $\mathbf{x} = \begin{pmatrix} x_1 \\ x_2 \end{pmatrix}$. Then, $A\mathbf{x} = \begin{pmatrix} \mathbf{r_1} \cdot \mathbf{x} \\ \mathbf{r_2} \cdot \mathbf{x} \end{pmatrix}$.</p>
+                <p class="text-lg"><strong>Example:</strong></p>
+                <p class="text-2xl">$$ \begin{bmatrix} 2 & -1 \\ 1 & 3 \end{bmatrix} \begin{pmatrix} 4 \\ 5 \end{pmatrix} = \begin{pmatrix} (2)(4) + (-1)(5) \\ (1)(4) + (3)(5) \end{pmatrix} = \begin{pmatrix} 3 \\ 19 \end{pmatrix} $$</p>
+            </div>
+            
+            <!-- Slide 7 -->
+            <div class="slide w-full hidden">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">Matrix-Matrix Multiplication (AB = C)</h2>
+                 <p class="text-lg mb-4">Matrix multiplication represents the <strong>composition of two linear transformations</strong>. If transformation `B` is followed by `A`, the combined transformation is `C = AB`.</p>
+                 <p class="text-lg mb-4"><strong>Rule:</strong> To multiply $A$ (m x n) by $B$ (n x p), the columns in `A` must equal the rows in `B`. The result `C` will be (m x p).</p>
+                 <p class="text-lg">The element $C_{ij}$ is the dot product of the $i^{th}$ row of `A` and the $j^{th}$ column of `B`.</p>
+                 <p class="text-2xl mt-4">$$ C_{ij} = \mathbf{r_i^A} \cdot \mathbf{c_j^B} $$</p>
+            </div>
+            
+            <!-- Slide 8 -->
+            <div class="slide w-full hidden">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">Matrix Multiplication Example</h2>
+                <p class="text-lg mb-4">Let $A = \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix}$ and $B = \begin{bmatrix} 5 & 6 \\ 7 & 8 \end{bmatrix}$. Find $C = AB$.</p>
+                <p class="text-2xl">$$ C = \begin{bmatrix} (1 \cdot 5 + 2 \cdot 7) & (1 \cdot 6 + 2 \cdot 8) \\ (3 \cdot 5 + 4 \cdot 7) & (3 \cdot 6 + 4 \cdot 8) \end{bmatrix} $$</p>
+                <p class="text-2xl">$$ C = \begin{bmatrix} 19 & 22 \\ 43 & 50 \end{bmatrix} $$</p>
+                <p class="text-lg mt-4"><strong>Important:</strong> In general, $AB \neq BA$. The order matters!</p>
+            </div>
+            
+            <!-- Slide 9 -->
+            <div class="slide w-full hidden">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">Euclidean Space & Matrix Transforms</h2>
+                <p class="text-lg mb-4"><strong>Euclidean Space ($R^n$)</strong> is the familiar space of points defined by a Cartesian coordinate system.</p>
+                <p class="text-lg mb-4">When we multiply a vector (a point) by a matrix, we are <strong>transforming</strong> that point to a new location.</p>
+                <p class="text-2xl mb-6">$$ \mathbf{v}_{new} = M \mathbf{v}_{old} $$</p>
+                <p class="text-lg">Common transformations include: Scaling, Rotation, Shearing, and Reflection.</p>
+            </div>
+            
+            <!-- Slide 10 -->
+            <div class="slide w-full hidden">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">The Problem with Translation</h2>
+                <p class="text-lg mb-4">A simple matrix multiplication can represent scaling, rotation, and shearing, but it <strong>cannot represent translation</strong> (shifting the origin).</p>
+                <p class="text-lg mb-4">This is because any linear transformation must keep the origin fixed.</p>
+                <p class="text-2xl mb-6">$$ M \begin{pmatrix} 0 \\ 0 \end{pmatrix} = \begin{pmatrix} 0 \\ 0 \end{pmatrix} $$</p>
+                <p class="text-lg">How do we solve this?</p>
+            </div>
+
+            <!-- Slide 11 -->
+            <div class="slide w-full hidden">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">The Solution: Homogeneous Coordinates</h2>
+                <p class="text-lg mb-4">We move into a higher dimension to make translation a linear transformation. For 2D space, we add a third coordinate, `w`.</p>
+                <ul class="text-lg text-left list-disc list-inside mx-auto max-w-sm space-y-2 mb-4">
+                    <li>A <strong>point</strong> $(x, y)$ becomes $(x, y, 1)$.</li>
+                    <li>A <strong>vector</strong> (direction) $(x, y)$ becomes $(x, y, 0)$.</li>
+                </ul>
+                <p class="text-lg mb-4">This allows us to use a 3x3 matrix to perform all transformations, including translation.</p>
+                 <p class="text-2xl">$$ \begin{pmatrix} x' \\ y' \\ 1 \end{pmatrix} = \begin{bmatrix} a & b & t_x \\ c & d & t_y \\ 0 & 0 & 1 \end{bmatrix} \begin{pmatrix} x \\ y \\ 1 \end{pmatrix} $$</p>
+            </div>
+
+            <!-- Slide 12 -->
+            <div class="slide w-full hidden">
+                 <h2 class="text-4xl font-bold text-gray-800 mb-6">Transforms in Homogeneous Coordinates</h2>
+                 <div class="grid md:grid-cols-3 gap-4 text-center">
+                    <div>
+                        <h3 class="text-xl font-semibold">Rotation</h3>
+                        <p class="text-xl">$$ \begin{bmatrix} \cos\theta & -\sin\theta & 0 \\ \sin\theta & \cos\theta & 0 \\ 0 & 0 & 1 \end{bmatrix} $$</p>
+                    </div>
+                     <div>
+                        <h3 class="text-xl font-semibold">Scaling</h3>
+                        <p class="text-xl">$$ \begin{bmatrix} S_x & 0 & 0 \\ 0 & S_y & 0 \\ 0 & 0 & 1 \end{bmatrix} $$</p>
+                    </div>
+                     <div>
+                        <h3 class="text-xl font-semibold">Translation</h3>
+                        <p class="text-xl">$$ \begin{bmatrix} 1 & 0 & T_x \\ 0 & 1 & T_y \\ 0 & 0 & 1 \end{bmatrix} $$</p>
+                    </div>
+                 </div>
+                 <p class="text-lg mt-6">The advantage is we can combine transformations (scale, rotate, translate) into a single matrix by multiplying them.</p>
+            </div>
+
+            <!-- NEW Slide 13 -->
+            <div class="slide w-full hidden">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">Rotation Matrix in Detail</h2>
+                <p class="text-lg mb-4">A rotation matrix transforms points by rotating them counter-clockwise around the origin by an angle $\theta$.</p>
+                <p class="text-lg mb-4">It's constructed by seeing where the basis vectors land:</p>
+                <ul class="text-lg text-left list-disc list-inside mx-auto max-w-xl space-y-2">
+                    <li>$\hat{i} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}$ rotates to $\begin{pmatrix} \cos\theta \\ \sin\theta \end{pmatrix}$. This is the <strong>first column</strong>.</li>
+                    <li>$\hat{j} = \begin{pmatrix} 0 \\ 1 \end{pmatrix}$ rotates to $\begin{pmatrix} -\sin\theta \\ \cos\theta \end{pmatrix}$. This is the <strong>second column</strong>.</li>
+                </ul>
+                <p class="text-2xl mt-4">$$ R(\theta) = \begin{bmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{bmatrix} $$</p>
+            </div>
+            
+            <!-- NEW Slide 14 -->
+            <div class="slide w-full hidden">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">Shear Matrix in Detail</h2>
+                <p class="text-lg mb-4">A shear transformation slants space along one axis, leaving the other axis fixed.</p>
+                <p class="text-lg mb-4">For a <strong>horizontal shear</strong> with factor $k$:</p>
+                <ul class="text-lg text-left list-disc list-inside mx-auto max-w-xl space-y-2">
+                     <li>The x-axis is fixed, so $\hat{i} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}$ stays the same. This is the <strong>first column</strong>.</li>
+                    <li>The y-axis is sheared. $\hat{j} = \begin{pmatrix} 0 \\ 1 \end{pmatrix}$ moves to $\begin{pmatrix} k \\ 1 \end{pmatrix}$. This is the <strong>second column</strong>.</li>
+                </ul>
+                <p class="text-2xl mt-4">$$ S_x(k) = \begin{bmatrix} 1 & k \\ 0 & 1 \end{bmatrix} $$</p>
+            </div>
+
+            <!-- Slide 15 (was 13) -->
+            <div class="slide w-full hidden">
+                <h2 class="text-4xl font-bold text-gray-800 mb-6">Summary</h2>
+                <ul class="text-lg text-left list-disc list-inside mx-auto max-w-3xl space-y-3">
+                    <li><strong>Views:</strong> Matrices can be seen as collections of row vectors, column vectors, or as a description of a transformation.</li>
+                    <li><strong>Matrix-Vector Multiplication:</strong> Is a linear combination of the matrix's columns or a series of dot products with its rows.</li>
+                    <li><strong>Matrix-Matrix Multiplication:</strong> Represents a composition of transformations. The order is crucial.</li>
+                    <li><strong>Euclidean Space:</strong> Matrices transform vectors (points) within this space.</li>
+                    <li><strong>Homogeneous Coordinates:</strong> A powerful technique to represent translation as a matrix multiplication, allowing us to combine all transformations.</li>
+                </ul>
+            </div>
+            
+            <!-- Slide 16 (was 14) -->
+            <div class="slide w-full hidden">
+                <h1 class="text-6xl font-bold text-gray-800">Questions?</h1>
+                <h2 class="text-3xl mt-4 text-gray-600">Q & A</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-6 flex justify-between items-center w-full max-w-4xl">
+        <button id="prev-btn" class="bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg hover:bg-gray-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Previous
+        </button>
+        <div id="page-counter" class="text-gray-600 font-semibold">1 / 16</div>
+        <button id="next-btn" class="bg-blue-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Next
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const pageCounter = document.getElementById('page-counter');
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+
+            function showSlide(slideIndex) {
+                slides.forEach((slide, index) => {
+                    slide.classList.toggle('hidden', index !== slideIndex);
+                });
+                pageCounter.textContent = `${slideIndex + 1} / ${totalSlides}`;
+                prevBtn.disabled = slideIndex === 0;
+                nextBtn.disabled = slideIndex === totalSlides - 1;
+                
+                // Rerender MathJax for the current slide
+                if (window.MathJax) {
+                    MathJax.typesetPromise([slides[slideIndex]]);
+                }
+            }
+
+            prevBtn.addEventListener('click', () => {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    showSlide(currentSlide);
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    showSlide(currentSlide);
+                }
+            });
+
+            // Initial setup
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>
+

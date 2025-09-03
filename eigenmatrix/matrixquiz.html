@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Matrices Quiz (Bilingual)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+            background-color: #f8f7f4;
+            color: #3D3D3D;
+        }
+        .thai {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .quiz-container {
+            transition: opacity 0.5s ease-in-out;
+        }
+        .answer-option {
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .answer-option.correct {
+            background-color: #d1fae5;
+            border-color: #10b981;
+        }
+        .answer-option.incorrect {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        .math-text {
+            font-size: 1.1em;
+        }
+        .rationale {
+             transition: opacity 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen p-4">
+
+    <div class="max-w-3xl w-full mx-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-[#3D3D3D]">Matrices Quiz</h1>
+            <p class="text-xl md:text-2xl mt-2 text-gray-700 thai">แบบทดสอบเรื่องเมทริกซ์</p>
+        </header>
+
+        <div id="quiz-container" class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+            <!-- Quiz content will be injected here -->
+        </div>
+
+        <div id="results-container" class="hidden bg-white rounded-xl shadow-lg p-6 md:p-8 text-center">
+            <h2 class="text-3xl font-bold text-[#4A90E2]">Quiz Complete! / <span class="thai">ทำแบบทดสอบเสร็จแล้ว!</span></h2>
+            <p class="text-xl my-4">Your Score / <span class="thai">คะแนนของคุณ</span>: <span id="score" class="font-bold"></span></p>
+            <button id="restart-btn" class="mt-4 bg-[#4A90E2] text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-600 transition-colors">
+                Restart Quiz / <span class="thai">เริ่มใหม่</span>
+            </button>
+        </div>
+    </div>
+
+<script>
+const quizData = {
+  "questions": [
+    {
+      "question": "Given the matrix $M = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}$, what geometric transformation does it represent when applied to a vector?",
+      "question_th": "เมทริกซ์ $M = \\begin{bmatrix} 0 & -1 \\\\ 1 & 0 \\end{bmatrix}$ แสดงถึงการแปลงทางเรขาคณิตแบบใดเมื่อนำไปใช้กับเวกเตอร์",
+      "hint": "Consider where the basis vectors $\\hat{i} = (1, 0)$ and $\\hat{j} = (0, 1)$ land. The first column is the new $\\hat{i}$ and the second is the new $\\hat{j}$.",
+      "hint_th": "พิจารณาว่าเวกเตอร์ฐาน $\\hat{i} = (1, 0)$ และ $\\hat{j} = (0, 1)$ จะไปอยู่ที่ตำแหน่งใด คอลัมน์แรกคือ $\\hat{i}$ ใหม่ และคอลัมน์ที่สองคือ $\\hat{j}$ ใหม่",
+      "answerOptions": [
+        {
+          "text": "A 90-degree counter-clockwise rotation.",
+          "text_th": "การหมุนทวนเข็มนาฬิกา 90 องศา",
+          "rationale": "The basis vector $\\hat{i}$ moves to $(0, 1)$ and $\\hat{j}$ moves to $(-1, 0)$, which corresponds to rotating the entire coordinate system 90 degrees counter-clockwise.",
+          "rationale_th": "เวกเตอร์ฐาน $\\hat{i}$ ย้ายไปที่ $(0, 1)$ และ $\\hat{j}$ ย้ายไปที่ $(-1, 0)$ ซึ่งสอดคล้องกับการหมุนระบบพิกัดทั้งหมดทวนเข็มนาฬิกา 90 องศา",
+          "isCorrect": true
+        },
+        {
+          "text": "A reflection across the x-axis.",
+          "text_th": "การสะท้อนข้ามแกน x",
+          "rationale": "A reflection across the x-axis would send the $\\hat{j}$ vector to $(0, -1)$, which is not described by the second column of this matrix.",
+          "rationale_th": "การสะท้อนข้ามแกน x จะส่งเวกเตอร์ $\\hat{j}$ ไปยัง $(0, -1)$ ซึ่งไม่ตรงกับคอลัมน์ที่สองของเมทริกซ์นี้",
+          "isCorrect": false
+        },
+        {
+          "text": "A scaling by a factor of 2.",
+          "text_th": "การขยายขนาด 2 เท่า",
+          "rationale": "Scaling would involve changing the magnitude of the basis vectors, but the columns here, $(0, 1)$ and $(-1, 0)$, are still unit length.",
+          "rationale_th": "การขยายขนาดจะเกี่ยวข้องกับการเปลี่ยนขนาดของเวกเตอร์ฐาน แต่คอลัมน์ในที่นี้คือ $(0, 1)$ และ $(-1, 0)$ ยังคงเป็นเวกเตอร์หนึ่งหน่วย",
+          "isCorrect": false
+        },
+        {
+          "text": "A 90-degree clockwise rotation.",
+          "text_th": "การหมุนตามเข็มนาฬิกา 90 องศา",
+          "rationale": "A clockwise rotation would map the $\\hat{i}$ vector to $(0, -1)$, which does not match the first column of the matrix.",
+          "rationale_th": "การหมุนตามเข็มนาฬิกาจะจับคู่เวกเตอร์ $\\hat{i}$ ไปยัง $(0, -1)$ ซึ่งไม่ตรงกับคอลัมน์แรกของเมทริกซ์",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+      "question": "Using the row view, calculate the result of the matrix-vector multiplication: $A\\mathbf{x} = \\begin{bmatrix} 3 & 2 \\\\ 5 & 1 \\end{bmatrix} \\begin{pmatrix} 2 \\\\ 3 \\end{pmatrix}$",
+      "question_th": "ใช้มุมมองแถวคำนวณผลลัพธ์ของการคูณเมทริกซ์กับเวกเตอร์: $A\\mathbf{x} = \\begin{bmatrix} 3 & 2 \\\\ 5 & 1 \\end{bmatrix} \\begin{pmatrix} 2 \\\\ 3 \\end{pmatrix}$",
+      "hint": "Calculate the dot product of each row of the matrix with the column vector.",
+      "hint_th": "คำนวณผลคูณจุดของแต่ละแถวของเมทริกซ์กับเวกเตอร์คอลัมน์",
+      "answerOptions": [
+        {
+          "text": "$\\begin{pmatrix} 12 \\\\ 13 \\end{pmatrix}$",
+          "text_th": "$\\begin{pmatrix} 12 \\\\ 13 \\end{pmatrix}$",
+          "rationale": "The first element is the dot product of the first row and the vector (3*2 + 2*3 = 12), and the second element is the dot product of the second row and the vector (5*2 + 1*3 = 13).",
+          "rationale_th": "องค์ประกอบแรกคือผลคูณจุดของแถวแรกกับเวกเตอร์ (3*2 + 2*3 = 12) และองค์ประกอบที่สองคือผลคูณจุดของแถวที่สองกับเวกเตอร์ (5*2 + 1*3 = 13)",
+          "isCorrect": true
+        },
+        {
+          "text": "$\\begin{pmatrix} 16 \\\\ 11 \\end{pmatrix}$",
+          "text_th": "$\\begin{pmatrix} 16 \\\\ 11 \\end{pmatrix}$",
+          "rationale": "This result appears to have multiplied the matrix columns by vector components incorrectly (3*2+5*2 and 2*3+1*3).",
+          "rationale_th": "ผลลัพธ์นี้ดูเหมือนจะมาจากการคูณคอลัมน์ของเมทริกซ์ด้วยส่วนประกอบของเวกเตอร์อย่างไม่ถูกต้อง (3*2+5*2 และ 2*3+1*3)",
+          "isCorrect": false
+        },
+        {
+          "text": "$\\begin{pmatrix} 9 \\\\ 6 \\end{pmatrix}$",
+          "text_th": "$\\begin{pmatrix} 9 \\\\ 6 \\end{pmatrix}$",
+          "rationale": "This appears to be a component-wise multiplication, which is not how matrix-vector multiplication is defined.",
+          "rationale_th": "นี่ดูเหมือนจะเป็นการคูณทีละส่วนประกอบ ซึ่งไม่ใช่วิธีการคูณเมทริกซ์กับเวกเตอร์",
+          "isCorrect": false
+        },
+        {
+          "text": "$\\begin{pmatrix} 21 \\\\ 8 \\end{pmatrix}$",
+          "text_th": "$\\begin{pmatrix} 21 \\\\ 8 \\end{pmatrix}$",
+          "rationale": "This result comes from an incorrect combination of row and column operations.",
+          "rationale_th": "ผลลัพธ์นี้มาจากการรวมการดำเนินการของแถวและคอลัมน์ที่ไม่ถูกต้อง",
+          "isCorrect": false
+        }
+      ]
+    },
+    {
+        "question": "What is the primary reason that standard 2x2 matrix transformations in 2D Euclidean space cannot perform translation?",
+        "question_th": "เหตุผลหลักที่การแปลงเมทริกซ์ 2x2 มาตรฐานในปริภูมิยูคลิด 2 มิติ ไม่สามารถทำการเลื่อนขนานได้คืออะไร",
+        "hint": "Think about what happens to the point (0, 0) during any standard matrix multiplication.",
+        "hint_th": "ลองนึกดูว่าเกิดอะไรขึ้นกับจุด (0, 0) ระหว่างการคูณเมทริกซ์มาตรฐานใดๆ",
+        "answerOptions": [
+            {
+                "text": "Linear transformations must always keep the origin (0,0) fixed.",
+                "text_th": "การแปลงเชิงเส้นจะต้องคงจุดกำเนิด (0,0) ไว้เสมอ",
+                "rationale": "Multiplying any matrix by the zero vector results in the zero vector, so the origin cannot be moved.",
+                "rationale_th": "การคูณเมทริกซ์ใดๆ ด้วยเวกเตอร์ศูนย์จะได้ผลลัพธ์เป็นเวกเตอร์ศูนย์ ดังนั้นจุดกำเนิดจึงไม่สามารถเคลื่อนย้ายได้",
+                "isCorrect": true
+            },
+            {
+                "text": "A 2x2 matrix does not have enough elements to store translation data.",
+                "text_th": "เมทริกซ์ 2x2 มีองค์ประกอบไม่เพียงพอที่จะเก็บข้อมูลการเลื่อนขนาน",
+                "rationale": "While true that it can't store the data for this operation, the fundamental reason is mathematical, not about storage capacity.",
+                "rationale_th": "แม้ว่าจะเป็นความจริงที่ไม่สามารถเก็บข้อมูลสำหรับการดำเนินการนี้ได้ แต่เหตุผลพื้นฐานนั้นเป็นเรื่องทางคณิตศาสตร์ ไม่ใช่เรื่องความจุ",
+                "isCorrect": false
+            }
+        ]
+    }
+  ]
+};
+
+
+const quizContainer = document.getElementById('quiz-container');
+const resultsContainer = document.getElementById('results-container');
+const scoreEl = document.getElementById('score');
+const restartBtn = document.getElementById('restart-btn');
+
+let currentQuestionIndex = 0;
+let score = 0;
+
+function startQuiz() {
+    currentQuestionIndex = 0;
+    score = 0;
+    resultsContainer.classList.add('hidden');
+    quizContainer.classList.remove('hidden');
+    showQuestion();
+}
+
+function showQuestion() {
+    const question = quizData.questions[currentQuestionIndex];
+    quizContainer.style.opacity = 0;
+    
+    setTimeout(() => {
+        let optionsHtml = '';
+        question.answerOptions.forEach((option, index) => {
+            optionsHtml += `
+                <button data-correct="${option.isCorrect}" class="answer-option w-full text-left p-4 my-2 border-2 border-gray-300 rounded-lg hover:bg-gray-100">
+                    <span class="math-text">${option.text}</span>
+                    <br>
+                    <span class="thai">${option.text_th}</span>
+                    <div class="rationale hidden mt-2 text-sm">
+                        <span>${option.rationale}</span>
+                        <br>
+                        <span class="thai">${option.rationale_th}</span>
+                    </div>
+                </button>
+            `;
+        });
+
+        quizContainer.innerHTML = `
+            <div class="mb-4">
+                <span class="text-gray-600">Question ${currentQuestionIndex + 1} of ${quizData.questions.length}</span>
+                <span class="thai text-gray-600"> / คำถามที่ ${currentQuestionIndex + 1} จาก ${quizData.questions.length}</span>
+            </div>
+            <h2 class="text-2xl font-bold mb-2 math-text">${question.question}</h2>
+            <h3 class="text-xl mb-4 thai">${question.question_th}</h3>
+            
+            <div class="my-4">
+                <button id="hint-btn" class="text-sm text-blue-600 hover:underline">Show Hint / <span class="thai">แสดงคำใบ้</span></button>
+                <p id="hint-text" class="hidden mt-2 p-3 bg-blue-50 text-blue-800 rounded-lg text-sm">
+                    ${question.hint}<br><span class="thai">${question.hint_th}</span>
+                </p>
+            </div>
+            
+            <div id="answer-options">${optionsHtml}</div>
+            
+            <div class="text-right mt-6">
+                <button id="next-btn" class="hidden bg-[#50E3C2] text-white font-bold py-2 px-6 rounded-lg hover:bg-teal-500 transition-colors">
+                    Next / <span class="thai">ถัดไป</span>
+                </button>
+            </div>
+        `;
+        quizContainer.style.opacity = 1;
+        
+        document.getElementById('hint-btn').addEventListener('click', () => {
+            document.getElementById('hint-text').classList.toggle('hidden');
+        });
+
+        const answerButtons = quizContainer.querySelectorAll('.answer-option');
+        answerButtons.forEach(button => {
+            button.addEventListener('click', selectAnswer);
+        });
+
+        if (window.MathJax && window.MathJax.typesetPromise) {
+             window.MathJax.typesetPromise([quizContainer]);
+        }
+
+    }, 300);
+}
+
+function selectAnswer(e) {
+    const selectedButton = e.currentTarget;
+    const isCorrect = selectedButton.dataset.correct === 'true';
+
+    if (isCorrect) {
+        score++;
+        selectedButton.classList.add('correct');
+    } else {
+        selectedButton.classList.add('incorrect');
+    }
+
+    const allOptions = document.querySelectorAll('.answer-option');
+    allOptions.forEach(button => {
+        button.disabled = true;
+        if (button.dataset.correct === 'true') {
+            button.classList.add('correct');
+        }
+        button.querySelector('.rationale').classList.remove('hidden');
+        button.querySelector('.rationale').style.opacity = 1;
+
+    });
+
+    document.getElementById('next-btn').classList.remove('hidden');
+    document.getElementById('next-btn').addEventListener('click', nextQuestion);
+}
+
+
+function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < quizData.questions.length) {
+        showQuestion();
+    } else {
+        showResults();
+    }
+}
+
+function showResults() {
+    quizContainer.classList.add('hidden');
+    resultsContainer.classList.remove('hidden');
+    scoreEl.textContent = `${score} / ${quizData.questions.length}`;
+}
+
+restartBtn.addEventListener('click', startQuiz);
+
+// MathJax rendering
+const setupMathJax = () => {
+    window.MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true
+        },
+        startup: {
+            ready: () => {
+                MathJax.startup.defaultReady();
+                startQuiz();
+            }
+        }
+    };
+
+    const script = document.createElement('script');
+    script.type = 'text/javascript';
+    script.id = 'MathJax-script';
+    script.async = true;
+    script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+    document.head.appendChild(script);
+};
+
+setupMathJax();
+
+</script>
+
+</body>
+</html>
+

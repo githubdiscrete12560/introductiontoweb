@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Understanding Matrix Properties & Operations (Thai/English)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .bilingual-title {
+            display: block;
+        }
+        .thai-text {
+            font-family: 'Sarabun', sans-serif;
+            font-weight: 400;
+            color: #0a9396;
+        }
+        .thai-text-sm {
+             font-family: 'Sarabun', sans-serif;
+             font-weight: 400;
+             font-size: 0.875rem;
+             line-height: 1.25rem;
+             color: #6b7280;
+        }
+        .matrix-grid {
+            display: inline-grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.5rem;
+            border-left: 2px solid;
+            border-right: 2px solid;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+        .matrix-grid-2x2 {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .matrix-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
+        }
+        .flowchart-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            min-height: 120px;
+        }
+        .flowchart-arrow {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #0a9396;
+            transform: rotate(90deg);
+        }
+        @media (min-width: 768px) {
+            .flowchart-arrow {
+                transform: rotate(0deg);
+            }
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+    
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-black text-[#005f73]">
+                <span class="bilingual-title">Unlocking Matrices</span>
+                <span class="bilingual-title thai-text text-3xl md:text-4xl">การปลดล็อกเมทริกซ์</span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-700 mt-2">A Visual Guide to Determinants, Inverses, and Singularity</p>
+            <p class="text-lg md:text-xl thai-text mt-1">คู่มือภาพสำหรับดีเทอร์มิแนนต์, อินเวอร์ส และเมทริกซ์เอกฐาน</p>
+        </header>
+
+        <main class="space-y-8">
+
+            <section id="what-is-a-matrix" class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-[#005f73]">What is a Matrix? / <span class="thai-text">เมทริกซ์คืออะไร?</span></h2>
+                <p class="mt-4 mb-6 text-gray-600">A matrix is a rectangular grid of numbers or expressions arranged in rows and columns. They are a cornerstone of linear algebra, used to represent data and transformations in a structured way.
+                <br><span class="thai-text-sm">เมทริกซ์คือตารางสี่เหลี่ยมของตัวเลขหรือนิพจน์ที่จัดเรียงเป็นแถวและคอลัมน์ เป็นรากฐานที่สำคัญของพีชคณิตเชิงเส้น ซึ่งใช้แทนข้อมูลและการแปลงในรูปแบบที่มีโครงสร้าง</span></p>
+                <div class="flex flex-wrap justify-around items-center gap-8">
+                    <div class="text-center">
+                        <h3 class="font-semibold text-lg mb-2">A 2x3 Matrix / <span class="thai-text">เมทริกซ์ขนาด 2x3</span></h3>
+                        <div class="matrix-grid border-[#ee9b00]">
+                            <div class="matrix-cell">1</div><div class="matrix-cell">9</div><div class="matrix-cell">-13</div>
+                            <div class="matrix-cell">20</div><div class="matrix-cell">5</div><div class="matrix-cell">-6</div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="font-semibold text-lg mb-2">A 3x3 Square Matrix / <span class="thai-text">เมทริกซ์จัตุรัส 3x3</span></h3>
+                        <div class="matrix-grid border-[#ca6702]">
+                            <div class="matrix-cell">1</div><div class="matrix-cell">2</div><div class="matrix-cell">3</div>
+                            <div class="matrix-cell">4</div><div class="matrix-cell">5</div><div class="matrix-cell">6</div>
+                            <div class="matrix-cell">7</div><div class="matrix-cell">8</div><div class="matrix-cell">9</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="determinant" class="bg-white rounded-lg shadow-md p-6">
+                 <h2 class="text-2xl font-bold text-[#005f73]">The Determinant / <span class="thai-text">ดีเทอร์มิแนนต์</span></h2>
+                 <p class="mt-4 mb-6 text-gray-600">The determinant is a special scalar value calculated from a <span class="font-semibold">square matrix</span>. It reveals how the matrix transforms space. For a 2x2 matrix, its absolute value is the area of the parallelogram formed by its column vectors.
+                 <br><span class="thai-text-sm">ดีเทอร์มิแนนต์คือค่าสเกลาร์พิเศษที่คำนวณจากเมทริกซ์จัตุรัส มันเผยให้เห็นว่าเมทริกซ์แปลงปริภูมิอย่างไร สำหรับเมทริกซ์ 2x2 ค่าสัมบูรณ์ของมันคือพื้นที่ของสี่เหลี่ยมด้านขนานที่เกิดจากเวกเตอร์คอลัมน์</span></p>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="font-semibold text-lg text-center mb-2">Calculation (from Slide 3) / <span class="thai-text">การคำนวณ (จากสไลด์ 3)</span></h3>
+                        <div class="text-center p-4 bg-[#f0f4f8] rounded-lg">
+                            <div class="flex justify-center items-center gap-4">
+                               <p class="text-xl font-bold">A =</p>
+                               <div class="matrix-grid matrix-grid-2x2 border-[#94d2bd]">
+                                   <div class="matrix-cell text-[#0a9396]">4</div><div class="matrix-cell text-[#ca6702]">2</div>
+                                   <div class="matrix-cell text-[#ca6702]">1</div><div class="matrix-cell text-[#0a9396]">3</div>
+                               </div>
+                            </div>
+                           <p class="text-xl font-bold mt-4">det(A) = <span class="text-[#0a9396]">(4)(3)</span> - <span class="text-[#ca6702]">(2)(1)</span></p>
+                           <p class="text-xl font-bold">det(A) = <span class="text-[#0a9396]">12</span> - <span class="text-[#ca6702]">2</span> = <span class="text-[#005f73]">10</span></p>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="determinantChart"></canvas>
+                    </div>
+                 </div>
+            </section>
+
+            <section id="inverse" class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-[#005f73]">The Inverse / <span class="thai-text">อินเวอร์ส</span></h2>
+                <p class="mt-4 mb-6 text-gray-600">The inverse of a square matrix A, denoted as A<sup>-1</sup>, is a matrix that, when multiplied by A, results in the Identity Matrix (I). An inverse only exists if the determinant is non-zero.
+                <br><span class="thai-text-sm">อินเวอร์สของเมทริกซ์จัตุรัส A ซึ่งเขียนแทนด้วย A<sup>-1</sup> คือเมทริกซ์ที่เมื่อคูณด้วย A แล้วจะได้เมทริกซ์เอกลักษณ์ (I) อินเวอร์สจะ tồn tại ก็ต่อเมื่อดีเทอร์มิแนนต์ไม่เท่ากับศูนย์</span></p>
+                <h3 class="font-semibold text-lg text-center mb-4">How to Find the 2x2 Inverse / <span class="thai-text">วิธีหาอินเวอร์สของเมทริกซ์ 2x2</span></h3>
+                <div class="grid grid-cols-1 md:grid-cols-5 items-center gap-4">
+                    <div class="flowchart-step bg-[#e9d8a6]/50">
+                        <p class="font-bold mb-1">1. Start Matrix<br><span class="thai-text font-semibold">เมทริกซ์เริ่มต้น</span></p>
+                        <div class="matrix-grid matrix-grid-2x2 border-[#ee9b00] text-sm">
+                           <div class="matrix-cell">a</div><div class="matrix-cell">b</div>
+                           <div class="matrix-cell">c</div><div class="matrix-cell">d</div>
+                       </div>
+                    </div>
+                    <div class="flowchart-arrow">→</div>
+                    <div class="flowchart-step bg-[#94d2bd]/50">
+                       <p class="font-bold mb-1">2. Rearrange<br><span class="thai-text font-semibold">จัดเรียงใหม่</span></p>
+                       <div class="matrix-grid matrix-grid-2x2 border-[#0a9396] text-sm">
+                           <div class="matrix-cell">d</div><div class="matrix-cell">-b</div>
+                           <div class="matrix-cell">-c</div><div class="matrix-cell">a</div>
+                       </div>
+                    </div>
+                    <div class="flowchart-arrow">→</div>
+                    <div class="flowchart-step bg-[#e9d8a6]/50">
+                       <p class="font-bold">3. Multiply by<br><span class="thai-text font-semibold">คูณด้วย</span></p>
+                       <p class="text-lg font-bold text-[#bb3e03]">1 / det(A)</p>
+                       <p class="text-xs">(if/ถ้า det(A) ≠ 0)</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="singular" class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-[#005f73]">The Decisive Role of the Determinant / <span class="thai-text">บทบาทชี้ขาดของดีเทอร์มิแนนต์</span></h2>
+                <p class="mt-4 text-gray-600">Think of a matrix as a transformation of space (stretching, rotating, etc.). The determinant's value tells you if that transformation is reversible.
+                <br><span class="thai-text-sm">ลองนึกภาพเมทริกซ์ว่าเป็นการแปลงปริภูมิ (เช่น การยืด, การหมุน) ค่าของดีเทอร์มิแนนต์จะบอกคุณว่าการแปลงนั้นสามารถย้อนกลับได้หรือไม่</span></p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+                    <div class="text-center bg-[#f0f4f8] p-4 rounded-lg">
+                        <h3 class="text-xl font-bold text-[#ae2012]">Singular Matrix (Slide 7) / <span class="thai-text">เมทริกซ์เอกฐาน (สไลด์ 7)</span></h3>
+                         <div class="my-2">
+                           <div class="matrix-grid matrix-grid-2x2 border-[#ae2012] text-sm inline-flex">
+                               <div class="matrix-cell">4</div><div class="matrix-cell">2</div>
+                               <div class="matrix-cell">2</div><div class="matrix-cell">1</div>
+                           </div>
+                        </div>
+                        <p class="font-bold text-base my-2">det = (4)(1) - (2)(2) = 0</p>
+                        <p class="text-2xl font-bold text-[#ae2012] mb-2">❌ No Inverse Exists / <span class="thai-text">ไม่มีอินเวอร์ส</span></p>
+                        <p class="text-gray-600 text-sm">This matrix <span class="font-semibold">collapses dimensions</span>, squishing a 2D plane onto a line. Information is lost, so the transformation cannot be undone.<br><span class="thai-text-sm">เมทริกซ์นี้<span class="font-semibold">ยุบมิติ</span> ทำให้ระนาบ 2 มิติถูกบีบลงบนเส้นตรง ข้อมูลจะสูญหายไป ทำให้ไม่สามารถย้อนกลับการแปลงได้</span></p>
+                    </div>
+                    <div class="text-center bg-[#f0f4f8] p-4 rounded-lg">
+                        <h3 class="text-xl font-bold text-[#0a9396]">Non-Singular Matrix (Slide 3) / <span class="thai-text">เมทริกซ์ไม่เอกฐาน (สไลด์ 3)</span></h3>
+                         <div class="my-2">
+                           <div class="matrix-grid matrix-grid-2x2 border-[#0a9396] text-sm inline-flex">
+                               <div class="matrix-cell">4</div><div class="matrix-cell">2</div>
+                               <div class="matrix-cell">1</div><div class="matrix-cell">3</div>
+                           </div>
+                        </div>
+                        <p class="font-bold text-base my-2">det = (4)(3) - (2)(1) = 10</p>
+                        <p class="text-2xl font-bold text-[#0a9396] mb-2">✅ Inverse Exists / <span class="thai-text">มีอินเวอร์ส</span></p>
+                        <p class="text-gray-600 text-sm">This matrix transforms space <span class="font-semibold">without collapsing it</span>. Every vector maps to a unique new vector, so the process is reversible.<br><span class="thai-text-sm">เมทริกซ์นี้แปลงปริภูมิ<span class="font-semibold">โดยไม่ยุบมิติ</span> ทุกเวกเตอร์จะจับคู่กับเวกเตอร์ใหม่ที่ไม่ซ้ำกัน ทำให้กระบวนการนี้สามารถย้อนกลับได้</span></p>
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <p class="text-center mb-2 text-gray-600">The chart below visualizes this critical difference with our examples.<br><span class="thai-text-sm">แผนภูมิด้านล่างแสดงความแตกต่างที่สำคัญนี้ด้วยตัวอย่างของเรา</span></p>
+                    <div class="chart-container h-64 max-h-72">
+                        <canvas id="singularityChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="applications" class="bg-white rounded-lg shadow-md p-6">
+                <h2 class="text-2xl font-bold text-[#005f73]">Why Do Matrices Matter? / <span class="thai-text">ทำไมเมทริกซ์ถึงสำคัญ?</span></h2>
+                <p class="mt-4 mb-6 text-gray-600">Matrix operations are fundamental to many fields, enabling powerful computational techniques in science, technology, and engineering.<br><span class="thai-text-sm">การดำเนินการของเมทริกซ์เป็นพื้นฐานของหลายสาขาวิชา ทำให้เกิดเทคนิคการคำนวณที่มีประสิทธิภาพในวิทยาศาสตร์ เทคโนโลยี และวิศวกรรม</span></p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                    <div class="bg-[#f0f4f8] p-4 rounded-lg flex flex-col justify-start">
+                        <p class="text-4xl mb-2">💻</p>
+                        <h3 class="font-semibold text-lg">Computer Graphics<br><span class="thai-text font-semibold">คอมพิวเตอร์กราฟิก</span></h3>
+                        <p class="text-sm mt-1">For scaling, rotating, and translating models.<br><span class="thai-text-sm">สำหรับการปรับขนาด การหมุน และการย้ายโมเดล</span></p>
+                    </div>
+                    <div class="bg-[#f0f4f8] p-4 rounded-lg flex flex-col justify-start">
+                        <p class="text-4xl mb-2">🔒</p>
+                        <h3 class="font-semibold text-lg">Cryptography<br><span class="thai-text font-semibold">การเข้ารหัส</span></h3>
+                        <p class="text-sm mt-1">To encrypt and decrypt sensitive information.<br><span class="thai-text-sm">เพื่อเข้ารหัสและถอดรหัสข้อมูลที่ละเอียดอ่อน</span></p>
+                    </div>
+                     <div class="bg-[#f0f4f8] p-4 rounded-lg flex flex-col justify-start">
+                        <p class="text-4xl mb-2">🧠</p>
+                        <h3 class="font-semibold text-lg">Machine Learning<br><span class="thai-text font-semibold">การเรียนรู้ของเครื่อง</span></h3>
+                        <p class="text-sm mt-1">In algorithms for data analysis and prediction.<br><span class="thai-text-sm">ในอัลกอริทึมสำหรับการวิเคราะห์ข้อมูลและการทำนาย</span></p>
+                    </div>
+                     <div class="bg-[#f0f4f8] p-4 rounded-lg flex flex-col justify-start">
+                        <p class="text-4xl mb-2">✒️</p>
+                        <h3 class="font-semibold text-lg">Solving Equations<br><span class="thai-text font-semibold">การแก้สมการ</span></h3>
+                        <p class="text-sm mt-1">To efficiently solve complex systems of equations.<br><span class="thai-text-sm">เพื่อแก้ระบบสมการที่ซับซ้อนอย่างมีประสิทธิภาพ</span></p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="text-center mt-12 py-4 border-t">
+            <p class="text-gray-500">A visual exploration of fundamental matrix concepts.</p>
+            <p class="thai-text-sm text-gray-500">การสำรวจแนวคิดพื้นฐานของเมทริกซ์ด้วยภาพ</p>
+        </footer>
+
+    </div>
+
+<script>
+    function processLabel(str, maxLength = 16) {
+        if (str.length <= maxLength || !str.includes(' ')) {
+            return str;
+        }
+        const words = str.split(' ');
+        const lines = [];
+        let currentLine = '';
+        for (const word of words) {
+            if ((currentLine + ' ' + word).trim().length > maxLength && currentLine.length > 0) {
+                lines.push(currentLine.trim());
+                currentLine = word;
+            } else {
+                currentLine = (currentLine + ' ' + word).trim();
+            }
+        }
+        if (currentLine) {
+            lines.push(currentLine.trim());
+        }
+        return lines;
+    }
+
+    const tooltipTitleCallback = {
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    title: function(tooltipItems) {
+                        const item = tooltipItems[0];
+                        let label = item.chart.data.labels[item.dataIndex];
+                        if (Array.isArray(label)) {
+                            return label.join(' ');
+                        } else {
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    const matrixForDeterminant = { a: 4, b: 2, c: 1, d: 3 };
+    const determinantValue = (matrixForDeterminant.a * matrixForDeterminant.d) - (matrixForDeterminant.b * matrixForDeterminant.c);
+    
+    const determinantCtx = document.getElementById('determinantChart').getContext('2d');
+    new Chart(determinantCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['ad (' + (matrixForDeterminant.a * matrixForDeterminant.d) + ')', ' -bc (' + -(matrixForDeterminant.b * matrixForDeterminant.c) + ')'],
+            datasets: [{
+                data: [matrixForDeterminant.a * matrixForDeterminant.d, -(matrixForDeterminant.b * matrixForDeterminant.c)],
+                backgroundColor: ['#0a9396', '#ca6702'],
+                borderColor: '#ffffff',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                ...tooltipTitleCallback.plugins,
+                legend: { position: 'bottom' },
+                title: { display: true, text: 'Example from Slide 3 / ตัวอย่างจากสไลด์ 3' }
+            }
+        },
+        plugins: [{
+            id: 'doughnutText',
+            beforeDraw(chart, args, options) {
+                const {ctx, width, height} = chart;
+                ctx.save();
+                const text = 'det = ' + determinantValue;
+                ctx.font = 'bold 24px Inter';
+                ctx.fillStyle = '#005f73';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, width / 2, height / 2);
+                ctx.restore();
+            }
+        }]
+    });
+
+    const singularMatrixDet = (4*1) - (2*2); 
+    const nonSingularMatrixDet = (4*3) - (2*1);
+
+    const singularityCtx = document.getElementById('singularityChart').getContext('2d');
+    new Chart(singularityCtx, {
+        type: 'bar',
+        data: {
+            labels: [
+                processLabel('Singular (Slide 7) / เอกฐาน (det=0)', 25),
+                processLabel('Non-Singular (Slide 3) / ไม่เอกฐาน (det=10)', 25)
+            ],
+            datasets: [{
+                label: 'Determinant Value / ค่าดีเทอร์มิแนนต์',
+                data: [singularMatrixDet, nonSingularMatrixDet],
+                backgroundColor: ['#ae2012', '#0a9396'],
+                borderColor: ['#9b2226', '#005f73'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Determinant Value / ค่าดีเทอร์มิแนนต์'
+                    }
+                }
+            },
+            plugins: {
+                 ...tooltipTitleCallback.plugins,
+                legend: { display: false },
+                title: { display: true, text: 'Determinant Comparison / การเปรียบเทียบดีเทอร์มิแนนต์' }
+            }
+        }
+    });
+
+</script>
+</body>
+</html>
+

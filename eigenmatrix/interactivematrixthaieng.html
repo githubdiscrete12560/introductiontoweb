@@ -1,0 +1,557 @@
+<!-- Chosen Palette: Modern Academia -->
+<!-- Application Structure Plan: The SPA is designed as an interactive, scroll-based explainer that builds concepts logically. It starts with defining a matrix through switchable views (Row, Column, Basis). It then moves to an interactive "sandbox" where users can input their own values for matrix-vector and matrix-matrix multiplication, seeing both the calculations and the visual results update in real-time. The final major section is a visual showcase of geometric transformations, where sliders for scale, rotation, and shear directly manipulate a shape and its corresponding transformation matrix. This section culminates in demonstrating the need for and power of homogeneous coordinates to handle translation. This structure was chosen over a static slide-by-slide format to transform passive learning into active experimentation, which is more effective for grasping mathematical concepts. The user flow is Define -> Operate -> Visualize & Apply. -->
+<!-- Visualization & Content Choices: 1. Matrix Views: Goal=Inform. Method=HTML/CSS for matrix display, with JS toggles for explanatory text and a Chart.js Canvas scatter plot for basis vectors. Justification=Combines three slides into one interactive component. 2. Operations Sandbox: Goal=Relationships/Inform. Method=HTML inputs and a Chart.js Canvas scatter plot to show vector transformations. JS updates visualizations and step-by-step calculation text. Justification=Allows user-driven exploration, which builds deeper understanding than static examples. 3. Transformations Showcase: Goal=Change/Relationships. Method=HTML sliders controlling a Chart.js Canvas scatter plot of a shape. JS updates the transformation matrix text and the chart simultaneously. A new display shows the original "Before" Identity matrix next to the final "After" transformed matrix for comparison. A calculation breakdown area shows how the final matrix is composed. A new sample calculation section shows the final matrix multiplying a single point vector to get a transformed point vector. Justification=Provides immediate, tangible feedback connecting abstract matrix values to concrete geometric effects, their underlying composition, and their direct application to a point. This explicitly demonstrates concepts like composition and the role of homogeneous coordinates. NO SVG/Mermaid used. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>An Interactive Introduction to Matrices (Bilingual)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Source+Code+Pro:wght@400;600&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+            background-color: #F8F7F4;
+            color: #3D3D3D;
+        }
+        .font-mono {
+            font-family: 'Source Code Pro', monospace;
+        }
+        .thai-subtitle {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            max-height: 40vh;
+        }
+        @media (min-width: 768px) {
+           .chart-container {
+                height: 400px;
+           }
+        }
+        .matrix-input {
+            width: 4em;
+            text-align: center;
+            border: 1px solid #D1D5DB;
+            border-radius: 0.25rem;
+            padding: 0.25rem;
+            background-color: #FFF;
+        }
+        .tab-button {
+            transition: all 0.2s ease-in-out;
+            padding: 0.5rem 1rem;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+        .tab-button.active {
+            border-bottom-color: #4A90E2;
+            color: #4A90E2;
+            font-weight: 600;
+        }
+        .matrix-calc-grid {
+            display: grid;
+            grid-template-columns: auto auto auto auto auto auto auto;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+        }
+        .matrix-calc-grid span {
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        
+        <header class="text-center my-8 md:my-16">
+            <h1 class="text-4xl md:text-6xl font-bold text-[#3D3D3D]">An Interactive Introduction to Matrices</h1>
+            <p class="text-2xl md:text-4xl mt-4 text-gray-700 thai-subtitle">ความรู้เบื้องต้นเกี่ยวกับเมทริกซ์เชิงโต้ตอบ</p>
+            <p class="text-lg md:text-xl mt-4 text-gray-600">Understanding the Building Blocks of Linear Algebra / <span class="thai-subtitle">ทำความเข้าใจส่วนประกอบพื้นฐานของพีชคณิตเชิงเส้น</span></p>
+        </header>
+
+        <section class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-12">
+            <h2 class="text-3xl font-bold text-center mb-2 text-[#4A90E2]">What is a Matrix? / <span class="thai-subtitle">เมทริกซ์คืออะไร?</span></h2>
+            <p class="text-center text-gray-600 mb-8">A matrix is a rectangular grid of numbers, but it's much more than that. It's a powerful tool for representing data and describing transformations. Explore the three fundamental ways to think about a matrix below.<br><span class="thai-subtitle text-sm">เมทริกซ์คือตารางสี่เหลี่ยมของตัวเลข แต่เป็นมากกว่านั้น มันเป็นเครื่องมือที่ทรงพลังสำหรับแสดงข้อมูลและอธิบายการแปลง ลองสำรวจสามวิธีพื้นฐานในการคิดเกี่ยวกับเมทริกซ์ด้านล่างนี้</span></p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                <div class="flex flex-col items-center">
+                    <div class="font-mono text-3xl p-4 bg-gray-100 rounded-lg">
+                        <span>[</span>
+                        <div class="inline-block text-center">
+                            <div id="view-row-1" class="p-1 rounded transition-all duration-300">
+                                <span class="text-[#4A90E2]">2</span> <span class="text-[#50E3C2]">1</span>
+                            </div>
+                            <div id="view-row-2" class="p-1 rounded transition-all duration-300">
+                                <span class="text-[#4A90E2]">1</span> <span class="text-[#50E3C2]">3</span>
+                            </div>
+                        </div>
+                        <span>]</span>
+                    </div>
+
+                    <div class="w-full max-w-md mt-6 border-b">
+                        <nav class="flex justify-center -mb-px flex-wrap">
+                            <button data-view="row" class="tab-button active text-sm md:text-base">Row View / <span class="thai-subtitle">มุมมองแถว</span></button>
+                            <button data-view="column" class="tab-button text-sm md:text-base">Column View / <span class="thai-subtitle">มุมมองคอลัมน์</span></button>
+                            <button data-view="basis" class="tab-button text-sm md:text-base">Basis View / <span class="thai-subtitle">มุมมองเวกเตอร์ฐาน</span></button>
+                        </nav>
+                    </div>
+
+                    <div id="view-explanation" class="mt-4 p-4 bg-blue-50 rounded-lg w-full max-w-md">
+                        <p id="view-text" class="text-center text-gray-700"></p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="basisViewChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-12">
+            <h2 class="text-3xl font-bold text-center mb-2 text-[#4A90E2]">Interactive Sandbox: Operations / <span class="thai-subtitle">สนามทดลอง: การดำเนินการ</span></h2>
+            <p class="text-center text-gray-600 mb-8">The best way to understand matrix operations is to perform them. Use the tools below to see how matrix multiplication works step-by-step and visually transforms vectors in space.<br><span class="thai-subtitle text-sm">วิธีที่ดีที่สุดในการทำความเข้าใจการดำเนินการของเมทริกซ์คือการลงมือทำ ใช้เครื่องมือด้านล่างเพื่อดูว่าการคูณเมทริกซ์ทำงานอย่างไรทีละขั้นตอนและแปลงเวกเตอร์ในปริภูมิให้เห็นภาพ</span></p>
+
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                <div class="p-6 border rounded-lg">
+                    <h3 class="text-2xl font-bold mb-4">Matrix-Vector Multiplication / <span class="thai-subtitle">การคูณเมทริกซ์กับเวกเตอร์</span></h3>
+                    <p class="mb-6 text-sm text-gray-600">This operation transforms a vector. Input a 2x2 matrix and a 2D vector below. The visualization will show the original vector (in grey) transformed into the new vector (in blue). Explore both the Column View and Row View to see two ways of reaching the same result.<br><span class="thai-subtitle">การดำเนินการนี้จะแปลงเวกเตอร์ ป้อนเมทริกซ์ 2x2 และเวกเตอร์ 2 มิติด้านล่าง ภาพจะแสดงเวกเตอร์เดิม (สีเทา) ที่ถูกแปลงเป็นเวกเตอร์ใหม่ (สีน้ำเงิน) สำรวจทั้งมุมมองคอลัมน์และมุมมองแถวเพื่อดูสองวิธีที่ให้ผลลัพธ์เดียวกัน</span></p>
+                    
+                    <div class="flex flex-wrap gap-6 items-center justify-center mb-6">
+                        <div class="font-mono text-xl">
+                            <span>[</span>
+                            <div class="inline-block text-center">
+                                <div>
+                                    <input type="number" id="mv-m11" class="matrix-input" value="2">
+                                    <input type="number" id="mv-m12" class="matrix-input" value="-1">
+                                </div>
+                                <div>
+                                    <input type="number" id="mv-m21" class="matrix-input" value="1">
+                                    <input type="number" id="mv-m22" class="matrix-input" value="3">
+                                </div>
+                            </div>
+                            <span>]</span>
+                        </div>
+                         <div class="font-mono text-xl">
+                            <span>[</span>
+                            <div class="inline-block text-center">
+                                <input type="number" id="mv-v1" class="matrix-input" value="4"> <br/>
+                                <input type="number" id="mv-v2" class="matrix-input" value="5">
+                            </div>
+                            <span>]</span>
+                        </div>
+                        <div class="font-bold text-2xl">=</div>
+                        <div id="mv-result" class="font-mono text-xl font-bold text-[#4A90E2]"></div>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg text-sm">
+                        <p><strong>Column View (Linear Combination) / <span class="thai-subtitle">มุมมองคอลัมน์ (การรวมเชิงเส้น):</span></strong></p>
+                        <p id="mv-col-view" class="font-mono"></p>
+                        <p class="mt-4"><strong>Row View (Dot Products) / <span class="thai-subtitle">มุมมองแถว (ผลคูณจุด):</span></strong></p>
+                        <p id="mv-row-view" class="font-mono"></p>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="mvChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white rounded-xl shadow-lg p-6 md:p-8 mb-12">
+            <h2 class="text-3xl font-bold text-center mb-2 text-[#4A90E2]">Visual Showcase: Geometric Transformations / <span class="thai-subtitle">การแสดงภาพ: การแปลงทางเรขาคณิต</span></h2>
+            <p class="text-center text-gray-600 mb-8">Matrices are the language of geometric transformations in fields like computer graphics and robotics. Use the sliders to manipulate a simple square and see how the transformation matrix changes in real-time. Notice how standard matrices can't perform translation—until we introduce Homogeneous Coordinates.<br><span class="thai-subtitle text-sm">เมทริกซ์เป็นภาษาของการแปลงทางเรขาคณิตในสาขาต่างๆ เช่น คอมพิวเตอร์กราฟิกส์และวิทยาการหุ่นยนต์ ใช้แถบเลื่อนเพื่อจัดการสี่เหลี่ยมจัตุรัสและดูว่าเมทริกซ์การแปลงเปลี่ยนแปลงอย่างไรตามเวลาจริง สังเกตว่าเมทริกซ์มาตรฐานไม่สามารถทำการเลื่อนขนานได้—จนกว่าเราจะแนะนำพิกัดเอกพันธุ์</span></p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <label for="scaleX" class="font-bold">Scale X / <span class="thai-subtitle">ขยาย X</span>: <span id="scaleX-val">1</span></label>
+                            <input type="range" id="scaleX" min="0" max="2" step="0.1" value="1" class="w-full">
+                            <label for="scaleY" class="font-bold">Scale Y / <span class="thai-subtitle">ขยาย Y</span>: <span id="scaleY-val">1</span></label>
+                            <input type="range" id="scaleY" min="0" max="2" step="0.1" value="1" class="w-full">
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <label for="rotation" class="font-bold">Rotation / <span class="thai-subtitle">การหมุน</span>: <span id="rotation-val">0</span>°</label>
+                            <input type="range" id="rotation" min="-180" max="180" step="5" value="0" class="w-full">
+                             <label for="shearX" class="font-bold">Shear X / <span class="thai-subtitle">การเฉือน X</span>: <span id="shearX-val">0</span></label>
+                            <input type="range" id="shearX" min="-1" max="1" step="0.1" value="0" class="w-full">
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg md:col-span-2">
+                             <div class="flex justify-between items-center">
+                                <div>
+                                    <label for="translateX" class="font-bold">Translate X / <span class="thai-subtitle">เลื่อน X</span>: <span id="translateX-val">0</span></label>
+                                    <input type="range" id="translateX" min="-2" max="2" step="0.1" value="0" class="w-full" disabled>
+                                    <label for="translateY" class="font-bold">Translate Y / <span class="thai-subtitle">เลื่อน Y</span>: <span id="translateY-val">0</span></label>
+                                    <input type="range" id="translateY" min="-2" max="2" step="0.1" value="0" class="w-full" disabled>
+                                </div>
+                                <div class="ml-4">
+                                     <label for="homogeneousToggle" class="flex flex-col items-center cursor-pointer">
+                                        <span class="text-sm font-bold mb-1">Homogeneous / <span class="thai-subtitle">เอกพันธุ์</span></span>
+                                        <div class="relative">
+                                            <input type="checkbox" id="homogeneousToggle" class="sr-only">
+                                            <div class="block bg-gray-300 w-10 h-6 rounded-full"></div>
+                                            <div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition"></div>
+                                        </div>
+                                     </label>
+                                </div>
+                             </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                        <div class="p-4 bg-gray-700 text-white rounded-lg font-mono text-center w-full sm:w-auto flex-1">
+                             <h4 class="text-lg font-bold mb-2">Before (Identity) / <span class="thai-subtitle">ก่อน (เอกลักษณ์)</span></h4>
+                             <div id="identity-matrix-display" class="text-lg"></div>
+                        </div>
+                        <div class="text-4xl font-bold text-gray-400 p-2">
+                            <span class="hidden sm:inline">&rarr;</span>
+                            <span class="inline sm:hidden">&darr;</span>
+                        </div>
+                        <div class="p-4 bg-gray-800 text-white rounded-lg font-mono text-center w-full sm:w-auto flex-1">
+                            <h4 class="text-lg font-bold mb-2">After (Final Matrix) / <span class="thai-subtitle">หลัง (เมทริกซ์สุดท้าย)</span></h4>
+                            <div id="matrix-display" class="text-lg"></div>
+                        </div>
+                    </div>
+
+                    <div id="homogeneous-explainer" class="hidden mt-4 p-4 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 text-sm">
+                        <strong>Enabled Homogeneous Coordinates!</strong><br><span class="thai-subtitle"><strong>เปิดใช้งานพิกัดเอกพันธุ์!</strong> เราได้ย้ายไปยังมิติที่สูงขึ้นโดยใช้เมทริกซ์ 3x3 เทคนิคอันชาญฉลาดนี้ช่วยให้เราสามารถแสดงการเลื่อนขนานเป็นการแปลงเชิงเส้น ทำให้สามารถรวมการขยาย, การหมุน และการเลื่อนขนานไว้ในเมทริกซ์เดียวได้</span>
+                    </div>
+                     <div class="mt-4 p-4 bg-gray-100 rounded-lg">
+                        <h4 class="text-md font-bold mb-2 text-center">Calculation Breakdown / <span class="thai-subtitle">การแจกแจงการคำนวณ</span></h4>
+                        <p class="text-xs text-center text-gray-500 mb-2">Final = Translate × Rotate × Shear × Scale</p>
+                        <div id="matrix-calculation-display" class="font-mono text-center overflow-x-auto"></div>
+                    </div>
+                     <div class="mt-4 p-4 bg-gray-100 rounded-lg">
+                        <h4 class="text-md font-bold mb-2 text-center">Sample Point Calculation / <span class="thai-subtitle">ตัวอย่างการคำนวณจุด</span></h4>
+                         <p class="text-xs text-center text-gray-500 mb-2">New Point = Final Matrix × Original Point</p>
+                        <div id="point-calculation-display" class="font-mono text-center overflow-x-auto"></div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="transformChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+         <footer class="text-center my-8 md:my-16 border-t pt-8">
+            <h2 class="text-2xl font-bold text-[#4A90E2] mb-4">Summary / <span class="thai-subtitle">สรุป</span></h2>
+            <ul class="space-y-4 max-w-2xl mx-auto text-gray-600">
+                <li><strong class="text-gray-800">Multiple Views:</strong> Matrices can be seen as collections of rows, columns, or as a description of a transformation.<br><span class="thai-subtitle text-sm"><strong>มุมมองหลากหลาย:</strong> เมทริกซ์สามารถมองได้ว่าเป็นชุดของแถว, คอลัมน์ หรือเป็นคำอธิบายของการแปลง</span></li>
+                <li><strong class="text-gray-800">Operations as Actions:</strong> Matrix multiplication transforms vectors or composes multiple transformations into one.<br><span class="thai-subtitle text-sm"><strong>การดำเนินการเป็นการกระทำ:</strong> การคูณเมทริกซ์จะแปลงเวกเตอร์หรือประกอบการแปลงหลายอย่างเป็นหนึ่งเดียว</span></li>
+                <li><strong class="text-gray-800">Visual Power:</strong> Matrices directly correspond to geometric actions like scaling, rotating, and shearing space.<br><span class="thai-subtitle text-sm"><strong>พลังของการแสดงภาพ:</strong> เมทริกซ์สอดคล้องโดยตรงกับการกระทำทางเรขาคณิต เช่น การขยาย, การหมุน และการเฉือนปริภูมิ</span></li>
+                <li><strong class="text-gray-800">Homogeneous Coordinates:</strong> This technique is the key to including translation in matrix transformations, unifying all common geometric operations.<br><span class="thai-subtitle text-sm"><strong>พิกัดเอกพันธุ์:</strong> เทคนิคนี้เป็นกุญแจสำคัญในการรวมการเลื่อนขนานเข้ากับการแปลงเมทริกซ์ ซึ่งรวมการดำเนินการทางเรขาคณิตทั่วไปทั้งหมดไว้ด้วยกัน</span></li>
+            </ul>
+        </footer>
+
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const chartDefaultOptions = {
+        maintainAspectRatio: false,
+        responsive: true,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    title: (tooltipItems) => {
+                        const item = tooltipItems[0];
+                        let label = item.chart.data.labels[item.dataIndex];
+                        return Array.isArray(label) ? label.join(' ') : label;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                min: -4, max: 4,
+                grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                ticks: { stepSize: 1 }
+            },
+            y: {
+                min: -4, max: 4,
+                grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                ticks: { stepSize: 1 }
+            }
+        }
+    };
+    
+    // Section 1: What is a Matrix?
+    const viewTabs = document.querySelectorAll('.tab-button');
+    const viewText = document.getElementById('view-text');
+    const row1 = document.getElementById('view-row-1');
+    const row2 = document.getElementById('view-row-2');
+    
+    const explanations = {
+        row: "Think of the matrix as two horizontal vectors stacked on top of each other. Each row represents a coordinate or a piece of data. / <span class='thai-subtitle'>คิดว่าเมทริกซ์เป็นเวกเตอร์แนวนอนสองอันซ้อนกัน แต่ละแถวแสดงถึงพิกัดหรือข้อมูลชิ้นหนึ่ง</span>",
+        column: "Think of the matrix as two vertical vectors side-by-side. This view is crucial for understanding transformations. / <span class='thai-subtitle'>คิดว่าเมทริกซ์เป็นเวกเตอร์แนวตั้งสองอันวางเคียงข้างกัน มุมมองนี้สำคัญอย่างยิ่งต่อการทำความเข้าใจการแปลง</span>",
+        basis: "The columns tell us where the original basis vectors (i=[1,0], j=[0,1]) land after being transformed by this matrix. / <span class='thai-subtitle'>คอลัมน์จะบอกเราว่าเวกเตอร์ฐานเดิม (i=[1,0], j=[0,1]) จะไปอยู่ที่ตำแหน่งใดหลังจากถูกแปลงโดยเมทริกซ์นี้</span>"
+    };
+
+    const basisViewCtx = document.getElementById('basisViewChart').getContext('2d');
+    const basisViewChart = new Chart(basisViewCtx, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                { data: [{x:0,y:0},{x:1,y:0}], showLine: true, borderColor: '#4A90E2', borderWidth: 3, label: 'i-hat', pointRadius: 0 },
+                { data: [{x:0,y:0},{x:0,y:1}], showLine: true, borderColor: '#50E3C2', borderWidth: 3, label: 'j-hat', pointRadius: 0 },
+                { data: [{x:1,y:0}], backgroundColor: '#4A90E2', pointRadius: 5, pointStyle: 'triangle', rotation: 90 },
+                { data: [{x:0,y:1}], backgroundColor: '#50E3C2', pointRadius: 5, pointStyle: 'triangle', rotation: 90 },
+            ]
+        },
+        options: { ...chartDefaultOptions, plugins: {legend: {display: false}} }
+    });
+
+    function updateView(view) {
+        viewTabs.forEach(t => t.classList.remove('active'));
+        document.querySelector(`[data-view="${view}"]`).classList.add('active');
+        viewText.innerHTML = explanations[view];
+
+        row1.style.backgroundColor = 'transparent';
+        row2.style.backgroundColor = 'transparent';
+
+        const transformedI = [{x:0,y:0},{x:2,y:1}];
+        const transformedJ = [{x:0,y:0},{x:1,y:3}];
+
+        if (view === 'row') {
+            row1.style.backgroundColor = 'rgba(74, 144, 226, 0.2)';
+            row2.style.backgroundColor = 'rgba(80, 227, 194, 0.2)';
+            basisViewChart.data.datasets[0].data = [{x:0,y:0},{x:1,y:0}];
+            basisViewChart.data.datasets[1].data = [{x:0,y:0},{x:0,y:1}];
+            basisViewChart.data.datasets[2].data = [{x:1,y:0}];
+            basisViewChart.data.datasets[3].data = [{x:0,y:1}];
+        } else if (view === 'column') {
+            basisViewChart.data.datasets[0].data = [{x:0,y:0},{x:1,y:0}];
+            basisViewChart.data.datasets[1].data = [{x:0,y:0},{x:0,y:1}];
+            basisViewChart.data.datasets[2].data = [{x:1,y:0}];
+            basisViewChart.data.datasets[3].data = [{x:0,y:1}];
+        } else if (view === 'basis') {
+            basisViewChart.data.datasets[0].data = transformedI;
+            basisViewChart.data.datasets[1].data = transformedJ;
+            basisViewChart.data.datasets[2].data = [{x:2,y:1}];
+            basisViewChart.data.datasets[3].data = [{x:1,y:3}];
+        }
+        basisViewChart.update();
+    }
+    viewTabs.forEach(tab => tab.addEventListener('click', () => updateView(tab.dataset.view)));
+    updateView('row');
+
+    // Section 2: Matrix-Vector Multiplication
+    const mvInputs = ['mv-m11', 'mv-m12', 'mv-m21', 'mv-m22', 'mv-v1', 'mv-v2'].map(id => document.getElementById(id));
+    const mvResultEl = document.getElementById('mv-result');
+    const mvColViewEl = document.getElementById('mv-col-view');
+    const mvRowViewEl = document.getElementById('mv-row-view');
+    
+    const mvCtx = document.getElementById('mvChart').getContext('2d');
+    const mvChart = new Chart(mvCtx, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                { label: 'Original Vector / เวกเตอร์เดิม', data: [], showLine: true, borderColor: '#9CA3AF', borderWidth: 2 },
+                { label: 'Transformed Vector / เวกเตอร์แปลงแล้ว', data: [], showLine: true, borderColor: '#4A90E2', borderWidth: 3 },
+                { data: [], backgroundColor: '#4A90E2', pointRadius: 5, pointStyle: 'triangle', rotation: 90 }
+            ]
+        },
+        options: chartDefaultOptions
+    });
+
+    function updateMV() {
+        const [m11, m12, m21, m22, v1, v2] = mvInputs.map(el => parseFloat(el.value) || 0);
+        
+        const resX = m11 * v1 + m12 * v2;
+        const resY = m21 * v1 + m22 * v2;
+        
+        mvResultEl.innerHTML = `[ <div class="inline-block text-center">${resX.toFixed(2)}<br/>${resY.toFixed(2)}</div> ]`;
+        
+        mvColViewEl.textContent = `${v1.toFixed(2)}*[${m11}, ${m21}] + ${v2.toFixed(2)}*[${m12}, ${m22}] = [${resX.toFixed(2)}, ${resY.toFixed(2)}]`;
+        mvRowViewEl.textContent = `[(${m11}*${v1})+(${m12}*${v2})], [(${m21}*${v1})+(${m22}*${v2})] = [${resX.toFixed(2)}, ${resY.toFixed(2)}]`;
+
+        mvChart.data.datasets[0].data = [{x:0, y:0}, {x:v1, y:v2}];
+        mvChart.data.datasets[1].data = [{x:0, y:0}, {x:resX, y:resY}];
+        mvChart.data.datasets[2].data = [{x:resX, y:resY}];
+        mvChart.update();
+    }
+    mvInputs.forEach(el => el.addEventListener('input', updateMV));
+    updateMV();
+
+    // Section 3: Transformations
+    const transformInputs = {
+        scaleX: document.getElementById('scaleX'),
+        scaleY: document.getElementById('scaleY'),
+        rotation: document.getElementById('rotation'),
+        shearX: document.getElementById('shearX'),
+        translateX: document.getElementById('translateX'),
+        translateY: document.getElementById('translateY'),
+        homogeneousToggle: document.getElementById('homogeneousToggle')
+    };
+
+    const transformValueSpans = {
+        scaleX: document.getElementById('scaleX-val'),
+        scaleY: document.getElementById('scaleY-val'),
+        rotation: document.getElementById('rotation-val'),
+        shearX: document.getElementById('shearX-val'),
+        translateX: document.getElementById('translateX-val'),
+        translateY: document.getElementById('translateY-val'),
+    };
+    
+    const identityMatrixDisplayEl = document.getElementById('identity-matrix-display');
+    const matrixDisplayEl = document.getElementById('matrix-display');
+    const matrixCalculationDisplayEl = document.getElementById('matrix-calculation-display');
+    const pointCalculationDisplayEl = document.getElementById('point-calculation-display');
+    const homogeneousExplainerEl = document.getElementById('homogeneous-explainer');
+
+    const transformCtx = document.getElementById('transformChart').getContext('2d');
+    const originalSquare = [{x:0.5, y:-0.5}, {x:0.5, y:0.5}, {x:-0.5, y:0.5}, {x:-0.5, y:-0.5}, {x:0.5, y:-0.5}];
+
+    const transformChart = new Chart(transformCtx, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                { label: 'Original / ต้นฉบับ', data: originalSquare, showLine: true, borderColor: '#9CA3AF', borderWidth: 2, borderDash: [5, 5], fill: false },
+                { label: 'Transformed / แปลงแล้ว', data: [], showLine: true, borderColor: '#50E3C2', borderWidth: 3, fill: false, backgroundColor: 'rgba(80, 227, 194, 0.2)' }
+            ]
+        },
+        options: chartDefaultOptions
+    });
+    
+    function multiplyMatrices(A, B) {
+        const C = [];
+        for (let i = 0; i < A.length; i++) {
+            C[i] = [];
+            for (let j = 0; j < B[0].length; j++) {
+                let sum = 0;
+                for (let k = 0; k < A[0].length; k++) {
+                    sum += A[i][k] * B[k][j];
+                }
+                C[i][j] = sum;
+            }
+        }
+        return C;
+    }
+
+    function formatMatrixHTML(matrix, colorClass = 'bg-gray-200 text-gray-700') {
+        let html = `<div class="inline-block text-center p-2 ${colorClass} rounded">`;
+        matrix.forEach(row => {
+            html += '<div>';
+            row.forEach(val => {
+                html += `<span class="inline-block w-12">${val.toFixed(2)}</span>`;
+            });
+            html += '</div>';
+        });
+        html += '</div>';
+        return html;
+    }
+
+    function formatVectorHTML(vector, colorClass = 'bg-gray-200 text-gray-700') {
+        let html = `<div class="inline-block text-center p-2 ${colorClass} rounded">`;
+        vector.forEach(val => {
+            html += `<div>${val.toFixed(2)}</div>`;
+        });
+        html += '</div>';
+        return html;
+    }
+    
+    function updateTransforms() {
+        const vals = {};
+        for (const key in transformInputs) {
+            vals[key] = key === 'homogeneousToggle' ? transformInputs[key].checked : parseFloat(transformInputs[key].value);
+            if (transformValueSpans[key]) transformValueSpans[key].textContent = vals[key];
+        }
+
+        const rad = vals.rotation * (Math.PI / 180);
+        const cos = Math.cos(rad);
+        const sin = Math.sin(rad);
+
+        let finalMatrix, transformedSquare, calcHTML = '', pointCalcHTML = '';
+        const samplePoint = originalSquare[1]; // {x: 0.5, y: 0.5}
+
+        if (vals.homogeneousToggle) {
+            const transM = [[1, 0, vals.translateX], [0, 1, vals.translateY], [0, 0, 1]];
+            const rotM = [[cos, -sin, 0], [sin, cos, 0], [0, 0, 1]];
+            const shearM = [[1, vals.shearX, 0], [0, 1, 0], [0, 0, 1]];
+            const scaleM = [[vals.scaleX, 0, 0], [0, vals.scaleY, 0], [0, 0, 1]];
+
+            finalMatrix = multiplyMatrices(multiplyMatrices(multiplyMatrices(transM, rotM), shearM), scaleM);
+            
+            transformedSquare = originalSquare.map(p => {
+                const x = finalMatrix[0][0] * p.x + finalMatrix[0][1] * p.y + finalMatrix[0][2];
+                const y = finalMatrix[1][0] * p.x + finalMatrix[1][1] * p.y + finalMatrix[1][2];
+                return {x, y};
+            });
+            
+            calcHTML = `<div class="flex items-center justify-center flex-wrap gap-x-2 gap-y-4">
+                ${formatMatrixHTML(transM)} <span class="text-xl">×</span> ${formatMatrixHTML(rotM)} <span class="text-xl">×</span> ${formatMatrixHTML(shearM)} <span class="text-xl">×</span> ${formatMatrixHTML(scaleM)}
+            </div>`;
+            
+            identityMatrixDisplayEl.innerHTML = `<div>1.00, 0.00, 0.00</div><div>0.00, 1.00, 0.00</div><div>0.00, 0.00, 1.00</div>`;
+
+            const originalVector = [samplePoint.x, samplePoint.y, 1];
+            const transformedVector = [transformedSquare[1].x, transformedSquare[1].y, 1];
+            pointCalcHTML = `<div class="flex items-center justify-center flex-wrap gap-x-2 gap-y-4">
+                ${formatMatrixHTML(finalMatrix, 'bg-gray-300')} <span class="text-xl">×</span> ${formatVectorHTML(originalVector)} <span class="text-xl">=</span> ${formatVectorHTML(transformedVector, 'bg-teal-100 text-teal-800')}
+            </div>`;
+
+        } else {
+            const rotM = [[cos, -sin], [sin, cos]];
+            const shearM = [[1, vals.shearX], [0, 1]];
+            const scaleM = [[vals.scaleX, 0], [0, vals.scaleY]];
+            
+            finalMatrix = multiplyMatrices(multiplyMatrices(rotM, shearM), scaleM);
+            
+             transformedSquare = originalSquare.map(p => {
+                const x = finalMatrix[0][0] * p.x + finalMatrix[0][1] * p.y;
+                const y = finalMatrix[1][0] * p.x + finalMatrix[1][1] * p.y;
+                return {x, y};
+            });
+
+            calcHTML = `<div class="flex items-center justify-center flex-wrap gap-x-2 gap-y-4">
+                ${formatMatrixHTML(rotM)} <span class="text-xl">×</span> ${formatMatrixHTML(shearM)} <span class="text-xl">×</span> ${formatMatrixHTML(scaleM)}
+            </div>`;
+
+            identityMatrixDisplayEl.innerHTML = `<div>1.00, 0.00</div><div>0.00, 1.00</div>`;
+
+            const originalVector = [samplePoint.x, samplePoint.y];
+            const transformedVector = [transformedSquare[1].x, transformedSquare[1].y];
+            pointCalcHTML = `<div class="flex items-center justify-center flex-wrap gap-x-2 gap-y-4">
+                ${formatMatrixHTML(finalMatrix, 'bg-gray-300')} <span class="text-xl">×</span> ${formatVectorHTML(originalVector)} <span class="text-xl">=</span> ${formatVectorHTML(transformedVector, 'bg-teal-100 text-teal-800')}
+            </div>`;
+        }
+
+        matrixDisplayEl.innerHTML = finalMatrix.map(row => `<div>${row.map(v => v.toFixed(2)).join(', ')}</div>`).join('');
+        matrixCalculationDisplayEl.innerHTML = calcHTML;
+        pointCalculationDisplayEl.innerHTML = pointCalcHTML;
+        transformChart.data.datasets[1].data = transformedSquare;
+        transformChart.update();
+    }
+
+    transformInputs.homogeneousToggle.addEventListener('change', () => {
+        const isHomogeneous = transformInputs.homogeneousToggle.checked;
+        transformInputs.translateX.disabled = !isHomogeneous;
+        transformInputs.translateY.disabled = !isHomogeneous;
+        homogeneousExplainerEl.classList.toggle('hidden', !isHomogeneous);
+        if (!isHomogeneous) {
+            transformInputs.translateX.value = 0;
+            transformInputs.translateY.value = 0;
+        }
+        updateTransforms();
+    });
+
+    Object.values(transformInputs).forEach(el => el.addEventListener('input', updateTransforms));
+    updateTransforms();
+});
+</script>
+
+</body>
+</html>
+

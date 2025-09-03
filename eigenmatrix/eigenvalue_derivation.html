@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eigenvalue Formula Derivation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.26.0/plotly.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            line-height: 1.6;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            font-size: 2.5em;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+        }
+        
+        h2 {
+            color: #34495e;
+            font-size: 1.8em;
+            margin-top: 40px;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .math-formula {
+            background: #e8f4f8;
+            border: 2px solid #3498db;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .key-insight {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .example-box {
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .why-box {
+            background: linear-gradient(45deg, #9b59b6, #8e44ad);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .plot-container {
+            width: 100%;
+            height: 400px;
+            margin: 20px 0;
+        }
+        
+        .matrix {
+            font-family: monospace;
+            font-size: 1.1em;
+            text-align: center;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Where Does det(C - λI) = 0 Come From?</h1>
+        <p style="text-align: center; font-size: 1.2em; color: #7f8c8d;">
+            The mathematical derivation of the characteristic equation for finding eigenvalues
+        </p>
+
+        <h2>Step 1: Definition of Eigenvalues and Eigenvectors</h2>
+        <div class="step">
+            <p><strong>By definition:</strong> λ (lambda) is an eigenvalue of matrix C, and v is the corresponding eigenvector if:</p>
+            <div class="math-formula">
+                <strong>C v = λ v</strong>
+            </div>
+            <p><strong>What this means:</strong></p>
+            <ul>
+                <li>When we multiply matrix C by vector v, we get the same vector v scaled by λ</li>
+                <li>The matrix C "stretches" or "shrinks" vector v by factor λ, but doesn't change its direction</li>
+                <li>This is the fundamental property that makes v an eigenvector with eigenvalue λ</li>
+            </ul>
+        </div>
+
+        <h2>Step 2: Rearrange the Eigenvalue Equation</h2>
+        <div class="step">
+            <p>Starting from <strong>C v = λ v</strong>, let's rearrange this equation:</p>
+            <div class="math-formula">
+                C v = λ v<br><br>
+                C v - λ v = 0<br><br>
+                C v - λ I v = 0   <span style="color: #e74c3c;">(since I v = v)</span><br><br>
+                <strong>(C - λ I) v = 0</strong>
+            </div>
+            <div class="why-box">
+                <strong>Why multiply λ by I?</strong><br>
+                We need λ to be a matrix to subtract it from C. Since λ is a scalar, we multiply it by the identity matrix I to make it the same size as C.
+            </div>
+        </div>
+
+        <h2>Step 3: The Critical Insight</h2>
+        <div class="step">
+            <p>Now we have: <strong>(C - λI) v = 0</strong></p>
+            <p>This is a <strong>homogeneous system of linear equations</strong>. For this system to have a <strong>non-trivial solution</strong> (v ≠ 0), we need:</p>
+            <div class="key-insight">
+                The matrix (C - λI) must be SINGULAR<br>
+                (i.e., not invertible, determinant = 0)
+            </div>
+            <div class="why-box">
+                <strong>Why must the determinant be zero?</strong><br><br>
+                • If det(C - λI) ≠ 0 → (C - λI) is invertible<br>
+                • Then we can multiply both sides by (C - λI)⁻¹<br>
+                • This gives us: v = (C - λI)⁻¹ × 0 = 0<br>
+                • But we want non-zero eigenvectors!<br><br>
+                • If det(C - λI) = 0 → (C - λI) is singular<br>
+                • The system has infinitely many solutions (non-zero v exists!)
+            </div>
+        </div>
+
+        <h2>Step 4: The Characteristic Equation</h2>
+        <div class="step">
+            <p>Therefore, for eigenvalues to exist, we need:</p>
+            <div class="math-formula">
+                <strong>det(C - λI) = 0</strong>
+            </div>
+            <p>This is called the <strong>characteristic equation</strong> of matrix C.</p>
+            <ul>
+                <li>It's a polynomial in λ (called the characteristic polynomial)</li>
+                <li>For an n×n matrix, it's a polynomial of degree n</li>
+                <li>The roots of this polynomial are the eigenvalues</li>
+            </ul>
+        </div>
+
+        <h2>Step 5: Concrete Example with 2×2 Matrix</h2>
+        <div class="example-box">
+            <p><strong>Let's see this in action with our PCA covariance matrix:</strong></p>
+            <div class="matrix">
+                C = [1.667  2.667]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;[2.667  4.333]
+            </div>
+            <p><strong>Step-by-step calculation:</strong></p>
+        </div>
+        
+        <div class="step">
+            <p><strong>1) Form (C - λI):</strong></p>
+            <div class="matrix">
+                C - λI = [1.667  2.667] - λ[1  0] = [1.667-λ  2.667&nbsp;&nbsp;&nbsp;]<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[2.667  4.333]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[0  1]&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[2.667&nbsp;&nbsp;&nbsp;&nbsp;4.333-λ]
+            </div>
+            
+            <p><strong>2) Calculate the determinant:</strong></p>
+            <div class="math-formula">
+                det(C - λI) = (1.667-λ)(4.333-λ) - (2.667)(2.667)<br><br>
+                = (1.667×4.333) - (1.667λ) - (4.333λ) + λ² - 7.111<br><br>
+                = 7.222 - 6.000λ + λ² - 7.111<br><br>
+                = <strong>λ² - 6.000λ + 0.111</strong>
+            </div>
+            
+            <p><strong>3) Set equal to zero and solve:</strong></p>
+            <div class="math-formula">
+                λ² - 6.000λ + 0.111 = 0<br><br>
+                Using quadratic formula:<br>
+                λ = (6 ± √(36 - 0.444))/2 = (6 ± √35.556)/2<br><br>
+                <strong>λ₁ ≈ 5.981, λ₂ ≈ 0.019</strong>
+            </div>
+        </div>
+
+        <h2>Step 6: Visual Understanding</h2>
+        <div class="step">
+            <p>Let's visualize what eigenvalues and eigenvectors mean geometrically:</p>
+            <div id="eigenPlot" class="plot-container"></div>
+        </div>
+
+        <h2>Step 7: Why This Formula is Fundamental</h2>
+        <div class="key-insight">
+            The characteristic equation det(C - λI) = 0 is the bridge between:<br><br>
+            📐 <strong>Geometric concept:</strong> "Directions that don't change under transformation"<br>
+            ⟺<br>
+            🔢 <strong>Algebraic method:</strong> "Roots of a polynomial equation"
+        </div>
+
+        <div class="step">
+            <p><strong>This formula is used everywhere in mathematics because it:</strong></p>
+            <ul>
+                <li><strong>Converts geometry to algebra:</strong> Turns the geometric concept of "unchanged directions" into a solvable equation</li>
+                <li><strong>Works for any square matrix:</strong> Not just 2×2, but 3×3, 100×100, etc.</li>
+                <li><strong>Connects to many applications:</strong> PCA, vibration analysis, quantum mechanics, Google's PageRank, etc.</li>
+                <li><strong>Provides systematic method:</strong> No guessing needed - just solve the characteristic equation!</li>
+            </ul>
+        </div>
+
+        <div class="example-box">
+            <p><strong>Fun Fact:</strong> The characteristic equation for an n×n matrix gives you exactly n eigenvalues (counting multiplicity). For our 2×2 covariance matrix, we get exactly 2 eigenvalues, which become our 2 principal components!</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Create a visualization showing the geometric meaning of eigenvalues
+        const data = [
+            [-1.5, -2.5], [-0.5, -0.5], [0.5, 0.5], [1.5, 2.5]
+        ];
+        
+        const pc1 = [0.528, 0.849];
+        const pc2 = [0.849, -0.528];
+        
+        // Original vectors
+        const originalVectors = {
+            x: [0, data[0][0], null, 0, data[1][0], null, 0, data[2][0], null, 0, data[3][0]],
+            y: [0, data[0][1], null, 0, data[1][1], null, 0, data[2][1], null, 0, data[3][1]],
+            mode: 'lines+markers',
+            type: 'scatter',
+            line: { width: 2, color: 'blue' },
+            marker: { size: 8, color: 'blue' },
+            name: 'Original vectors'
+        };
+        
+        // Eigenvector PC1
+        const eigenvector1 = {
+            x: [0, 2*pc1[0]],
+            y: [0, 2*pc1[1]],
+            mode: 'lines+markers',
+            type: 'scatter',
+            line: { width: 4, color: 'red' },
+            marker: { size: 12, color: 'red', symbol: 'arrow-right' },
+            name: 'PC1 Eigenvector'
+        };
+        
+        // Eigenvector PC2  
+        const eigenvector2 = {
+            x: [0, 1*pc2[0]],
+            y: [0, 1*pc2[1]],
+            mode: 'lines+markers',
+            type: 'scatter',
+            line: { width: 4, color: 'green' },
+            marker: { size: 12, color: 'green', symbol: 'arrow-right' },
+            name: 'PC2 Eigenvector'
+        };
+
+        Plotly.newPlot('eigenPlot', [originalVectors, eigenvector1, eigenvector2], {
+            title: 'Eigenvalues & Eigenvectors: Special Directions in Data Space',
+            xaxis: { 
+                title: 'X₁ (centered)', 
+                range: [-2, 2], 
+                zeroline: true,
+                gridcolor: '#f0f0f0'
+            },
+            yaxis: { 
+                title: 'X₂ (centered)', 
+                range: [-3, 2], 
+                zeroline: true,
+                gridcolor: '#f0f0f0'
+            },
+            showlegend: true,
+            annotations: [
+                {
+                    x: 1.5,
+                    y: 1.5,
+                    text: 'Red: PC1 (λ₁=5.981)<br>Direction of max variance<br><br>Green: PC2 (λ₂=0.019)<br>Direction of min variance',
+                    showarrow: false,
+                    bgcolor: 'rgba(255,255,255,0.8)',
+                    bordercolor: '#333',
+                    font: { size: 11 }
+                }
+            ]
+        });
+    </script>
+</body>
+</html>

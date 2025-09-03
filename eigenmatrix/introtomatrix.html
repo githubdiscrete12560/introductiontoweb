@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>An Introduction to Matrices: A Visual Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#CAF0F8] text-[#03045E]">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-6xl font-black text-[#0077B6] mb-2">An Introduction to Matrices</h1>
+            <p class="text-lg md:text-xl text-[#00B4D8]">A Visual Guide to the Building Blocks of Linear Algebra</p>
+        </header>
+        
+        <main class="space-y-8">
+        
+            <section id="what-is-a-matrix" class="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-[#0077B6] mb-4">What is a Matrix? Three Perspectives</h2>
+                <p class="mb-6 text-base">A matrix is a rectangular grid of numbers, but its true power lies in how we interpret it. Understanding these three viewpoints is key to unlocking their utility in graphics, data science, and physics.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    <div class="border-2 border-[#90E0EF] rounded-lg p-4 text-center">
+                        <h3 class="text-xl font-bold mb-2">1. The Row View</h3>
+                        <p class="mb-4">A stack of horizontal vectors. Each row can represent a data point or an equation.</p>
+                        <div class="font-mono text-lg p-2 bg-[#CAF0F8] rounded">
+                            <p>[a, b, c]</p>
+                            <p>[d, e, f]</p>
+                        </div>
+                    </div>
+                    
+                    <div class="border-2 border-[#90E0EF] rounded-lg p-4 text-center">
+                        <h3 class="text-xl font-bold mb-2">2. The Column View</h3>
+                        <p class="mb-4">A collection of vertical vectors. This view is crucial for understanding transformations.</p>
+                         <div class="font-mono text-lg p-2 bg-[#CAF0F8] rounded flex justify-center gap-4">
+                            <div><p>a</p><p>d</p></div>
+                            <div><p>b</p><p>e</p></div>
+                            <div><p>c</p><p>f</p></div>
+                        </div>
+                    </div>
+
+                    <div class="border-2 border-[#90E0EF] rounded-lg p-4 text-center">
+                        <h3 class="text-xl font-bold mb-2">3. The Basis Vector View</h3>
+                        <p class="mb-4">A recipe for transforming space. The columns tell us where the original axes land.</p>
+                        <div class="chart-container h-48">
+                           <canvas id="basisTransformChart"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section id="operations" class="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-[#0077B6] mb-4">Core Operations</h2>
+                <p class="mb-6">Multiplying matrices and vectors is the engine of linear algebra. These operations combine data and compose transformations, with different viewpoints offering unique insights into the process.</p>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    
+                    <div class="space-y-4">
+                        <h3 class="text-2xl font-bold text-center text-[#00B4D8]">Matrix-Vector Multiplication</h3>
+                        <p class="text-center">This operation transforms a vector. It can be seen as a weighted sum of the matrix's columns (Column View) or a series of dot products with the matrix's rows (Row View). Both methods yield the same result: a new, transformed vector.</p>
+                         <div class="chart-container h-64">
+                            <canvas id="vectorMultiplyChart"></canvas>
+                         </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <h3 class="text-2xl font-bold text-center text-[#00B4D8]">Matrix-Matrix Multiplication</h3>
+                        <p class="text-center">This operation combines two transformations into one. The element in the result's first row and first column, for example, is the dot product of the first matrix's first row and the second matrix's first column. The order matters: AB is not the same as BA.</p>
+                        <div class="flex flex-col items-center justify-center bg-[#CAF0F8] p-4 rounded-lg h-full min-h-[250px]">
+                            <div class="flex items-center gap-4">
+                                <div class="font-mono text-center p-2 border-2 border-[#00B4D8] rounded">
+                                    <div class="bg-[#90E0EF] px-1">[1, 2]</div>
+                                    <div>[3, 4]</div>
+                                </div>
+                                <span class="text-2xl font-bold">&times;</span>
+                                <div class="font-mono text-center p-2 border-2 border-[#00B4D8] rounded">
+                                    <div class="inline-block bg-[#90E0EF] p-1 leading-4"><p>5</p><p>7</p></div>
+                                    <div class="inline-block p-1 leading-4"><p>6</p><p>8</p></div>
+                                </div>
+                                <span class="text-2xl font-bold">=</span>
+                                 <div class="font-mono text-center p-2 border-2 border-[#00B4D8] rounded">
+                                    <div class="bg-[#90E0EF] px-1">[19, 22]</div>
+                                    <div>[43, 50]</div>
+                                </div>
+                            </div>
+                            <p class="mt-4 text-sm">C₁₁ = (1&times;5) + (2&times;7) = 19</p>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+            
+            <section id="transforms" class="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 md:p-8">
+                 <h2 class="text-3xl font-bold text-[#0077B6] mb-4">Matrices as Geometric Transformations</h2>
+                <p class="mb-6">In Euclidean space (our familiar grid), matrices don't just sit on a page; they actively manipulate points and shapes. Multiplying a vector by a matrix transforms it, leading to scaling, rotation, shearing, and more. Here, we see how different matrices transform a simple unit square.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    
+                    <div>
+                        <h3 class="text-xl font-bold text-center mb-2">Scaling</h3>
+                        <div class="chart-container">
+                            <canvas id="scaleChart"></canvas>
+                        </div>
+                        <p class="text-center text-sm mt-2">Stretches or shrinks space. Uneven scaling values will distort proportions.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-center mb-2">Rotation</h3>
+                        <div class="chart-container">
+                            <canvas id="rotateChart"></canvas>
+                        </div>
+                        <p class="text-center text-sm mt-2">Rotates all points around the origin by a specified angle.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-center mb-2">Shearing</h3>
+                        <div class="chart-container">
+                            <canvas id="shearChart"></canvas>
+                        </div>
+                        <p class="text-center text-sm mt-2">Tilts one axis relative to another, turning squares into parallelograms.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="homogeneous" class="bg-white/80 backdrop-blur-sm rounded-lg shadow-lg p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-[#0077B6] mb-4">The Power of Homogeneous Coordinates</h2>
+                <p class="mb-6">Standard matrix multiplication can scale, rotate, and shear, but it can't perform translation (shifting). This is because it must always leave the origin (0,0) unchanged. To overcome this, we use homogeneous coordinates, a clever trick that adds an extra dimension.</p>
+                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <p class="mb-4">By representing a 2D point (x, y) as a 3D point (x, y, 1), we can use a larger 3x3 matrix. This new matrix has room to encode translation, alongside rotation and scaling. It allows us to combine a whole sequence of transformations into a single matrix, which is incredibly efficient for computer graphics and robotics.</p>
+                        <div class="font-mono p-4 bg-[#CAF0F8] rounded-lg text-center text-sm md:text-base">
+                            <p class="font-bold mb-2">Point P(x, y) &rarr; Translate by (Tₓ, Tᵧ)</p>
+                            <p>
+                                <span class="font-bold text-lg text-[#0077B6]">
+                                    [ 1  0  Tₓ ]<br>
+                                    [ 0  1  Tᵧ ]<br>
+                                    [ 0  0  1  ]
+                                </span>
+                                <span class="font-bold text-lg mx-2">&times;</span>
+                                <span class="font-bold text-lg text-[#00B4D8]">
+                                    [ x ]<br>
+                                    [ y ]<br>
+                                    [ 1 ]
+                                </span>
+                                <span class="font-bold text-lg mx-2">=</span>
+                                <span class="font-bold text-lg text-[#03045E]">
+                                    [ x + Tₓ ]<br>
+                                    [ y + Tᵧ ]<br>
+                                    [ 1 ]
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div>
+                         <h3 class="text-xl font-bold text-center mb-2">Visualizing Translation</h3>
+                         <p class="text-center text-sm mb-2">The transformation can now move the point away from the origin.</p>
+                         <div class="chart-container">
+                             <canvas id="translateChart"></canvas>
+                         </div>
+                    </div>
+                 </div>
+            </section>
+            
+        </main>
+        
+        <footer class="text-center mt-12 py-6 border-t-2 border-[#90E0EF]">
+            <h3 class="text-2xl font-bold text-[#0077B6] mb-2">Key Takeaways</h3>
+            <ul class="list-none space-y-1 text-[#03045E]">
+                <li>Matrices offer multiple perspectives: rows, columns, and transformations.</li>
+                <li>Matrix operations are the engine for transforming data and space.</li>
+                <li>Homogeneous coordinates enable translation and the composition of complex transformations.</li>
+            </ul>
+        </footer>
+
+    </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const COLORS = {
+        primary: '#0077B6',
+        secondary: '#00B4D8',
+        accent: '#90E0EF',
+        text: '#03045E',
+        background: '#CAF0F8'
+    };
+
+    function processLabels(labels) {
+        const charLimit = 16;
+        return labels.map(label => {
+            if (typeof label !== 'string' || label.length <= charLimit) {
+                return label;
+            }
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + ' ' + word).trim().length > charLimit) {
+                    lines.push(currentLine.trim());
+                    currentLine = word;
+                } else {
+                    currentLine = (currentLine + ' ' + word).trim();
+                }
+            }
+            if (currentLine) {
+                lines.push(currentLine.trim());
+            }
+            return lines;
+        });
+    }
+
+    const defaultTooltipOptions = {
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    title: function(tooltipItems) {
+                        const item = tooltipItems[0];
+                        let label = item.chart.data.labels[item.dataIndex];
+                        if (Array.isArray(label)) {
+                          return label.join(' ');
+                        } else {
+                          return label;
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+    function createScatterPlot(ctx, datasets, title) {
+        return new Chart(ctx, {
+            type: 'scatter',
+            data: { datasets },
+            options: {
+                ...defaultTooltipOptions,
+                maintainAspectRatio: false,
+                responsive: true,
+                scales: {
+                    x: {
+                        grid: { color: 'rgba(144, 224, 239, 0.3)' },
+                        ticks: { color: COLORS.text }
+                    },
+                    y: {
+                        grid: { color: 'rgba(144, 224, 239, 0.3)' },
+                        ticks: { color: COLORS.text }
+                    }
+                },
+                plugins: {
+                    ...defaultTooltipOptions.plugins,
+                    legend: {
+                        labels: { color: COLORS.text }
+                    },
+                    title: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+
+    const basisCtx = document.getElementById('basisTransformChart');
+    if (basisCtx) {
+        const basisData = {
+            datasets: [{
+                label: 'Original Basis',
+                data: [{x: 0, y: 0}, {x: 1, y: 0}, {x: 0, y: 0}, {x: 0, y: 1}],
+                borderColor: COLORS.secondary,
+                backgroundColor: COLORS.secondary,
+                borderWidth: 3,
+                showLine: true,
+                pointRadius: 4,
+                fill: false
+            }, {
+                label: 'Transformed Basis',
+                data: [{x: 0, y: 0}, {x: 2, y: 1}, {x: 0, y: 0}, {x: 1, y: 3}],
+                borderColor: COLORS.primary,
+                backgroundColor: COLORS.primary,
+                borderWidth: 3,
+                showLine: true,
+                pointRadius: 4,
+                fill: false
+            }]
+        };
+        createScatterPlot(basisCtx, basisData.datasets, 'Basis Vector Transformation');
+    }
+    
+    const vectorMultiplyCtx = document.getElementById('vectorMultiplyChart');
+    if (vectorMultiplyCtx) {
+        new Chart(vectorMultiplyCtx, {
+            type: 'bar',
+            data: {
+                labels: processLabels(['Result Vector Component 1', 'Result Vector Component 2']),
+                datasets: [{
+                    label: 'Resulting Vector: [3, 19]',
+                    data: [3, 19],
+                    backgroundColor: [COLORS.secondary, COLORS.primary],
+                    borderColor: [COLORS.primary, COLORS.secondary],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                ...defaultTooltipOptions,
+                maintainAspectRatio: false,
+                responsive: true,
+                indexAxis: 'y',
+                scales: {
+                    x: { beginAtZero: true, grid: { color: 'rgba(144, 224, 239, 0.3)' }, ticks: { color: COLORS.text } },
+                    y: { grid: { display: false }, ticks: { color: COLORS.text } }
+                },
+                plugins: {
+                    ...defaultTooltipOptions.plugins,
+                    legend: { display: false },
+                    title: { display: true, text: 'Matrix-Vector Product', color: COLORS.text, font: { size: 16 } }
+                }
+            }
+        });
+    }
+
+    const unitSquare = [{x:0,y:0}, {x:1,y:0}, {x:1,y:1}, {x:0,y:1}, {x:0,y:0}];
+    
+    const scaleCtx = document.getElementById('scaleChart');
+    if (scaleCtx) {
+        const scaledSquare = [{x:0,y:0}, {x:1.5,y:0}, {x:1.5,y:0.5}, {x:0,y:0.5}, {x:0,y:0}];
+        createScatterPlot(scaleCtx, [{
+            label: 'Original',
+            data: unitSquare,
+            borderColor: COLORS.secondary,
+            showLine: true,
+            fill: false
+        }, {
+            label: 'Scaled',
+            data: scaledSquare,
+            borderColor: COLORS.primary,
+            showLine: true,
+            fill: false
+        }]);
+    }
+    
+    const rotateCtx = document.getElementById('rotateChart');
+    if (rotateCtx) {
+        const rad = Math.PI / 4; 
+        const rotatedSquare = unitSquare.map(p => ({
+            x: p.x * Math.cos(rad) - p.y * Math.sin(rad),
+            y: p.x * Math.sin(rad) + p.y * Math.cos(rad)
+        }));
+        createScatterPlot(rotateCtx, [{
+            label: 'Original',
+            data: unitSquare,
+            borderColor: COLORS.secondary,
+            showLine: true,
+            fill: false
+        }, {
+            label: 'Rotated',
+            data: rotatedSquare,
+            borderColor: COLORS.primary,
+            showLine: true,
+            fill: false
+        }]);
+    }
+
+    const shearCtx = document.getElementById('shearChart');
+    if (shearCtx) {
+        const shearedSquare = unitSquare.map(p => ({ x: p.x + 0.5 * p.y, y: p.y }));
+        createScatterPlot(shearCtx, [{
+            label: 'Original',
+            data: unitSquare,
+            borderColor: COLORS.secondary,
+            showLine: true,
+            fill: false
+        }, {
+            label: 'Sheared',
+            data: shearedSquare,
+            borderColor: COLORS.primary,
+            showLine: true,
+            fill: false
+        }]);
+    }
+
+    const translateCtx = document.getElementById('translateChart');
+    if (translateCtx) {
+        createScatterPlot(translateCtx, [{
+            label: 'Original Point (2, 3)',
+            data: [{x: 2, y: 3}],
+            backgroundColor: COLORS.secondary,
+            pointRadius: 6,
+            pointStyle: 'circle'
+        }, {
+            label: 'Translated Point (6, 5)',
+            data: [{x: 6, y: 5}],
+            backgroundColor: COLORS.primary,
+            pointRadius: 6,
+            pointStyle: 'rectRot'
+        }]);
+    }
+});
+</script>
+</body>
+</html>
