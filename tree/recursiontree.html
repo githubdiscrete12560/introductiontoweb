@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Recursion Playground / สนามทดลอง Recursion แบบอินเทอร์แอคทีฟ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The application is designed with two main sections to facilitate learning. First, a static "Concepts" section introduces the core theory of recursion, its components (base case, recursive step), and its relationship with trees, directly adapting the initial slides. This ensures a solid theoretical foundation. The second, and primary, section is an "Interactive Playground." This section uses a two-column layout: a visual representation of the tree on the left and a control panel on the right. This structure was chosen because it allows users to immediately apply theory to practice. By clicking buttons to run recursive functions, users can see the code, the result, and a step-by-step animation of the algorithm on the tree itself. This direct cause-and-effect interaction is far more effective for understanding an abstract concept like recursion than a passive slide-based presentation. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Core concepts of recursion. Goal: Inform. Viz/Method: Static, well-formatted text blocks using HTML and Tailwind CSS. Justification: Clear and direct presentation for foundational knowledge.
+        - Report Info: Sample tree data structure. Goal: Organize/Interact. Viz/Method: A visual tree built with semantic HTML (nested divs) and styled with CSS. Interaction: Nodes can be highlighted via JavaScript. Justification: Using the DOM for the tree makes it easy to manipulate and animate individual nodes, which is key to visualizing the algorithms. CONFIRMS NO SVG/Mermaid.
+        - Report Info: Four recursive algorithms (size, height, find, in-order). Goal: Engage/Demonstrate. Viz/Method: Interactive buttons, a code display area, and a results panel. Interaction: Buttons trigger the corresponding JS function. An animation sequence highlights nodes on the visual tree in the order they are processed by the algorithm. The final result is displayed. Justification: This interactive loop provides immediate visual feedback, making the abstract flow of recursive calls tangible and easy to follow.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Sarabun:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+        }
+        .tree {
+            text-align: center;
+        }
+        .tree ul {
+            display: inline-flex;
+            padding-top: 20px;
+            position: relative;
+            transition: all 0.5s;
+        }
+        .tree li {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            list-style-type: none;
+            position: relative;
+            padding: 20px 5px 0 5px;
+            transition: all 0.5s;
+        }
+        .tree li::before, .tree li::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 50%;
+            border-top: 2px solid #D1D5DB;
+            width: 50%;
+            height: 20px;
+        }
+        .tree li::after {
+            right: auto;
+            left: 50%;
+            border-left: 2px solid #D1D5DB;
+        }
+        .tree li:only-child::after, .tree li:only-child::before {
+            display: none;
+        }
+        .tree li:only-child {
+            padding-top: 0;
+        }
+        .tree li:first-child::before, .tree li:last-child::after {
+            border: 0 none;
+        }
+        .tree li:last-child::before {
+            border-right: 2px solid #D1D5DB;
+            border-radius: 0 5px 0 0;
+        }
+        .tree li:first-child::after {
+            border-radius: 5px 0 0 0;
+        }
+        .tree ul ul::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            border-left: 2px solid #D1D5DB;
+            width: 0;
+            height: 20px;
+        }
+        .tree li .node-content {
+            border: 2px solid #D1D5DB;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: #374151;
+            background-color: #FFFFFF;
+            font-size: 1.125rem;
+            font-weight: 700;
+            display: inline-block;
+            border-radius: 9999px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        .node-content.highlight {
+            background-color: #FBBF24;
+            border-color: #F59E0B;
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.7);
+        }
+        .node-content.path {
+            background-color: #60A5FA;
+            border-color: #3B82F6;
+        }
+        .node-content.found {
+            background-color: #34D399;
+            border-color: #10B981;
+        }
+        .output-console {
+            background: #282c34;
+            color: #abb2bf;
+            font-family: 'Fira Code', monospace;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            min-height: 100px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body class="bg-[#FDFBF8] text-gray-800 p-4 sm:p-6 lg:p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">Interactive Recursion Playground</h1>
+            <h2 class="text-2xl md:text-3xl font-bold text-amber-600 mt-2">สนามทดลอง Recursion แบบอินเทอร์แอคทีฟ</h2>
+        </header>
+
+        <main>
+            <!-- Concepts Section -->
+            <section id="concepts" class="mb-16 bg-white p-8 rounded-xl shadow-lg">
+                <h3 class="text-3xl font-bold mb-6 text-center">Core Concepts / แนวคิดหลัก</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-2xl font-semibold mb-3">What is Recursion? / Recursion คืออะไร?</h4>
+                        <p class="mb-4">
+                            At its core, recursion is a problem-solving technique where a function calls itself to solve smaller instances of the same problem.
+                            <br><span class="text-gray-600">โดยแก่นแท้แล้ว, recursion คือเทคนิคการแก้ปัญหาที่ฟังก์ชันเรียกใช้ตัวเองเพื่อแก้ปัญหาย่อยที่มีลักษณะเดียวกัน</span>
+                        </p>
+                    </div>
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg">
+                        <h4 class="text-2xl font-semibold mb-3">Two Pillars / สองเสาหลัก</h4>
+                        <p><strong>1. Base Case (กรณีฐาน):</strong> The stopping condition. The simplest version of the problem that doesn't need another recursive call.<br><span class="text-gray-600">เงื่อนไขการหยุด รูปแบบที่ง่ายที่สุดของปัญหาที่ไม่ต้องเรียกซ้ำ</span></p>
+                        <p><strong>2. Recursive Step (ขั้นตอนเวียนเกิด):</strong> The part that breaks the problem down and calls the function on a smaller piece.<br><span class="text-gray-600">ส่วนที่แบ่งปัญหาให้เล็กลงและเรียกใช้ฟังก์ชันตัวเองกับส่วนที่เล็กกว่า</span></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interactive Playground -->
+            <section id="playground" class="bg-white p-6 sm:p-8 rounded-xl shadow-2xl">
+                <h3 class="text-3xl font-bold mb-8 text-center">The Playground / สนามทดลอง</h3>
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <!-- Tree Visualization -->
+                    <div class="flex flex-col items-center justify-center p-4 border rounded-lg bg-gray-50 min-h-[400px]">
+                        <h4 class="text-xl font-semibold mb-4">Our Sample Tree / Tree ตัวอย่างของเรา</h4>
+                        <div class="tree" id="tree-container">
+                           <!-- Tree will be generated here by JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Controls & Code -->
+                    <div>
+                        <div class="mb-6">
+                            <h4 class="text-xl font-semibold mb-3">Choose an Operation / เลือกการทำงาน</h4>
+                            <div class="flex flex-wrap gap-3">
+                                <button id="btn-size" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg transition">Size / ขนาด</button>
+                                <button id="btn-height" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg transition">Height / ความสูง</button>
+                                <button id="btn-inorder" class="flex-1 bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg transition">In-Order Traversal</button>
+                            </div>
+                            <div class="mt-4 flex items-center gap-3">
+                                <input type="number" id="find-input" placeholder="Enter value..." class="flex-grow p-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500">
+                                <button id="btn-find" class="bg-amber-500 hover:bg-amber-600 text-white font-bold py-2 px-4 rounded-lg transition">Find / ค้นหา</button>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h4 class="text-xl font-semibold mb-3">Code / โค้ด</h4>
+                            <div class="output-console" id="code-display">
+                                <pre><code class="language-javascript">// Select an operation to see the code.
+// เลือกการทำงานเพื่อดูโค้ด</code></pre>
+                            </div>
+                        </div>
+
+                        <div>
+                             <h4 class="text-xl font-semibold mb-3">Result / ผลลัพธ์</h4>
+                            <div class="output-console" id="output-display">
+                                <p>// Results will appear here.</p>
+                                <p>// ผลลัพธ์จะปรากฏที่นี่</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="text-center mt-12 text-gray-500">
+            <p>An interactive visualization based on the "Introduction to Recursion" slides.</p>
+        </footer>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- DATA STRUCTURE SETUP ---
+        class Node {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+            }
+        }
+
+        const root = new Node(6);
+        root.left = new Node(4);
+        root.right = new Node(8);
+        root.left.left = new Node(3);
+        root.left.right = new Node(5);
+        root.right.left = new Node(7);
+        root.right.right = new Node(9);
+        
+        // --- UI ELEMENTS ---
+        const treeContainer = document.getElementById('tree-container');
+        const codeDisplay = document.getElementById('code-display');
+        const outputDisplay = document.getElementById('output-display');
+        const findInput = document.getElementById('find-input');
+        
+        let isAnimating = false;
+
+        // --- RECURSIVE ALGORITHMS ---
+        const algorithms = {
+            size: {
+                code: `function size(node) {
+  // Base Case
+  if (node === null) {
+    return 0;
+  }
+  // Recursive Step
+  return 1 + size(node.left) + size(node.right);
+}
+
+console.log(size(root)); // Output: 7`,
+                run: () => {
+                    const visitedNodes = [];
+                    function getSize(node) {
+                        if (node === null) return 0;
+                        visitedNodes.push(node.value);
+                        return 1 + getSize(node.left) + getSize(node.right);
+                    }
+                    const result = getSize(root);
+                    animateTraversal(visitedNodes, 'highlight');
+                    updateOutput(`// Tree Size / ขนาดของ Tree: ${result}`);
+                }
+            },
+            height: {
+                code: `function height(node) {
+  // Base Case
+  if (node === null) {
+    return -1;
+  }
+  // Recursive Step
+  let leftHeight = height(node.left);
+  let rightHeight = height(node.right);
+  return 1 + Math.max(leftHeight, rightHeight);
+}
+
+console.log(height(root)); // Output: 2`,
+                run: () => {
+                    const pathNodes = [];
+                    function getHeightAndPath(node) {
+                        if (node === null) return -1;
+                        
+                        let leftPath = [];
+                        let rightPath = [];
+                        
+                        let leftHeight = getHeightAndPath(node.left, leftPath);
+                        let rightHeight = getHeightAndPath(node.right, rightPath);
+
+                        if (leftHeight > rightHeight) {
+                            pathNodes[node.value] = [node.value, ...(pathNodes[node.left?.value] || [])];
+                        } else {
+                           pathNodes[node.value] = [node.value, ...(pathNodes[node.right?.value] || [])];
+                        }
+
+                        return 1 + Math.max(leftHeight, rightHeight);
+                    }
+                    const result = getHeightAndPath(root);
+                    animateTraversal(pathNodes[root.value], 'path');
+                    updateOutput(`// Tree Height / ความสูงของ Tree: ${result}`);
+                }
+            },
+            find: {
+                code: `function find(node, value) {
+  // Base Cases
+  if (node === null) {
+    return false;
+  }
+  if (node.value === value) {
+    return true;
+  }
+  // Recursive Step
+  return find(node.left, value) || find(node.right, value);
+}
+
+console.log(find(root, 5)); // Output: true
+console.log(find(root, 1)); // Output: false`,
+                run: () => {
+                    const valueToFind = parseInt(findInput.value, 10);
+                    if (isNaN(valueToFind)) {
+                        updateOutput(`// Please enter a valid number.
+// กรุณาใส่ตัวเลขที่ถูกต้อง`);
+                        return;
+                    }
+
+                    const path = [];
+                    let found = false;
+
+                    function findValue(node, value) {
+                        if (node === null) return false;
+                        
+                        path.push(node.value);
+
+                        if (node.value === value) {
+                            found = true;
+                            return true;
+                        }
+
+                        if (findValue(node.left, value) || findValue(node.right, value)) {
+                            return true;
+                        }
+                        
+                        if (!found) path.pop();
+                        return false;
+                    }
+                    
+                    const result = findValue(root, valueToFind);
+                    animateFind(path, result);
+                    updateOutput(`// Find ${valueToFind}: ${result}
+// ค้นหา ${valueToFind}: ${result ? 'พบ' : 'ไม่พบ'}`);
+                }
+            },
+            inorder: {
+                code: `function inOrderPrint(node) {
+  // Base Case
+  if (node === null) {
+    return;
+  }
+  // 1. Go left
+  inOrderPrint(node.left);
+  // 2. Process current node
+  console.log(node.value);
+  // 3. Go right
+  inOrderPrint(node.right);
+}
+
+inOrderPrint(root); // Output: 3, 4, 5, 6, 7, 8, 9`,
+                run: () => {
+                    const visitedNodes = [];
+                    function traverse(node) {
+                        if (node === null) return;
+                        traverse(node.left);
+                        visitedNodes.push(node.value);
+                        traverse(node.right);
+                    }
+                    traverse(root);
+                    animateTraversal(visitedNodes, 'highlight');
+                    updateOutput(`// In-Order Traversal Result:
+// ${visitedNodes.join(', ')}`);
+                }
+            }
+        };
+
+        // --- EVENT LISTENERS ---
+        document.getElementById('btn-size').addEventListener('click', () => executeAlgorithm('size'));
+        document.getElementById('btn-height').addEventListener('click', () => executeAlgorithm('height'));
+        document.getElementById('btn-find').addEventListener('click', () => executeAlgorithm('find'));
+        document.getElementById('btn-inorder').addEventListener('click', () => executeAlgorithm('inorder'));
+
+        // --- CORE LOGIC ---
+        function executeAlgorithm(algoName) {
+            if (isAnimating) return;
+            isAnimating = true;
+            resetTreeHighlights();
+            const algo = algorithms[algoName];
+            updateCode(algo.code);
+            algo.run();
+        }
+
+        function updateCode(code) {
+            codeDisplay.innerHTML = `<pre><code class="language-javascript">${code}</code></pre>`;
+        }
+
+        function updateOutput(text) {
+           outputDisplay.innerHTML = `<p>${text.replace(/\n/g, '<br>')}</p>`;
+        }
+
+        function resetTreeHighlights() {
+            document.querySelectorAll('.node-content').forEach(el => {
+                el.classList.remove('highlight', 'path', 'found');
+            });
+        }
+        
+        function animateTraversal(nodes, className) {
+            let delay = 0;
+            nodes.forEach(nodeValue => {
+                setTimeout(() => {
+                    document.getElementById(`node-${nodeValue}`).classList.add(className);
+                }, delay);
+                delay += 300;
+            });
+            setTimeout(() => { isAnimating = false; }, delay);
+        }
+
+        function animateFind(path, found) {
+            let delay = 0;
+            path.forEach((nodeValue, index) => {
+                setTimeout(() => {
+                    const el = document.getElementById(`node-${nodeValue}`);
+                    if (index === path.length - 1 && found) {
+                        el.classList.add('found');
+                    } else {
+                        el.classList.add('path');
+                    }
+                }, delay);
+                delay += 300;
+            });
+             setTimeout(() => { isAnimating = false; }, delay);
+        }
+
+        // --- TREE VISUALIZATION BUILDER ---
+        function buildTreeHTML(node) {
+            if (!node) return '';
+            let childrenHTML = '';
+            if (node.left || node.right) {
+                childrenHTML = `<ul>${buildTreeHTML(node.left)}${buildTreeHTML(node.right)}</ul>`;
+            }
+            return `<li><span class="node-content" id="node-${node.value}">${node.value}</span>${childrenHTML}</li>`;
+        }
+        
+        treeContainer.innerHTML = `<ul>${buildTreeHTML(root)}</ul>`;
+
+    });
+    </script>
+</body>
+</html>
+
+

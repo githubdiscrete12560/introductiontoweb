@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Recursion & Trees Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .option.selected {
+            background-color: #3b82f6; /* bg-blue-500 */
+            color: white;
+            border-color: #2563eb; /* border-blue-700 */
+        }
+        .option.correct {
+            background-color: #22c55e; /* bg-green-500 */
+            color: white;
+        }
+        .option.incorrect {
+            background-color: #ef4444; /* bg-red-500 */
+            color: white;
+        }
+        .rationale {
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+        }
+        .rationale.correct {
+            background-color: #dcfce7; /* bg-green-100 */
+            color: #166534; /* text-green-800 */
+        }
+        .rationale.incorrect {
+            background-color: #fee2e2; /* bg-red-100 */
+            color: #991b1b; /* text-red-800 */
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 flex items-center justify-center min-h-screen p-4">
+
+    <div id="quiz-container" class="bg-white w-full max-w-3xl rounded-xl shadow-lg p-6 md:p-8 transition-all duration-500">
+        <div id="quiz-header" class="mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-900">Recursion & Trees Quiz</h1>
+            <p class="text-slate-500 mt-1">แบบทดสอบเรื่อง Recursion และ Trees</p>
+            <div class="w-full bg-slate-200 rounded-full h-2.5 mt-4">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+        </div>
+
+        <div id="quiz-body">
+            <div id="question-container">
+                <p id="question-text" class="text-lg md:text-xl font-semibold mb-5 min-h-[6rem]"></p>
+                <div id="options-container" class="space-y-3"></div>
+            </div>
+             <p id="hint-text" class="text-sm text-slate-500 mt-4 p-3 bg-slate-50 rounded-lg border border-slate-200"></p>
+        </div>
+
+        <div id="quiz-footer" class="mt-8 flex justify-between items-center">
+            <button id="prev-btn" class="bg-slate-300 hover:bg-slate-400 text-slate-800 font-bold py-2 px-6 rounded-lg transition-colors">Previous</button>
+            <button id="next-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">Next</button>
+            <button id="submit-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition-colors hidden">Submit</button>
+        </div>
+
+        <div id="results-container" class="hidden text-center">
+            <h2 class="text-3xl font-bold text-slate-900">Quiz Complete!</h2>
+            <p class="text-slate-500 mt-2">สรุปผลการทดสอบ</p>
+            <p class="text-5xl font-bold my-6" id="score-text"></p>
+            <div id="review-container" class="text-left mt-8 space-y-6"></div>
+            <button id="restart-btn" class="mt-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-colors">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = {
+          "questions": [
+            {
+              "question": "What is the most critical component of a recursive function that prevents it from running indefinitely? / ส่วนประกอบที่สำคัญที่สุดของฟังก์ชันเรียกซ้ำ (recursive function) ที่ป้องกันไม่ให้มันทำงานไปเรื่อยๆ คืออะไร?",
+              "hint": "Think about what tells the function it has reached the simplest version of the problem and can stop dividing it further. / ลองคิดดูว่าอะไรเป็นตัวบอกฟังก์ชันว่ามันได้ไปถึงรูปแบบที่ง่ายที่สุดของปัญหาแล้ว และสามารถหยุดการแบ่งย่อยปัญหาต่อไปได้",
+              "answerOptions": [
+                {
+                  "text": "The recursive step / ขั้นตอนเวียนเกิด (Recursive step)",
+                  "rationale": "The recursive step is what continues the process by calling the function on a smaller problem; it doesn't stop it. / ขั้นตอนเวียนเกิดคือส่วนที่ทำให้กระบวนการดำเนินต่อไปโดยการเรียกฟังก์ชันกับปัญหาที่เล็กลง ไม่ใช่ส่วนที่หยุดมัน",
+                  "isCorrect": false
+                },
+                {
+                  "text": "The base case / กรณีฐาน (Base case)",
+                  "rationale": "This component provides a stopping condition, a direct answer for the simplest case, which is essential to terminate the chain of calls. / ส่วนประกอบนี้เป็นเงื่อนไขในการหยุด โดยให้คำตอบโดยตรงสำหรับกรณีที่ง่ายที่สุด ซึ่งจำเป็นอย่างยิ่งในการสิ้นสุดสายการเรียกซ้ำ",
+                  "isCorrect": true
+                },
+                {
+                  "text": "The function's parameters / พารามิเตอร์ของฟังก์ชัน",
+                  "rationale": "While parameters carry the state of the problem, they do not inherently contain the logic to stop the recursion. / แม้ว่าพารามิเตอร์จะเก็บสถานะของปัญหา แต่มันไม่ได้มีตรรกะในการหยุดการเรียกซ้ำอยู่ในตัว",
+                  "isCorrect": false
+                },
+                {
+                  "text": "A loop within the function / ลูปภายในฟังก์ชัน",
+                  "rationale": "Recursion is an alternative to iteration; a loop is not a required component for the recursive process itself. / การเรียกซ้ำเป็นทางเลือกหนึ่งของการทำซ้ำ (iteration); ลูปไม่ได้เป็นส่วนประกอบที่จำเป็นสำหรับกระบวนการเรียกซ้ำ",
+                  "isCorrect": false
+                }
+              ]
+            },
+            {
+              "question": "Given the `size()` function from the slides, what would it return for a tree that only has a root node and a left child? / จากฟังก์ชัน `size()` ในสไลด์ ฟังก์ชันจะคืนค่าอะไรสำหรับทรีที่มีเพียงโหนดรากและโหนดลูกทางซ้าย?",
+              "hint": "Trace the function: it's 1 (for the root) plus the size of the left subtree, plus the size of the right subtree. / ลองไล่การทำงานของฟังก์ชัน: คือ 1 (สำหรับโหนดราก) บวกกับขนาดของทรีย่อยทางซ้าย บวกกับขนาดของทรีย่อยทางขวา",
+              "answerOptions": [
+                { "text": "1", "rationale": "This would be the result if the tree only had a root node, but it overlooks the left child. / นี่จะเป็นผลลัพธ์หากทรีมีเพียงโหนดราก แต่คำตอบนี้มองข้ามโหนดลูกทางซ้ายไป", "isCorrect": false },
+                { "text": "2", "rationale": "The function returns 1 (for the root) + size(left child) (which is 1) + size(right child) (which is 0). So, 1 + 1 + 0 = 2. / ฟังก์ชันจะคืนค่า 1 (สำหรับโหนดราก) + size(โหนดลูกซ้าย) (คือ 1) + size(โหนดลูกขวา) (คือ 0) ดังนั้น 1 + 1 + 0 = 2", "isCorrect": true },
+                { "text": "3", "rationale": "This number would be correct if the root had both a left and a right child. / ตัวเลขนี้จะถูกต้องถ้าโหนดรากมีทั้งโหนดลูกทางซ้ายและทางขวา", "isCorrect": false },
+                { "text": "0", "rationale": "The function only returns 0 for a null (empty) tree, not a tree with nodes. / ฟังก์ชันจะคืนค่า 0 สำหรับทรีที่เป็น null (ว่าง) เท่านั้น ไม่ใช่สำหรับทรีที่มีโหนด", "isCorrect": false }
+              ]
+            },
+            {
+              "question": "What would the `height()` function from the slides return for a tree with a single root node and no children? / ฟังก์ชัน `height()` จากสไลด์จะคืนค่าอะไรสำหรับทรีที่มีโหนดรากเพียงโหนดเดียวและไม่มีโหนดลูก?",
+              "hint": "The height of an empty (null) tree is defined as -1. The function returns 1 + the max height of its children. / ความสูงของทรีว่าง (null) ถูกกำหนดไว้เป็น -1 และฟังก์ชันจะคืนค่า 1 + ความสูงสูงสุดของโหนดลูก",
+              "answerOptions": [
+                { "text": "-1", "rationale": "This is the height of a null node, which would be the value for the children of the root, but not the final answer for the root itself. / นี่คือความสูงของโหนดที่เป็น null ซึ่งเป็นค่าสำหรับโหนดลูกของราก แต่ไม่ใช่คำตอบสุดท้ายสำหรับตัวโหนดรากเอง", "isCorrect": false },
+                { "text": "1", "rationale": "This would be correct if the base case returned 0 for a null node, but the convention used is -1. / นี่จะถูกต้องถ้ากรณีฐานคืนค่า 0 สำหรับโหนดที่เป็น null แต่ตามข้อตกลงที่ใช้คือ -1", "isCorrect": false },
+                { "text": "0", "rationale": "The function calculates `1 + Math.max(height(null), height(null))`, which evaluates to `1 + Math.max(-1, -1)`, resulting in `1 + (-1) = 0`. / ฟังก์ชันจะคำนวณ `1 + Math.max(height(null), height(null))` ซึ่งได้ผลเป็น `1 + Math.max(-1, -1)` และได้ผลลัพธ์เป็น `1 + (-1) = 0`", "isCorrect": true },
+                { "text": "2", "rationale": "This value would indicate a tree with at least two levels below the root. / ค่านี้จะบ่งบอกว่าทรีมีอย่างน้อยสองระดับใต้โหนดราก", "isCorrect": false }
+              ]
+            },
+            {
+              "question": "If you wanted to find the smallest value in a Binary Search Tree (a tree where `left child < parent < right child`), which path would a recursive function logically follow? / หากคุณต้องการหาค่าที่น้อยที่สุดใน Binary Search Tree (ทรีที่ `โหนดลูกซ้าย < โหนดแม่ < โหนดลูกขวา`) ฟังก์ชันเรียกซ้ำควรจะตามเส้นทางใด?",
+              "hint": "In a Binary Search Tree, smaller values are always stored in a specific direction from the parent node. / ใน Binary Search Tree ค่าที่น้อยกว่าจะถูกเก็บในทิศทางที่เฉพาะเจาะจงเสมอเมื่อเทียบกับโหนดแม่",
+              "answerOptions": [
+                { "text": "Always go to the right child until you can't anymore. / ไปยังโหนดลูกทางขวาเสมอจนกว่าจะไปต่อไม่ได้", "rationale": "Following the right child would lead to the largest value in the tree, not the smallest. / การตามไปยังโหนดลูกทางขวาจะนำไปสู่ค่าที่มากที่สุดในทรี ไม่ใช่ค่าน้อยที่สุด", "isCorrect": false },
+                { "text": "Check both the left and right children at every node. / ตรวจสอบทั้งโหนดลูกทางซ้ายและขวาในทุกๆ โหนด", "rationale": "While this would find the minimum value, it's inefficient for a Binary Search Tree, which has a specific ordering. / แม้วิธีนี้จะหาค่าต่ำสุดได้ แต่ไม่มีประสิทธิภาพสำหรับ Binary Search Tree ซึ่งมีการเรียงลำดับที่เฉพาะเจาะจง", "isCorrect": false },
+                { "text": "Go to the root's right child, then all the way left. / ไปที่โหนดลูกทางขวาของราก แล้วไปทางซ้ายสุด", "rationale": "This path is illogical for finding the absolute minimum value in the entire tree. / เส้นทางนี้ไม่มีเหตุผลในการค้นหาค่าที่น้อยที่สุดในทรีทั้งทรี", "isCorrect": false },
+                { "text": "Always go to the left child until you can't anymore. / ไปยังโหนดลูกทางซ้ายเสมอจนกว่าจะไปต่อไม่ได้", "rationale": "Because smaller values are always to the left in a Binary Search Tree, the minimum value will be the leftmost node. / เนื่องจากค่าที่น้อยกว่าจะอยู่ทางซ้ายเสมอใน Binary Search Tree ดังนั้นค่าที่น้อยที่สุดคือโหนดที่อยู่ซ้ายสุด", "isCorrect": true }
+              ]
+            },
+            {
+              "question": "Using the sample tree from the slides, what would be the first three values printed by a **Pre-Order Traversal** (Process Node, Go Left, Go Right)? / จากทรีตัวอย่างในสไลด์ ค่าสามค่าแรกที่จะถูกพิมพ์ออกมาจากการท่องไปในทรีแบบ **Pre-Order** (ประมวลผลโหนด, ไปซ้าย, ไปขวา) คืออะไร?",
+              "hint": "In-Order was Left-Node-Right. Pre-Order processes the current node *before* visiting its children. / แบบ In-Order คือ ซ้าย-โหนด-ขวา แต่แบบ Pre-Order จะประมวลผลโหนดปัจจุบัน *ก่อน* ที่จะไปยังโหนดลูก",
+              "answerOptions": [
+                { "text": "3, 4, 5", "rationale": "This is the beginning of an In-Order Traversal, which processes the left subtree first. / นี่คือการเริ่มต้นของการท่องไปในทรีแบบ In-Order ซึ่งประมวลผลทรีย่อยทางซ้ายก่อน", "isCorrect": false },
+                { "text": "6, 4, 8", "rationale": "This only processes the root and its immediate children, not following the full Pre-Order logic. / นี่เป็นเพียงการประมวลผลโหนดรากและโหนดลูกของมันเท่านั้น ไม่ได้เป็นไปตามตรรกะของ Pre-Order ทั้งหมด", "isCorrect": false },
+                { "text": "6, 4, 3", "rationale": "The traversal starts at the root (6), prints it, then goes left to node 4, prints it, then goes left again to node 3 and prints it. / การท่องไปในทรีเริ่มที่ราก (6) และพิมพ์ค่า จากนั้นไปซ้ายที่โหนด 4 และพิมพ์ค่า จากนั้นไปซ้ายอีกครั้งที่โหนด 3 และพิมพ์ค่า", "isCorrect": true },
+                { "text": "3, 5, 4", "rationale": "This is the sequence for a Post-Order Traversal (Left-Right-Node) of the left subtree. / นี่คือลำดับของการท่องไปในทรีแบบ Post-Order (ซ้าย-ขวา-โหนด) ของทรีย่อยทางซ้าย", "isCorrect": false }
+              ]
+            },
+            {
+              "question": "What is the primary cause of a 'stack overflow' error when using recursion? / สาเหตุหลักของข้อผิดพลาด 'stack overflow' เมื่อใช้ recursion คืออะไร?",
+              "hint": "This error happens when the chain of function calls gets too long. / ข้อผิดพลาดนี้เกิดขึ้นเมื่อสายการเรียกฟังก์ชันยาวเกินไป",
+              "answerOptions": [
+                { "text": "The function returns an incorrect value. / ฟังก์ชันคืนค่าที่ไม่ถูกต้อง", "rationale": "Returning an incorrect value is a logical error but does not directly cause a stack overflow. / การคืนค่าที่ไม่ถูกต้องเป็นข้อผิดพลาดทางตรรกะ แต่ไม่ก่อให้เกิด stack overflow โดยตรง", "isCorrect": false },
+                { "text": "The function takes too long to execute. / ฟังก์ชันใช้เวลาในการประมวลผลนานเกินไป", "rationale": "Slow execution time is a performance issue, not the direct cause of a stack overflow, which is about memory. / เวลาการประมวลผลที่ช้าเป็นปัญหาด้านประสิทธิภาพ ไม่ใช่สาเหตุโดยตรงของ stack overflow ซึ่งเกี่ยวกับหน่วยความจำ", "isCorrect": false },
+                { "text": "A missing or incorrect base case. / กรณีฐาน (base case) หายไปหรือไม่ถูกต้อง", "rationale": "Without a proper stopping condition, the function calls itself indefinitely, and each call adds to the memory stack until it runs out of space. / หากไม่มีเงื่อนไขการหยุดที่เหมาะสม ฟังก์ชันจะเรียกตัวเองไปเรื่อยๆ และการเรียกแต่ละครั้งจะเพิ่มข้อมูลลงในหน่วยความจำ stack จนกระทั่งพื้นที่หมด", "isCorrect": true },
+                { "text": "The tree data structure is not balanced. / โครงสร้างข้อมูลทรีไม่สมดุล", "rationale": "An unbalanced tree can lead to deep recursion and potentially cause a stack overflow, but the root cause is still the deep recursion itself, not the tree's shape alone. / ทรีที่ไม่สมดุลสามารถนำไปสู่การเรียกซ้ำที่ลึกและอาจทำให้เกิด stack overflow ได้ แต่สาเหตุที่แท้จริงยังคงเป็นการเรียกซ้ำที่ลึกเกินไป ไม่ใช่แค่รูปร่างของทรีเพียงอย่างเดียว", "isCorrect": false }
+              ]
+            },
+            {
+              "question": "Which of these problems is LEAST suited for a recursive solution? / ปัญหาใดต่อไปนี้เหมาะสมน้อยที่สุดที่จะแก้ไขด้วยวิธีเรียกซ้ำ (recursive solution)?",
+              "hint": "Recursion shines when a problem can be broken down into smaller, similar sub-problems. Consider which option doesn't fit this pattern. / Recursion จะเหมาะสมที่สุดเมื่อปัญหาสามารถแบ่งย่อยเป็นปัญหาย่อยที่คล้ายกันได้ ลองพิจารณาว่าตัวเลือกใดไม่เข้ากับรูปแบบนี้",
+              "answerOptions": [
+                { "text": "Calculating the factorial of a number (n! = n * (n-1)!). / การคำนวณแฟกทอเรียลของตัวเลข (n! = n * (n-1)!)", "rationale": "Factorial has a classic recursive definition where the problem is broken down into a smaller instance. / แฟกทอเรียลมีนิยามแบบเรียกซ้ำที่เป็นมาตรฐาน ซึ่งปัญหาจะถูกแบ่งย่อยเป็นกรณีที่เล็กลง", "isCorrect": false },
+                { "text": "Summing all elements in a simple, flat array. / การหาผลรวมของสมาชิกทั้งหมดในอาร์เรย์แบบเรียบง่าย", "rationale": "While you *can* solve this with recursion, a simple iterative loop is far more efficient and intuitive for this linear task. / แม้คุณจะสามารถแก้ปัญหานี้ด้วย recursion ได้ แต่การใช้ลูปแบบปกติ (iterative loop) นั้นมีประสิทธิภาพและเข้าใจง่ายกว่ามากสำหรับงานที่เป็นเชิงเส้นตรงเช่นนี้", "isCorrect": true },
+                { "text": "Navigating a file system to find a specific file. / การท่องไปในระบบไฟล์เพื่อค้นหาไฟล์ที่ต้องการ", "rationale": "A file system is a tree-like structure (folders containing folders), making it a perfect candidate for recursion. / ระบบไฟล์มีโครงสร้างคล้ายทรี (โฟลเดอร์ซ้อนโฟลเดอร์) ทำให้เป็นตัวเลือกที่สมบูรณ์แบบสำหรับ recursion", "isCorrect": false },
+                { "text": "Generating Fibonacci numbers. / การสร้างเลขฟีโบนัชชี", "rationale": "The Fibonacci sequence is defined recursively (F(n) = F(n-1) + F(n-2)), making it a natural fit. / ลำดับฟีโบนัชชีถูกนิยามแบบเรียกซ้ำ (F(n) = F(n-1) + F(n-2)) ซึ่งทำให้เหมาะสมกับการใช้วิธีนี้โดยธรรมชาติ", "isCorrect": false }
+              ]
+            },
+            {
+              "question": "In the `find(node, value)` function, what is the purpose of the `||` (OR) operator in the return statement? / ในฟังก์ชัน `find(node, value)` ตัวดำเนินการ `||` (OR) ในคำสั่ง return มีจุดประสงค์อะไร?",
+              "hint": "Consider what happens if the value is not found in the left subtree. / ลองพิจารณาว่าจะเกิดอะไรขึ้นหากไม่พบค่าในทรีย่อยทางซ้าย",
+              "answerOptions": [
+                { "text": "It checks if the node's value is greater than or less than the target value. / มันตรวจสอบว่าค่าของโหนดมากกว่าหรือน้อยกว่าค่าเป้าหมาย", "rationale": "This describes the logic for a search in a Binary Search Tree, not the general `find` function shown. / คำอธิบายนี้เป็นตรรกะสำหรับการค้นหาใน Binary Search Tree ไม่ใช่ฟังก์ชัน `find` ทั่วไปที่แสดงให้เห็น", "isCorrect": false },
+                { "text": "It ensures the function searches both subtrees even if the value is found in the left one. / มันทำให้แน่ใจว่าฟังก์ชันจะค้นหาทั้งสองทรีย่อยแม้ว่าจะพบค่าในทรีย่อยทางซ้ายแล้วก็ตาม", "rationale": "The `||` operator uses short-circuiting; if the left side is true, the right side is never evaluated. / ตัวดำเนินการ `||` ใช้การประเมินผลแบบ short-circuit; หากด้านซ้ายเป็นจริง ด้านขวาจะไม่ถูกประเมินค่าเลย", "isCorrect": false },
+                { "text": "It combines the boolean results, returning true if the value is found in either the left or the right subtree. / มันรวมผลลัพธ์ที่เป็น boolean โดยจะคืนค่า true หากพบค่าในทรีย่อยทางซ้ายหรือทางขวา", "rationale": "If `find(node.left)` returns false, the function must then proceed to check `find(node.right)` to continue the search. / หาก `find(node.left)` คืนค่า false ฟังก์ชันจะต้องดำเนินการตรวจสอบ `find(node.right)` ต่อไปเพื่อค้นหาต่อ", "isCorrect": true },
+                { "text": "It converts the node values to booleans before returning. / มันแปลงค่าของโหนดเป็น boolean ก่อนที่จะคืนค่า", "rationale": "The operator works on the boolean results returned by the recursive calls, not on the node values themselves. / ตัวดำเนินการทำงานกับผลลัพธ์ boolean ที่ได้จากการเรียกซ้ำ ไม่ได้ทำงานกับค่าของโหนดโดยตรง", "isCorrect": false }
+              ]
+            },
+            {
+              "question": "If the `inOrderPrint` function were changed to print the value *before* the two recursive calls (a Pre-Order Traversal), what would the output be for the sample tree? / หากฟังก์ชัน `inOrderPrint` ถูกเปลี่ยนให้พิมพ์ค่า *ก่อน* การเรียกซ้ำสองครั้ง (การท่องไปในทรีแบบ Pre-Order) ผลลัพธ์สำหรับทรีตัวอย่างจะเป็นอย่างไร?",
+              "hint": "The order of operations is: Process Node, Recurse Left, Recurse Right. / ลำดับการทำงานคือ: ประมวลผลโหนด, เรียกซ้ำทางซ้าย, เรียกซ้ำทางขวา",
+              "answerOptions": [
+                { "text": "3, 5, 4, 7, 9, 8, 6", "rationale": "This is the output of a Post-Order Traversal (Left, Right, Node). / นี่คือผลลัพธ์ของการท่องไปในทรีแบบ Post-Order (ซ้าย, ขวา, โหนด)", "isCorrect": false },
+                { "text": "6, 4, 3, 5, 8, 7, 9", "rationale": "This correctly follows the Pre-Order pattern: print 6, go left; print 4, go left; print 3; go back to 4, go right; print 5; and so on. / ลำดับนี้เป็นไปตามรูปแบบ Pre-Order อย่างถูกต้อง: พิมพ์ 6, ไปซ้าย; พิมพ์ 4, ไปซ้าย; พิมพ์ 3; กลับไปที่ 4, ไปขวา; พิมพ์ 5; และต่อไปเรื่อยๆ", "isCorrect": true },
+                { "text": "6, 4, 8, 3, 5, 7, 9", "rationale": "This processes the tree level by level, which is a Breadth-First Traversal, not a recursive Pre-Order traversal. / วิธีนี้ประมวลผลทรีทีละระดับ ซึ่งเป็นการท่องไปในทรีแบบ Breadth-First ไม่ใช่แบบ Pre-Order ที่ใช้การเรียกซ้ำ", "isCorrect": false },
+                { "text": "3, 4, 5, 6, 7, 8, 9", "rationale": "This is the output of the original In-Order Traversal. / นี่คือผลลัพธ์ของการท่องไปในทรีแบบ In-Order ดั้งเดิม", "isCorrect": false }
+              ]
+            },
+            {
+              "question": "Why is the base case `height(node === null)` set to return `-1` instead of `0`? / ทำไมกรณีฐาน `height(node === null)` จึงตั้งค่าให้คืน `-1` แทนที่จะเป็น `0`?",
+              "hint": "Consider the height of a tree with a single node. The formula is `1 + Math.max(left_height, right_height)`. / ลองพิจารณาความสูงของทรีที่มีโหนดเดียว สูตรคือ `1 + Math.max(ความสูงซ้าย, ความสูงขวา)`",
+              "answerOptions": [
+                { "text": "It's an arbitrary choice that has no logical reason. / เป็นการเลือกแบบสุ่มที่ไม่มีเหตุผลทางตรรกะ", "rationale": "The choice is deliberate to make the math work correctly for the recursive step. / การเลือกนี้มีเจตนาเพื่อให้การคำนวณในขั้นตอนเวียนเกิดทำงานได้อย่างถูกต้อง", "isCorrect": false },
+                { "text": "To prevent division by zero errors. / เพื่อป้องกันข้อผิดพลาดจากการหารด้วยศูนย์", "rationale": "The height function does not perform any division. / ฟังก์ชัน height ไม่ได้มีการดำเนินการหารใดๆ", "isCorrect": false },
+                { "text": "So that a leaf node (a node with two null children) correctly calculates its height as 0. / เพื่อให้โหนดใบ (leaf node) (โหนดที่ไม่มีลูก) คำนวณความสูงของมันเป็น 0 ได้อย่างถูกต้อง", "rationale": "For a leaf node, the calculation becomes `1 + Math.max(-1, -1)`, which correctly results in `0`. / สำหรับโหนดใบ การคำนวณจะกลายเป็น `1 + Math.max(-1, -1)` ซึ่งได้ผลลัพธ์เป็น `0` อย่างถูกต้อง", "isCorrect": true },
+                { "text": "To indicate that an error has occurred. / เพื่อบ่งชี้ว่ามีข้อผิดพลาดเกิดขึ้น", "rationale": "Returning -1 is a conventional part of the algorithm's logic, not an error signal. / การคืนค่า -1 เป็นส่วนหนึ่งของตรรกะตามแบบแผนของอัลกอริทึม ไม่ใช่สัญญาณของข้อผิดพลาด", "isCorrect": false }
+              ]
+            }
+          ]
+        };
+
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(quizData.questions.length).fill(null);
+
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const hintText = document.getElementById('hint-text');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const progressBar = document.getElementById('progress-bar');
+
+        const quizContainer = document.getElementById('quiz-container');
+        const resultsContainer = document.getElementById('results-container');
+        const scoreText = document.getElementById('score-text');
+        const reviewContainer = document.getElementById('review-container');
+        const restartBtn = document.getElementById('restart-btn');
+
+        function loadQuestion(index) {
+            const question = quizData.questions[index];
+            questionText.innerText = question.question;
+            hintText.innerText = `Hint: ${question.hint}`;
+            optionsContainer.innerHTML = '';
+
+            question.answerOptions.forEach((option, optionIndex) => {
+                const optionElement = document.createElement('div');
+                optionElement.innerText = option.text;
+                optionElement.classList.add('option', 'p-4', 'border', 'border-slate-300', 'rounded-lg', 'cursor-pointer', 'transition-colors', 'hover:bg-slate-100');
+                optionElement.dataset.index = optionIndex;
+                if (userAnswers[index] === optionIndex) {
+                    optionElement.classList.add('selected');
+                }
+                optionElement.addEventListener('click', () => selectOption(index, optionIndex));
+                optionsContainer.appendChild(optionElement);
+            });
+            updateNavigation();
+            updateProgressBar();
+        }
+
+        function selectOption(questionIndex, optionIndex) {
+            userAnswers[questionIndex] = optionIndex;
+            const options = optionsContainer.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[optionIndex].classList.add('selected');
+        }
+
+        function updateNavigation() {
+            prevBtn.disabled = currentQuestionIndex === 0;
+            prevBtn.classList.toggle('opacity-50', prevBtn.disabled);
+            
+            if (currentQuestionIndex === quizData.questions.length - 1) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
+        }
+        
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex + 1) / quizData.questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function showResults() {
+            quizContainer.classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+
+            let score = 0;
+            reviewContainer.innerHTML = '';
+
+            quizData.questions.forEach((q, i) => {
+                const userAnswerIndex = userAnswers[i];
+                const correctAnswerIndex = q.answerOptions.findIndex(opt => opt.isCorrect);
+                const isCorrect = userAnswerIndex === correctAnswerIndex;
+                if (isCorrect) score++;
+
+                const reviewBlock = document.createElement('div');
+                reviewBlock.classList.add('p-4', 'rounded-lg', 'border');
+                reviewBlock.classList.toggle('border-green-400', isCorrect);
+                reviewBlock.classList.toggle('border-red-400', !isCorrect);
+                reviewBlock.classList.toggle('bg-green-50', isCorrect);
+                reviewBlock.classList.toggle('bg-red-50', !isCorrect);
+
+                let reviewHTML = `<p class="font-bold text-slate-800">${i + 1}. ${q.question}</p>`;
+                if (userAnswerIndex !== null) {
+                     reviewHTML += `<p class="mt-2 text-sm">Your answer: <span class="font-semibold">${q.answerOptions[userAnswerIndex].text}</span></p>`;
+                } else {
+                     reviewHTML += `<p class="mt-2 text-sm text-red-700 font-semibold">You did not answer this question.</p>`;
+                }
+               
+                reviewHTML += `<p class="mt-1 text-sm">Correct answer: <span class="font-semibold">${q.answerOptions[correctAnswerIndex].text}</span></p>`;
+
+                q.answerOptions.forEach((opt, optIndex) => {
+                    const isSelected = userAnswerIndex === optIndex;
+                    const isCorrectOption = opt.isCorrect;
+                    if(isSelected || isCorrectOption) {
+                        const rationaleClass = isCorrectOption ? 'rationale correct' : 'rationale incorrect';
+                        reviewHTML += `<div class="${rationaleClass}">${isSelected ? '<b>Your choice:</b> ' : ''}${opt.rationale}</div>`;
+                    }
+                });
+
+                reviewBlock.innerHTML = reviewHTML;
+                reviewContainer.appendChild(reviewBlock);
+            });
+            
+            scoreText.innerText = `${score} / ${quizData.questions.length}`;
+            const scoreColor = score / quizData.questions.length >= 0.7 ? 'text-green-600' : 'text-red-600';
+            scoreText.classList.add(scoreColor);
+        }
+        
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            userAnswers.fill(null);
+            resultsContainer.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            scoreText.className = 'text-5xl font-bold my-6'; // Reset color
+            loadQuestion(0);
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion(currentQuestionIndex);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < quizData.questions.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion(currentQuestionIndex);
+            }
+        });
+
+        submitBtn.addEventListener('click', showResults);
+        restartBtn.addEventListener('click', restartQuiz);
+
+        // Initial load
+        loadQuestion(0);
+    </script>
+</body>
+</html>
