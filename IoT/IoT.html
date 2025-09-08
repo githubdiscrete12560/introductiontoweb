@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Internet of Things (IoT) and Motion Sensors</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            overscroll-behavior: none;
+        }
+        .slide {
+            display: none;
+            min-height: 100vh;
+            opacity: 0;
+            transition: opacity 0.7s ease-in-out;
+        }
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+        .interactive-icon, .interactive-btn, .nav-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .interactive-icon:hover {
+            transform: scale(1.05);
+            background-color: #374151; /* gray-700 */
+        }
+        .interactive-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .platform-popup {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-10px);
+            margin-bottom: 5px;
+            z-index: 10;
+        }
+        .platform-header:hover .platform-popup {
+            display: block;
+        }
+        #phone-image-container, #phone-image-container-2 {
+            perspective: 1000px;
+        }
+        #phone-image, #phone-image-2 {
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transform-style: preserve-3d;
+        }
+        .shake-animation {
+            animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+          10%, 90% { transform: translate3d(-1px, 0, 0) rotateX(60deg); }
+          20%, 80% { transform: translate3d(2px, 0, 0) rotateX(60deg); }
+          30%, 50%, 70% { transform: translate3d(-4px, 0, 0) rotateX(60deg); }
+          40%, 60% { transform: translate3d(4px, 0, 0) rotateX(60deg); }
+        }
+        .eng-text {
+            opacity: 0.75;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white overflow-hidden">
+
+    <main id="presentation-container">
+
+        <!-- Slide 1 (index 0): Title -->
+        <section class="slide active flex-col justify-center items-center text-center p-8 bg-cover bg-center" style="background-image: linear-gradient(rgba(17, 24, 39, 0.8), rgba(17, 24, 39, 0.95)), url('https://placehold.co/1200x800/0E1018/FFFFFF?text=Connected+World');">
+            <div class="text-5xl md:text-7xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                <div>Internet of Things (IoT)</div>
+            </div>
+            <div class="text-3xl md:text-5xl font-bold mt-2">
+                <div>และแพลตฟอร์มที่ขับเคลื่อน</div>
+                <div class="text-2xl md:text-4xl eng-text">and the Platforms That Power It</div>
+            </div>
+            <div class="text-xl md:text-2xl mt-6 text-gray-300">
+                <div>เชื่อมต่อโลกกายภาพสู่จักรวาลดิจิทัล</div>
+                <div class="text-lg md:text-xl eng-text">Connecting the Physical World to the Digital Universe</div>
+            </div>
+            <button id="start-btn" class="interactive-btn nav-btn mt-12 bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg">
+                <div>เริ่มต้นการเดินทาง ►</div>
+                <div class="text-sm eng-text">Start the Journey ►</div>
+            </button>
+        </section>
+
+        <!-- Slide 2 (index 1): What is IoT? -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+            <div class="text-4xl md:text-5xl font-bold mb-4">
+                <div>Internet of Things คืออะไร?</div>
+                <div class="text-3xl md:text-4xl eng-text">What is the Internet of Things?</div>
+            </div>
+            <div class="text-lg md:text-xl text-gray-400 max-w-3xl mb-12">
+                <div>แก่นแท้ของ IoT คือเครือข่ายของวัตถุทางกายภาพ ("สิ่งของ") ที่เชื่อมต่อกับอินเทอร์เน็ตเพื่อแลกเปลี่ยนข้อมูล คลิกที่ไอคอนด้านล่างเพื่อดูว่ามันกลายเป็นอะไร!</div>
+                <div class="text-base md:text-lg eng-text">At its core, IoT is a network of physical objects—"things"—that connect to the internet to share data. Click the icons below to see what they become!</div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl">
+                <div id="iot-icon-1" class="interactive-icon bg-gray-800 p-8 rounded-2xl cursor-pointer">
+                    <div class="text-5xl mb-4">💡</div>
+                    <div class="text-2xl font-bold">
+                        <div>หลอดไฟ</div>
+                        <div class="text-xl eng-text">A Lightbulb</div>
+                    </div>
+                </div>
+                <div id="iot-icon-2" class="interactive-icon bg-gray-800 p-8 rounded-2xl cursor-pointer">
+                    <div class="text-5xl mb-4">🚗</div>
+                     <div class="text-2xl font-bold">
+                        <div>รถยนต์</div>
+                        <div class="text-xl eng-text">A Car</div>
+                    </div>
+                </div>
+                <div id="iot-icon-3" class="interactive-icon bg-gray-800 p-8 rounded-2xl cursor-pointer">
+                    <div class="text-5xl mb-4">⌚</div>
+                    <div class="text-2xl font-bold">
+                        <div>นาฬิกา</div>
+                        <div class="text-xl eng-text">A Watch</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3 (index 2): Platform Choice -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+             <div class="text-4xl md:text-5xl font-bold mb-4">
+                 <div>สมองของ IoT: แพลตฟอร์ม</div>
+                 <div class="text-3xl md:text-4xl eng-text">The Brains of IoT: The Platforms</div>
+            </div>
+            <div class="text-lg md:text-xl text-gray-400 max-w-3xl mb-12">
+                <div>IoT Platform คือสะพานที่สำคัญที่เชื่อมต่อฮาร์ดแวร์เข้ากับโลกดิจิทัล คุณสนใจประเภทไหน?</div>
+                <div class="text-base md:text-lg eng-text">An IoT Platform is the essential bridge that connects the hardware to the digital world. Which type are you interested in?</div>
+            </div>
+            <div class="flex flex-col md:flex-row gap-6">
+                <button id="prof-platform-btn" class="interactive-btn bg-purple-600 text-white font-bold py-4 px-10 rounded-lg text-xl shadow-lg">
+                    <div>🏭 แพลตฟอร์มระดับมืออาชีพ</div>
+                    <div class="text-base eng-text">Professional Platforms</div>
+                </button>
+                <button id="hobby-platform-btn" class="interactive-btn bg-teal-500 text-white font-bold py-4 px-10 rounded-lg text-xl shadow-lg">
+                    <div>🎨 แพลตฟอร์มสำหรับมือสมัครเล่น</div>
+                    <div class="text-base eng-text">Hobbyist Platforms</div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Slide 4 (index 3): Professional Platforms -->
+        <section class="slide flex-col justify-center items-center p-4 md:p-8">
+            <div class="text-3xl md:text-4xl font-bold text-center mb-8">
+                <div>เปรียบเทียบแพลตฟอร์มระดับมืออาชีพ</div>
+                <div class="text-2xl md:text-3xl eng-text">Professional Platform Comparison</div>
+            </div>
+            <div class="w-full max-w-6xl overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="text-lg text-gray-300">
+                        <tr>
+                            <th class="p-4 bg-gray-800 rounded-tl-lg"><div>คุณสมบัติ</div><div class="text-sm eng-text">Feature</div></th>
+                            <th class="p-4 bg-gray-800 platform-header relative cursor-pointer">AWS IoT Core<div class="platform-popup bg-blue-500 text-white text-xs font-bold p-2 rounded"><div>ดีที่สุดสำหรับผู้ใช้ AWS</div><div class="text-xs eng-text">Best for AWS ecosystem users</div></div></th>
+                            <th class="p-4 bg-gray-800 platform-header relative cursor-pointer">Azure IoT Hub<div class="platform-popup bg-blue-500 text-white text-xs font-bold p-2 rounded"><div>เหมาะสำหรับองค์กรที่ใช้ Microsoft</div><div class="text-xs eng-text">Ideal for Microsoft enterprises</div></div></th>
+                            <th class="p-4 bg-gray-800 platform-header relative cursor-pointer">Google Cloud IoT<div class="platform-popup bg-blue-500 text-white text-xs font-bold p-2 rounded"><div>การวิเคราะห์ข้อมูล & ML ที่เหนือกว่า</div><div class="text-xs eng-text">Superior data analytics & ML</div></div></th>
+                            <th class="p-4 bg-gray-800 rounded-tr-lg platform-header relative cursor-pointer">ThingWorx (PTC)<div class="platform-popup bg-blue-500 text-white text-xs font-bold p-2 rounded w-48 text-center"><div>ตัวเลือกอันดับต้น ๆ สำหรับอุตสาหกรรมหนัก</div><div class="text-xs eng-text">Top choice for heavy industry</div></div></th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-gray-800 bg-opacity-50">
+                        <tr class="border-b border-gray-700"><td class="p-4 font-bold text-blue-300"><div>กลุ่มเป้าหมาย</div><div class="text-sm eng-text">Target Audience</div></td><td class="p-4"><div>นักพัฒนา, องค์กร</div><div class="text-sm eng-text">Developers, Enterprises</div></td><td class="p-4"><div>องค์กร</div><div class="text-sm eng-text">Enterprises</div></td><td class="p-4"><div>องค์กรที่เน้นข้อมูล</div><div class="text-sm eng-text">Data-centric Enterprises</div></td><td class="p-4"><div>อุตสาหกรรม (IIoT)</div><div class="text-sm eng-text">Industrial (IIoT)</div></td></tr>
+                        <tr class="border-b border-gray-700"><td class="p-4 font-bold text-blue-300"><div>จุดแข็งหลัก</div><div class="text-sm eng-text">Key Strength</div></td><td class="p-4"><div>การรวมกับ AWS</div><div class="text-sm eng-text">Deep AWS integration</div></td><td class="p-4"><div>การรวมกับองค์กร</div><div class="text-sm eng-text">Strong enterprise integration</div></td><td class="p-4"><div>การวิเคราะห์ข้อมูล</div><div class="text-sm eng-text">Superior data analytics</div></td><td class="p-4"><div>การพัฒนาแอป, AR</div><div class="text-sm eng-text">Rapid app dev, AR</div></td></tr>
+                        <tr class="border-b border-gray-700"><td class="p-4 font-bold text-blue-300"><div>ฟีเจอร์เด่น</div><div class="text-sm eng-text">Unique Feature</div></td><td class="p-4"><div>Greengrass สำหรับ edge</div><div class="text-sm eng-text">Greengrass for edge</div></td><td class="p-4"><div>IoT Edge, Digital Twins</div><div class="text-sm eng-text">IoT Edge, Digital Twins</div></td><td class="p-4"><div>การรวม BigQuery</div><div class="text-sm eng-text">BigQuery integration</div></td><td class="p-4"><div>การเชื่อมต่ออุตสาหกรรม</div><div class="text-sm eng-text">Industrial connectivity</div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Slide 5 (index 4): Hobbyist Platforms -->
+        <section class="slide flex-col justify-center items-center p-4 md:p-8">
+             <div class="text-3xl md:text-4xl font-bold text-center mb-8">
+                <div>เปรียบเทียบแพลตฟอร์มสำหรับมือสมัครเล่น</div>
+                <div class="text-2xl md:text-3xl eng-text">Amateur & Hobbyist Platform Comparison</div>
+            </div>
+             <div class="w-full max-w-6xl overflow-x-auto">
+                 <table class="w-full text-left border-collapse">
+                     <thead class="text-lg text-gray-300">
+                         <tr>
+                             <th class="p-4 bg-gray-800 rounded-tl-lg"><div>คุณสมบัติ</div><div class="text-sm eng-text">Feature</div></th>
+                             <th class="p-4 bg-gray-800 platform-header relative cursor-pointer">ThingSpeak<div class="platform-popup bg-teal-500 text-white text-xs font-bold p-2 rounded"><div>วิธีที่เร็วที่สุดในการสร้างกราฟ</div><div class="text-xs eng-text">Quickest way to graph data</div></div></th>
+                             <th class="p-4 bg-gray-800 platform-header relative cursor-pointer">Blynk<div class="platform-popup bg-teal-500 text-white text-xs font-bold p-2 rounded"><div>เหมาะสำหรับการควบคุมผ่านแอปมือถือ</div><div class="text-xs eng-text">Perfect for mobile app control</div></div></th>
+                             <th class="p-4 bg-gray-800 rounded-tr-lg platform-header relative cursor-pointer">Adafruit IO<div class="platform-popup bg-teal-500 text-white text-xs font-bold p-2 rounded w-48 text-center"><div>ดีที่สุดกับฮาร์ดแวร์ Adafruit</div><div class="text-xs eng-text">Best with Adafruit hardware</div></div></th>
+                         </tr>
+                     </thead>
+                     <tbody class="bg-gray-800 bg-opacity-50">
+                         <tr class="border-b border-gray-700"><td class="p-4 font-bold text-teal-300"><div>ความง่ายในการใช้งาน</div><div class="text-sm eng-text">Ease of Use</div></td><td class="p-4"><div>ง่ายมาก</div><div class="text-sm eng-text">Very Easy</div></td><td class="p-4"><div>ง่าย</div><div class="text-sm eng-text">Easy</div></td><td class="p-4"><div>ง่าย</div><div class="text-sm eng-text">Easy</div></td></tr>
+                         <tr class="border-b border-gray-700"><td class="p-4 font-bold text-teal-300"><div>จุดแข็งหลัก</div><div class="text-sm eng-text">Key Strength</div></td><td class="p-4"><div>การบันทึกข้อมูลอย่างง่าย</div><div class="text-sm eng-text">Simple data logging</div></td><td class="p-4"><div>แดชบอร์ดแอปมือถือ</div><div class="text-sm eng-text">Drag-and-drop mobile apps</div></td><td class="p-4"><div>การรวมฮาร์ดแวร์</div><div class="text-sm eng-text">Great hardware integration</div></td></tr>
+                         <tr class="border-b border-gray-700"><td class="p-4 font-bold text-teal-300"><div>เหมาะสำหรับ</div><div class="text-sm eng-text">Best For</div></td><td class="p-4"><div>การแสดงภาพข้อมูล</div><div class="text-sm eng-text">Visualizing sensor data</div></td><td class="p-4"><div>การควบคุมฮาร์ดแวร์</div><div class="text-sm eng-text">Controlling hardware</div></td><td class="p-4"><div>การสร้างต้นแบบ</div><div class="text-sm eng-text">Prototyping projects</div></td></tr>
+                     </tbody>
+                 </table>
+             </div>
+        </section>
+
+        <!-- Slide 6 (index 5): Amateur Example Intro -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+            <div class="text-4xl md:text-5xl font-bold mb-4">
+                <div>ตัวอย่างสำหรับมือสมัครเล่น: สมาร์ทโฟนเป็นเซ็นเซอร์ IoT</div>
+                <div class="text-3xl md:text-4xl eng-text">Amateur Example: Smartphone as an IoT Sensor</div>
+            </div>
+             <div class="text-lg md:text-xl text-gray-400 max-w-3xl mb-8">
+                <div>มาสร้างโปรเจกต์โดย<span class="font-bold text-teal-400">ไม่ต้องมีค่าใช้จ่ายด้านฮาร์ดแวร์</span> เราจะเปลี่ยนโทรศัพท์ของคุณให้เป็นเซ็นเซอร์ตรวจจับการเคลื่อนไหวและแสดงข้อมูลบนเว็บโดยใช้ ThingSpeak</div>
+                <div class="text-base md:text-lg eng-text">Let's build a project with <span class="font-bold text-teal-400">zero hardware cost</span>. We'll turn your phone into a live motion sensor and visualize its data on the web using ThingSpeak.</div>
+            </div>
+             <button id="amateur-demo-btn" class="interactive-btn nav-btn bg-teal-500 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg">
+                <div>ดูวิธีการทำงาน!</div>
+                <div class="text-sm eng-text">See How It Works!</div>
+             </button>
+        </section>
+
+        <!-- Slide 7 (index 6): What is a Sensor Logger App? -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+            <div class="text-4xl md:text-5xl font-bold mb-4">
+                <div>Sensor Logger App คืออะไร?</div>
+                <div class="text-3xl md:text-4xl eng-text">What is a Sensor Logger App?</div>
+            </div>
+            <div class="flex flex-col md:flex-row items-center gap-8 max-w-5xl">
+                <div class="md:w-1/2 text-left">
+                    <div class="text-lg md:text-xl text-gray-300 mb-4">
+                        <div>เป็นเครื่องมือที่อ่านข้อมูลดิบจากเซ็นเซอร์ในโทรศัพท์ของคุณ (เช่น accelerometer, gyroscope) และส่งไปยังปลายทางบนอินเทอร์เน็ต</div>
+                        <div class="text-base md:text-lg eng-text mt-2">It's a powerful tool that reads the raw data from your phone's built-in sensors (like the accelerometer, gyroscope, etc.) and sends it to a destination on the internet.</div>
+                    </div>
+                    <div class="text-lg md:text-xl text-gray-300">
+                        <div>สำหรับโปรเจกต์นี้ มันทำหน้าที่เป็นสะพานเชื่อมระหว่างเซ็นเซอร์จับการเคลื่อนไหวของโทรศัพท์กับแพลตฟอร์ม ThingSpeak <strong class="text-teal-400">โดยไม่จำเป็นต้องเขียนโค้ด!</strong></div>
+                        <div class="text-base md:text-lg eng-text mt-2">For our project, it acts as the bridge between your phone's motion sensor and the ThingSpeak platform, <strong class="text-teal-400">without needing to write any code!</strong></div>
+                    </div>
+                </div>
+                <div class="md:w-1/2">
+                    <img src="https://placehold.co/400x400/1F2937/FFFFFF?text=Sensor+Logger+App" alt="Sensor Logger App Interface" class="rounded-lg shadow-2xl">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8 (index 7): Amateur Example Guide -->
+        <section class="slide flex-col justify-center items-center p-8">
+            <div class="text-3xl md:text-4xl font-bold text-center mb-8">
+                <div>3 ขั้นตอนง่ายๆ สู่การสร้างอุปกรณ์ IoT ของคุณ</div>
+                <div class="text-2xl md:text-3xl eng-text">3 Simple Steps to Your IoT Device</div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
+                 <div class="bg-gray-800 p-6 rounded-2xl">
+                    <div class="text-2xl font-bold text-teal-300 mb-3">
+                        <div>1. ตั้งค่า ThingSpeak</div>
+                        <div class="text-xl eng-text">1. Set up ThingSpeak</div>
+                    </div>
+                    <div class="text-gray-400">
+                        <div>สร้างบัญชีฟรีและ "Channel" ใหม่ เปิดใช้งานสามฟิลด์ (`X-axis`, `Y-axis`, `Z-axis`) และคัดลอก "Write API Key" ของคุณ</div>
+                        <div class="text-sm eng-text mt-2">Create a free account and a new "Channel". Enable three fields (`X-axis`, `Y-axis`, `Z-axis`) and copy your "Write API Key".</div>
+                    </div>
+                </div>
+                 <div class="bg-gray-800 p-6 rounded-2xl">
+                    <div class="text-2xl font-bold text-teal-300 mb-3">
+                        <div>2. กำหนดค่าโทรศัพท์ของคุณ</div>
+                        <div class="text-xl eng-text">2. Configure Your Phone</div>
+                    </div>
+                    <div class="text-gray-400">
+                        <div>ดาวน์โหลดแอป "IoT Sensor Logger" ป้อน Channel ID และ API Key ของคุณ แล้วเลือก Accelerometer</div>
+                        <div class="text-sm eng-text mt-2">Download an "IoT Sensor Logger" app. Enter your Channel ID and API Key, then select the Accelerometer.</div>
+                    </div>
+                </div>
+                 <div class="bg-gray-800 p-6 rounded-2xl">
+                    <div class="text-2xl font-bold text-teal-300 mb-3">
+                        <div>3. แสดงภาพข้อมูลของคุณ!</div>
+                        <div class="text-xl eng-text">3. Visualize Your Data!</div>
+                    </div>
+                    <div class="text-gray-400">
+                        <div>เริ่มบริการในแอป เปิดช่อง ThingSpeak ของคุณบนเว็บและขยับโทรศัพท์ของคุณเพื่อดูกราฟสด!</div>
+                        <div class="text-sm eng-text mt-2">Start the service in the app. Open your ThingSpeak channel on the web and move your phone to see the live graphs!</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Slide 9 (index 8): Motion Sensor Intro Transition -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+             <div class="text-4xl md:text-5xl font-bold">
+                <div>แล้วเทคโนโลยีอะไรที่ทำให้สิ่งนี้เป็นไปได้?</div>
+                <div class="text-3xl md:text-4xl eng-text">So, what technology makes this possible?</div>
+            </div>
+             <div class="text-lg md:text-xl text-gray-400 max-w-3xl mt-4">
+                <div>มาดูภายในโทรศัพท์ของคุณกันที่เครื่องจักรขนาดจิ๋วที่ตรวจจับการเคลื่อนไหว</div>
+                <div class="text-base md:text-lg eng-text">Let's look inside your phone at the microscopic machines that sense motion.</div>
+            </div>
+        </section>
+
+        <!-- Slide 10 (index 9): Sensor Trio -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+            <div class="text-4xl md:text-5xl font-bold mb-8">
+                <div>สามทหารเสือเซ็นเซอร์: โทรศัพท์ของคุณรับรู้การเคลื่อนไหวได้อย่างไร</div>
+                <div class="text-3xl md:text-4xl eng-text">The Sensor Trio: How Your Phone Senses Motion</div>
+            </div>
+            <div class="text-lg md:text-xl text-gray-400 max-w-3xl mb-12">
+                <div>โทรศัพท์ของคุณใช้เซ็นเซอร์ขนาดจิ๋วที่เรียกว่า MEMS คลิกแต่ละเซ็นเซอร์เพื่อเรียนรู้หน้าที่ของมัน</div>
+                <div class="text-base md:text-lg eng-text">Your phone uses microscopic sensors called MEMS. Click each sensor to learn its job.</div>
+            </div>
+            <div class="flex flex-col md:flex-row gap-6 w-full max-w-5xl">
+                <div class="flex-1">
+                    <button class="sensor-btn interactive-btn bg-gray-800 w-full text-white font-bold py-4 px-10 rounded-lg text-xl" data-desc="accel-desc">
+                        <div>เซ็นเซอร์วัดความเร่ง</div>
+                        <div class="text-base eng-text">Accelerometer</div>
+                    </button>
+                    <p id="accel-desc" class="sensor-desc mt-4 text-gray-400 h-24" style="display:none;">
+                        <div>วัดความเร่งเชิงเส้นและแรงโน้มถ่วงคงที่</div>
+                        <div class="text-sm eng-text">Measures linear acceleration and the constant force of gravity.</div>
+                    </p>
+                </div>
+                <div class="flex-1">
+                    <button class="sensor-btn interactive-btn bg-gray-800 w-full text-white font-bold py-4 px-10 rounded-lg text-xl" data-desc="gyro-desc">
+                        <div>ไจโรสโคป</div>
+                        <div class="text-base eng-text">Gyroscope</div>
+                    </button>
+                    <p id="gyro-desc" class="sensor-desc mt-4 text-gray-400 h-24" style="display:none;">
+                        <div>วัดการหมุน นี่คือวิธีที่โทรศัพท์ของคุณรู้ว่าเมื่อคุณหมุนมัน</div>
+                        <div class="text-sm eng-text">Measures rotation. This is how your phone knows when you turn it.</div>
+                    </p>
+                </div>
+                <div class="flex-1">
+                    <button class="sensor-btn interactive-btn bg-gray-800 w-full text-white font-bold py-4 px-10 rounded-lg text-xl" data-desc="mag-desc">
+                        <div>เซ็นเซอร์วัดสนามแม่เหล็ก</div>
+                        <div class="text-base eng-text">Magnetometer</div>
+                    </button>
+                    <p id="mag-desc" class="sensor-desc mt-4 text-gray-400 h-24" style="display:none;">
+                        <div>วัดสนามแม่เหล็ก มันคือเข็มทิศดิจิทัล</div>
+                        <div class="text-sm eng-text">Measures magnetic fields. It's the digital compass.</div>
+                    </p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Slide 11 (index 10): Focus on Accelerometer -->
+        <section class="slide flex-col justify-center items-center gap-8 p-8">
+            <div class="text-4xl font-bold text-center">
+                <div>เจาะลึกเซ็นเซอร์วัดความเร่ง</div>
+                <div class="text-3xl eng-text">Focus on the Accelerometer</div>
+            </div>
+            <div class="flex flex-col lg:flex-row items-center gap-8 w-full max-w-5xl mt-8">
+                <div class="w-full lg:w-1/2">
+                    <div class="text-lg text-gray-300">
+                        <div>ผลลัพธ์ของเซ็นเซอร์วัดความเร่งคือ <strong class="text-white">เวกเตอร์ความเร่ง 3 มิติ</strong> ที่แสดงแรงในแต่ละแกนภายในสามแกน</div>
+                        <div class="text-base eng-text mt-2">The accelerometer's output is a **3D acceleration vector** that shows the force on each of its three internal axes.</div>
+                    </div>
+                    <div class="mt-6 bg-gray-800 p-4 rounded-lg text-left">
+                        <p class="text-2xl font-mono text-center text-teal-300 mb-4">a = (aₓ, aᵧ, a₂)</p>
+                        <ul class="space-y-4 text-lg">
+                            <li class="flex items-start">
+                                <span class="font-bold text-red-400 w-12 flex-shrink-0">aₓ:</span>
+                                <div>
+                                    <div>แรงตามแกน X (ซ้าย-ขวา)</div>
+                                    <div class="text-sm eng-text">Force along the X-axis (left-right).</div>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="font-bold text-green-400 w-12 flex-shrink-0">aᵧ:</span>
+                                <div>
+                                    <div>แรงตามแกน Y (ล่าง-บน)</div>
+                                    <div class="text-sm eng-text">Force along the Y-axis (bottom-top).</div>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="font-bold text-blue-400 w-12 flex-shrink-0">a₂:</span>
+                                <div>
+                                    <div>แรงตามแกน Z (หลัง-หน้า)</div>
+                                    <div class="text-sm eng-text">Force along the Z-axis (back-front).</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mt-6 text-gray-400">
+                        <div>จุดกำเนิด (0,0,0) คือศูนย์กลางทางกายภาพของชิปเซ็นเซอร์ภายในโทรศัพท์</div>
+                        <div class="text-sm eng-text mt-2">The origin point (0,0,0) is the physical center of the sensor chip inside the phone.</div>
+                    </div>
+                </div>
+                <div class="w-1/2 lg:w-1/2">
+                     <img src="https://placehold.co/400x400/1F2937/FFFFFF?text=Phone+Cutaway" alt="Phone Cutaway showing accelerometer" class="rounded-lg mx-auto">
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 12 (index 11): Example: Flat on Table -->
+        <section class="slide flex-col justify-center items-center p-8 text-center">
+            <div class="text-4xl font-bold mb-4">
+                <div>ตัวอย่าง: วางโทรศัพท์ราบบนโต๊ะ</div>
+                <div class="text-3xl eng-text">Example: Phone Flat on a Table</div>
+            </div>
+            <div class="text-lg text-gray-400 max-w-3xl">
+                <div>เมื่อโทรศัพท์อยู่นิ่ง แรงเดียวที่เซ็นเซอร์วัดได้คือแรงโน้มถ่วง</div>
+                <div class="text-base eng-text mt-2">When the phone is still, the only force the accelerometer measures is gravity.</div>
+            </div>
+            <div class="mt-8 bg-gray-800 p-8 rounded-2xl w-full max-w-4xl text-left grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                    <div class="font-bold text-xl text-blue-300"><div>สถานการณ์:</div><div class="text-lg eng-text">Scenario:</div></div>
+                    <p class="text-gray-300 mb-4"><div>โทรศัพท์วางราบอย่างสมบูรณ์โดยให้หน้าจอหงายขึ้น</div><div class="text-sm eng-text mt-1">The phone is lying perfectly flat, screen facing up.</div></p>
+                    <div class="font-bold text-xl text-blue-300"><div>การวิเคราะห์:</div><div class="text-lg eng-text">Analysis:</div></div>
+                    <p class="text-gray-300"><div>แกน Z ชี้ขึ้นตรงข้ามกับแรงโน้มถ่วงอย่างสมบูรณ์</div><div class="text-sm eng-text mt-1">The Z-axis points straight up, directly opposing the full, constant force of gravity.</div></p>
+                </div>
+                <div class="bg-gray-900 p-6 rounded-xl text-center">
+                    <div class="text-lg text-gray-400"><div>เวกเตอร์ผลลัพธ์</div><div class="text-base eng-text">Output Vector</div></div>
+                    <p class="text-4xl font-mono text-teal-300 mt-2">( 0, 0, +9.8 ) <span class="text-2xl">m/s²</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 13 (index 12): Deeper Dive: Why Positive Z -->
+        <section class="slide flex-col justify-center items-center p-8 text-center">
+            <div class="text-4xl font-bold mb-6">
+                <div>เจาะลึก: ทำไมค่า Z ถึงเป็นบวก?</div>
+                <div class="text-3xl eng-text">Deeper Dive: Why is the Z-value Positive?</div>
+            </div>
+            <div class="text-xl text-gray-400 max-w-3xl">
+                <div>ถ้าแรงโน้มถ่วงดึง <span class="text-red-400">ลง</span> ทำไมเซ็นเซอร์ถึงรายงานค่า <span class="text-green-400">บวก</span>?</div>
+                <div class="text-lg eng-text mt-2">If gravity pulls <span class="text-red-400">down</span>, why does the sensor report a <span class="text-green-400">positive</span> value?</div>
+            </div>
+            <div class="mt-8 bg-gray-800 p-8 rounded-2xl w-full max-w-md relative h-64">
+                <div class="w-24 h-48 bg-gray-600 rounded-2xl mx-auto flex items-center justify-center text-gray-400">Phone</div>
+                <div id="step1" class="absolute inset-x-0 top-full mt-4 transition-opacity duration-500 opacity-0">
+                    <p class="text-lg"><div>ขั้นตอนที่ 1: แรงโน้มถ่วงดึงโทรศัพท์ <span class="text-red-400">ลง</span></div><div class="text-base eng-text">Step 1: Gravity pulls the phone <span class="text-red-400">down</span>.</div></p>
+                    <svg class="w-8 h-16 mx-auto mt-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 17l-4 4m0 0l-4-4m4 4V3"></path></svg>
+                </div>
+                 <div id="step2" class="absolute inset-x-0 bottom-full mb-4 transition-opacity duration-500 opacity-0">
+                    <svg class="w-8 h-16 mx-auto mb-2 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7l4-4m0 0l4 4m-4-4v18"></path></svg>
+                    <p class="text-lg"><div>ขั้นตอนที่ 2: โต๊ะดัน <span class="text-green-400">ขึ้น</span> <br><strong class="text-white">เซ็นเซอร์รู้สึกถึงแรงผลักขึ้นนี้</strong></div><div class="text-base eng-text">Step 2: The table pushes <span class="text-green-400">up</span>. <br><strong class="text-white">The sensor feels this upward push.</strong></div></p>
+                </div>
+            </div>
+             <button id="gravity-next-btn" class="interactive-btn bg-white text-black font-bold py-2 px-6 rounded-lg mt-40"><div>► ถัดไป</div><div class="text-sm eng-text">► Next</div></button>
+        </section>
+
+        <!-- Slide 14 (index 13): More Examples -->
+        <section class="slide flex-col justify-center items-center gap-8 p-8">
+            <div class="text-4xl font-bold text-center">
+                <div>ตัวอย่างเพิ่มเติม: การเอียงและการเขย่า</div>
+                <div class="text-3xl eng-text">More Examples: Tilting and Shaking</div>
+            </div>
+            <div class="text-lg text-gray-400 text-center max-w-2xl">
+                <div>แรงโน้มถ่วงจะแสดงผลต่างกันไปตามแกนเมื่อเอียง การเขย่าจะสร้างแรงไดนามิกใหม่</div>
+                <div class="text-base eng-text mt-2">Gravity's force projects differently across axes when tilted. Shaking introduces new, dynamic forces.</div>
+            </div>
+            <div class="flex flex-col lg:flex-row items-center gap-8 w-full max-w-5xl">
+                <div id="phone-image-container-2" class="w-1/2 lg:w-1/3">
+                    <img id="phone-image-2" src="https://placehold.co/300x600/374151/FFFFFF?text=Phone" alt="Smartphone" class="mx-auto">
+                </div>
+                <div class="w-full lg:w-2/3 flex flex-col items-center">
+                     <div class="bg-gray-800 p-6 rounded-xl text-center mb-8">
+                        <div class="text-lg text-gray-400"><div>เวกเตอร์ผลลัพธ์ (aₓ, aᵧ, a₂)</div><div class="text-base eng-text">Output Vector (aₓ, aᵧ, a₂)</div></div>
+                        <p id="vector-output-2" class="text-3xl font-mono text-teal-300 mt-2">( 0, 0, +9.8 ) m/s²</p>
+                     </div>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <button class="example-btn interactive-btn bg-blue-600 font-bold py-2 px-5 rounded-lg" data-pos="side">
+                            <div>เอียงข้าง</div>
+                            <div class="text-sm eng-text">Tilt on Side</div>
+                        </button>
+                        <button class="example-btn interactive-btn bg-purple-600 font-bold py-2 px-5 rounded-lg" data-pos="shake">
+                            <div>เขย่าซ้าย-ขวา</div>
+                            <div class="text-sm eng-text">Shake Left-Right</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Slide 15 (index 14): Conclusion -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+            <div class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                <div>สรุป</div>
+                <div class="text-4xl eng-text">Conclusion</div>
+            </div>
+            <div class="text-xl text-gray-300 max-w-3xl mt-8">
+                <div>สิ่งที่คุณได้เรียนรู้:</div>
+                <div class="text-lg eng-text">You've learned:</div>
+            </div>
+            <ul class="text-left list-disc list-inside mt-6 text-lg text-gray-400 space-y-2">
+                <li>
+                    <div>IoT คืออะไรและแพลตฟอร์มที่ขับเคลื่อนมัน</div>
+                    <div class="text-base eng-text ml-6">What IoT is and the platforms that run it.</div>
+                </li>
+                <li>
+                    <div>วิธีเปลี่ยนสมาร์ทโฟนของคุณให้เป็นอุปกรณ์ IoT จริง</div>
+                    <div class="text-base eng-text ml-6">How to turn your smartphone into a real IoT device.</div>
+                </li>
+                <li>
+                    <div>เซ็นเซอร์วัดความเร่งวัดแรงและแรงโน้มถ่วงอย่างไร</div>
+                    <div class="text-base eng-text ml-6">How the accelerometer measures force and gravity.</div>
+                </li>
+            </ul>
+        </section>
+
+        <!-- Slide 16 (index 15): References & Credits -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+            <div class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                 <div>อ้างอิง</div>
+                <div class="text-4xl eng-text">References</div>
+            </div>
+            
+            <div class="text-left max-w-3xl w-full mt-10">
+                <h4 class="font-bold text-lg text-gray-300">
+                    <div>อ้างอิง</div>
+                    <div class="text-base eng-text">References</div>
+                </h4>
+                <ul class="list-disc list-inside text-sm text-gray-500 mt-2 space-y-1">
+                    <li>
+                        <div>แนวคิดพื้นฐานเกี่ยวกับ Internet of Things (IoT)</div>
+                        <div class="text-xs eng-text">General Concepts of the Internet of Things (IoT).</div>
+                    </li>
+                    <li>
+                        <div>หลักการทำงานของเซ็นเซอร์ MEMS Accelerometer</div>
+                        <div class="text-xs eng-text">Principles of MEMS Accelerometer Sensors.</div>
+                    </li>
+                     <li>
+                        <div>เอกสารประกอบแพลตฟอร์ม: AWS IoT, Azure IoT Hub, Google Cloud IoT, ThingSpeak</div>
+                        <div class="text-xs eng-text">Platform Documentation: AWS IoT, Azure IoT Hub, Google Cloud IoT, ThingSpeak.</div>
+                    </li>
+                </ul>
+            </div>
+
+             <div class="mt-10 text-sm text-gray-600">
+                <div>สร้างโดย Google Gemini</div>
+                <div class="text-xs eng-text">Created by Google Gemini</div>
+            </div>
+
+             <button id="restart-btn" class="interactive-btn nav-btn mt-8 bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg">
+                <div>เริ่มการนำเสนอใหม่</div>
+                <div class="text-sm eng-text">Restart Presentation</div>
+            </button>
+        </section>
+
+    </main>
+
+    <!-- Navigation -->
+    <div class="fixed bottom-5 right-5 z-20 flex gap-3">
+        <button id="prev-btn" class="nav-btn bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-full shadow-lg">
+            <div>‹ ก่อนหน้า</div>
+            <div class="text-xs eng-text">Prev</div>
+        </button>
+        <button id="next-btn" class="nav-btn bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-full shadow-lg">
+            <div>ถัดไป ›</div>
+            <div class="text-xs eng-text">Next</div>
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            let currentSlide = 0;
+            let gravityStep = 0;
+
+            const showSlide = (index) => {
+                if (index >= slides.length) index = slides.length - 1;
+                if (index < 0) index = 0;
+
+                slides[currentSlide].classList.remove('active');
+                slides[index].classList.add('active');
+                currentSlide = index;
+                
+                if (index === 12) { // Reset gravity demo
+                    gravityStep = 0;
+                    document.getElementById('step1').style.opacity = 0;
+                    document.getElementById('step2').style.opacity = 0;
+                    document.getElementById('gravity-next-btn').querySelector('div:first-child').textContent = '► ถัดไป';
+                    document.getElementById('gravity-next-btn').querySelector('div:last-child').textContent = '► Next';
+                }
+                if (index === 13) { // Reset second demo phone
+                    simulateExample('flat');
+                }
+            };
+
+            const navigateSlides = (direction) => {
+                showSlide(currentSlide + direction);
+            };
+
+            // --- Event Listeners ---
+            document.getElementById('start-btn').addEventListener('click', () => showSlide(1));
+            document.getElementById('prof-platform-btn').addEventListener('click', () => showSlide(3));
+            document.getElementById('hobby-platform-btn').addEventListener('click', () => showSlide(4));
+            document.getElementById('amateur-demo-btn').addEventListener('click', () => showSlide(6));
+            document.getElementById('restart-btn').addEventListener('click', () => showSlide(0));
+            document.getElementById('prev-btn').addEventListener('click', () => navigateSlides(-1));
+            document.getElementById('next-btn').addEventListener('click', () => navigateSlides(1));
+
+            // Slide 2: IoT Icons
+            const iotIconsData = {
+                'iot-icon-1': { 
+                    title: "หลอดไฟ", engTitle: "A Lightbulb",
+                    desc: "เปิดอัตโนมัติเมื่อคุณกลับถึงบ้าน", engDesc: "Turns on automatically when you arrive home.",
+                    newTitle: "ระบบไฟอัจฉริยะ", newEngTitle: "Smart Lighting"
+                },
+                'iot-icon-2': { 
+                    title: "รถยนต์", engTitle: "A Car",
+                    desc: "แจ้งเตือนเมื่อถึงเวลาบำรุงรักษา", engDesc: "Alerts you when maintenance is needed.",
+                    newTitle: "ยานพาหนะที่เชื่อมต่อ", newEngTitle: "Connected Vehicle"
+                 },
+                'iot-icon-3': {
+                    title: "นาฬิกา", engTitle: "A Watch",
+                    desc: "ติดตามข้อมูลการออกกำลังกายและสุขภาพของคุณ", engDesc: "Tracks your fitness and health data.",
+                    newTitle: "อุปกรณ์สวมใส่", newEngTitle: "Wearable Device"
+                },
+            };
+            document.querySelectorAll('.interactive-icon').forEach(icon => {
+                icon.addEventListener('click', () => {
+                    const data = iotIconsData[icon.id];
+                    const h3 = icon.querySelector('div.font-bold');
+                    const thaiTitleDiv = h3.querySelector('div:first-child');
+
+                    if (thaiTitleDiv.textContent === data.title) {
+                        thaiTitleDiv.textContent = data.newTitle;
+                        h3.querySelector('div:last-child').textContent = data.newEngTitle;
+                        const p = document.createElement('div');
+                        p.className = 'text-gray-400 mt-2';
+                        p.innerHTML = `<div>${data.desc}</div><div class="text-sm eng-text">${data.engDesc}</div>`;
+                        icon.appendChild(p);
+                    } else {
+                        thaiTitleDiv.textContent = data.title;
+                        h3.querySelector('div:last-child').textContent = data.engTitle;
+                        icon.querySelector('div.text-gray-400').remove();
+                    }
+                });
+            });
+
+            // Slide 10: Sensor Trio
+            document.querySelectorAll('.sensor-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const descId = btn.dataset.desc;
+                    const allDescs = document.querySelectorAll('.sensor-desc');
+                    allDescs.forEach(desc => {
+                        if (desc.id === descId) {
+                            desc.style.display = desc.style.display === 'none' ? 'block' : 'none';
+                        } else {
+                            desc.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            // Slide 13: Gravity Demo
+            document.getElementById('gravity-next-btn').addEventListener('click', () => {
+                gravityStep++;
+                const btn = document.getElementById('gravity-next-btn');
+                if (gravityStep === 1) {
+                    document.getElementById('step1').style.opacity = 1;
+                } else if (gravityStep === 2) {
+                    document.getElementById('step2').style.opacity = 1;
+                    btn.querySelector('div:first-child').textContent = 'รีเซ็ต';
+                    btn.querySelector('div:last-child').textContent = 'Reset';
+                } else {
+                    gravityStep = 0;
+                    document.getElementById('step1').style.opacity = 0;
+                    document.getElementById('step2').style.opacity = 0;
+                    btn.querySelector('div:first-child').textContent = '► ถัดไป';
+                    btn.querySelector('div:last-child').textContent = '► Next';
+                }
+            });
+
+            // Slide 14: More Examples Demo
+            const examples = {
+                flat: { transform: 'rotateX(60deg)', vector: '( 0, 0, +9.8 ) m/s²' },
+                side: { transform: 'rotateX(60deg) rotateZ(-90deg)', vector: '( +9.8, 0, 0 ) m/s²' },
+                shake: { transform: 'rotateX(60deg)', vector: '( -2.5, 0, +9.8 ) m/s²' }
+            };
+            const simulateExample = (pos) => {
+                const phoneImg = document.getElementById('phone-image-2');
+                phoneImg.style.transform = examples[pos].transform;
+                document.getElementById('vector-output-2').textContent = examples[pos].vector;
+                
+                phoneImg.classList.remove('shake-animation');
+                if (pos === 'shake') {
+                    setTimeout(() => phoneImg.classList.add('shake-animation'), 50);
+                }
+            };
+            document.querySelectorAll('.example-btn').forEach(btn => {
+                btn.addEventListener('click', () => simulateExample(btn.dataset.pos));
+            });
+
+            // Initial State
+            showSlide(0);
+        });
+    </script>
+</body>
+</html>
+
+
+
+
