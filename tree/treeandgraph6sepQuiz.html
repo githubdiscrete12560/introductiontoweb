@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Theory & Tree Algorithms Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Sarabun', sans-serif;
+        }
+        .thai {
+            font-family: 'Sarabun', sans-serif;
+        }
+        .quiz-option {
+            transition: background-color 0.2s, border-color 0.2s;
+            cursor: pointer;
+        }
+        .quiz-option.correct {
+            background-color: #D1FAE5; /* Green-100 */
+            border-color: #10B981; /* Green-500 */
+        }
+        .quiz-option.incorrect {
+            background-color: #FEE2E2; /* Red-100 */
+            border-color: #EF4444; /* Red-500 */
+        }
+        .quiz-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+        .rationale {
+            display: none;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            background-color: #F3F4F6; /* Gray-100 */
+        }
+        .rationale.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Graph Theory & Tree Algorithms Quiz</h1>
+            <p class="text-lg text-gray-600 mt-2 thai">แบบทดสอบทฤษฎีกราฟและอัลกอริทึมต้นไม้</p>
+        </header>
+
+        <div id="quiz-container" class="space-y-8">
+            <!-- Quiz questions will be dynamically inserted here -->
+        </div>
+
+        <footer class="text-center text-sm text-gray-500 mt-12 py-4 border-t">
+            <p>Created by Google Gemini.</p>
+            <p class="thai">สร้างโดย Google Gemini</p>
+        </footer>
+    </div>
+
+    <script>
+        const quizDataRaw = {
+            "Qn": [{
+                "Aua": 0,
+                "question": "What is the key characteristic that distinguishes a tree from a general graph? | อะไรคือคุณสมบัติสำคัญที่แยกความแตกต่างระหว่างต้นไม้กับกราฟทั่วไป?",
+                "hint": "Think about what would happen if you could travel in a loop within the structure. | ลองคิดดูว่าจะเกิดอะไรขึ้นถ้าคุณสามารถเดินทางเป็นวงกลมภายในโครงสร้างได้",
+                "jF": [{
+                    "text": "The absence of cycles. | การไม่มีวัฏจักร",
+                    "vt": true,
+                    "Glb": "A tree is a specific type of graph defined by its acyclic (no cycles) and connected nature. | ต้นไม้เป็นกราฟชนิดหนึ่งที่กำหนดโดยคุณสมบัติที่ไม่มีวัฏจักรและมีการเชื่อมต่อถึงกัน"
+                }, {
+                    "text": "The presence of a root node. | การมีโหนดราก",
+                    "vt": false,
+                    "Glb": "While many trees are 'rooted' to give them a hierarchy, not all trees have a designated root, and general graphs do not. | แม้ว่าต้นไม้จำนวนมากจะมี 'ราก' เพื่อให้มีลำดับชั้น แต่ไม่ใช่ทุกต้นไม้จะมีโหนดรากที่กำหนดไว้ และกราฟทั่วไปก็ไม่มี"
+                }, {
+                    "text": "It must have more vertices than edges. | ต้องมีจุดยอดมากกว่าเส้นเชื่อม",
+                    "vt": false,
+                    "Glb": "In a tree, the number of vertices is always exactly one more than the number of edges (V = E + 1), not just 'more'. | ในต้นไม้ จำนวนจุดยอดจะมากกว่าจำนวนเส้นเชื่อมอยู่หนึ่งเสมอ (V = E + 1) ไม่ใช่แค่ 'มากกว่า'"
+                }, {
+                    "text": "All edges must be weighted. | เส้นเชื่อมทุกเส้นต้องมีค่าน้ำหนัก",
+                    "vt": false,
+                    "Glb": "Edge weights are a feature of weighted graphs, but they are not a requirement for a structure to be classified as a tree. | ค่าน้ำหนักของเส้นเชื่อมเป็นคุณสมบัติของกราฟถ่วงน้ำหนัก แต่ไม่ใช่ข้อกำหนดสำหรับโครงสร้างที่จะจัดว่าเป็นต้นไม้"
+                }]
+            }, {
+                "Aua": 0,
+                "question": "Given a binary tree with root 'A', left child 'B', and right child 'C', what is the Pre-order traversal sequence? | กำหนดให้ต้นไม้ทวิภาคมีรากคือ 'A', ลูกซ้ายคือ 'B', และลูกขวาคือ 'C', ลำดับการท่องไปแบบ Pre-order คืออะไร?",
+                "hint": "Pre-order traversal visits the current node first before exploring its children. | การท่องไปแบบ Pre-order จะเยี่ยมโหนดปัจจุบันก่อนที่จะไปสำรวจลูก",
+                "jF": [{
+                    "text": "A, B, C",
+                    "vt": true,
+                    "Glb": "Pre-order follows the 'Root, Left, Right' pattern, so the root 'A' is visited first, followed by the left subtree 'B', then the right subtree 'C'. | Pre-order เป็นไปตามรูปแบบ 'ราก, ซ้าย, ขวา' ดังนั้นราก 'A' จะถูกเยี่ยมก่อน ตามด้วยต้นไม้ย่อยด้านซ้าย 'B' แล้วจึงไปที่ต้นไม้ย่อยด้านขวา 'C'"
+                }, {
+                    "text": "B, A, C",
+                    "vt": false,
+                    "Glb": "This sequence represents an In-order ('Left, Root, Right') traversal, where the left subtree is visited before the root. | ลำดับนี้แสดงถึงการท่องไปแบบ In-order ('ซ้าย, ราก, ขวา') ซึ่งต้นไม้ย่อยด้านซ้ายจะถูกเยี่ยมก่อนราก"
+                }, {
+                    "text": "B, C, A",
+                    "vt": false,
+                    "Glb": "This sequence represents a Post-order ('Left, Right, Root') traversal, where the root is visited last. | ลำดับนี้แสดงถึงการท่องไปแบบ Post-order ('ซ้าย, ขวา, ราก') ซึ่งรากจะถูกเยี่ยมเป็นลำดับสุดท้าย"
+                }, {
+                    "text": "C, B, A",
+                    "vt": false,
+                    "Glb": "This sequence doesn't match any of the standard traversal methods, as it visits the right child first. | ลำดับนี้ไม่ตรงกับวิธีการท่องไปมาตรฐานใดๆ เนื่องจากเป็นการเยี่ยมลูกด้านขวาก่อน"
+                }]
+            }, {
+                "Aua": 0,
+                "question": "Which of the following traversal methods visits the root node last? | วิธีการท่องไปแบบใดต่อไปนี้ที่เยี่ยมโหนดรากเป็นลำดับสุดท้าย?",
+                "hint": "The name of this traversal method describes when the root is processed relative to its children. | ชื่อของวิธีการท่องไปนี้อธิบายถึงเวลาที่รากถูกประมวลผลเมื่อเทียบกับลูกๆ ของมัน",
+                "jF": [{
+                    "text": "Post-order",
+                    "vt": true,
+                    "Glb": "Post-order traversal follows the 'Left, Right, Root' pattern, ensuring the root is the last node visited in any given subtree. | การท่องไปแบบ Post-order เป็นไปตามรูปแบบ 'ซ้าย, ขวา, ราก' ทำให้แน่ใจว่ารากเป็นโหนดสุดท้ายที่ถูกเยี่ยมในต้นไม้ย่อยใดๆ"
+                }, {
+                    "text": "In-order",
+                    "vt": false,
+                    "Glb": "In-order traversal ('Left, Root, Right') visits the root in between visiting the left and right subtrees. | การท่องไปแบบ In-order ('ซ้าย, ราก, ขวา') จะเยี่ยมรากระหว่างการเยี่ยมต้นไม้ย่อยด้านซ้ายและขวา"
+                }, {
+                    "text": "Pre-order",
+                    "vt": false,
+                    "Glb": "Pre-order traversal ('Root, Left, Right') visits the root node before visiting any of its children. | การท่องไปแบบ Pre-order ('ราก, ซ้าย, ขวา') จะเยี่ยมโหนดรากก่อนที่จะเยี่ยมลูกๆ ของมัน"
+                }, {
+                    "text": "Level-order",
+                    "vt": false,
+                    "Glb": "Level-order traversal visits nodes level by level, so the root is always visited first. | การท่องไปแบบ Level-order จะเยี่ยมโหนดทีละระดับ ดังนั้นรากจะถูกเยี่ยมเป็นลำดับแรกเสมอ"
+                }]
+            }, {
+                "Aua": 0,
+                "question": "What is the primary goal when creating a Minimum Spanning Tree (MST)? | อะไรคือเป้าหมายหลักในการสร้าง Minimum Spanning Tree (MST)?",
+                "hint": "Consider a real-world example like connecting cities with the least amount of cable. | ลองพิจารณาตัวอย่างในโลกแห่งความเป็นจริง เช่น การเชื่อมต่อเมืองต่างๆ ด้วยสายเคเบิลที่น้อยที่สุด",
+                "jF": [{
+                    "text": "To connect all vertices with the minimum possible total edge weight. | เพื่อเชื่อมต่อจุดยอดทั้งหมดด้วยน้ำหนักรวมของเส้นเชื่อน้อยที่สุดเท่าที่จะเป็นไปได้",
+                    "vt": true,
+                    "Glb": "The definition of an MST is a spanning tree whose sum of edge weights is less than or equal to every other spanning tree. | คำจำกัดความของ MST คือต้นไม้แบบทอดข้ามที่ผลรวมของน้ำหนักเส้นเชื่อมมีค่าน้อยกว่าหรือเท่ากับต้นไม้แบบทอดข้ามอื่นๆ ทุกต้น"
+                }, {
+                    "text": "To find the shortest path between two specific vertices. | เพื่อค้นหาเส้นทางที่สั้นที่สุดระหว่างจุดยอดสองจุดที่ระบุ",
+                    "vt": false,
+                    "Glb": "Finding the shortest path between two points is a different problem, typically solved by algorithms like Dijkstra's. | การค้นหาเส้นทางที่สั้นที่สุดระหว่างสองจุดเป็นปัญหาที่แตกต่างออกไป ซึ่งโดยทั่วไปจะแก้ไขด้วยอัลกอริทึมเช่น Dijkstra's"
+                }, {
+                    "text": "To create a tree with the fewest possible edges. | เพื่อสร้างต้นไม้ที่มีเส้นเชื่อน้อยที่สุดเท่าที่จะเป็นไปได้",
+                    "vt": false,
+                    "Glb": "All spanning trees for a given graph will have the same number of edges (V-1), so this is not the distinguishing factor. | ต้นไม้แบบทอดข้ามทั้งหมดสำหรับกราฟที่กำหนดจะมีจำนวนเส้นเชื่อมเท่ากัน (V-1) ดังนั้นนี่จึงไม่ใช่ปัจจัยที่สร้างความแตกต่าง"
+                }, {
+                    "text": "To ensure the graph has no cycles. | เพื่อให้แน่ใจว่ากราฟไม่มีวัฏจักร",
+                    "vt": false,
+                    "Glb": "While an MST has no cycles, this is true for *all* spanning trees, not just the minimum one. | แม้ว่า MST จะไม่มีวัฏจักร แต่ก็เป็นจริงสำหรับต้นไม้แบบทอดข้าม *ทุก* ต้น ไม่ใช่แค่ต้นที่น้อยที่สุด"
+                }]
+            }, {
+                "Aua": 0,
+                "question": "How does Prim's algorithm start building a Minimum Spanning Tree? | อัลกอริทึมของพริมเริ่มต้นสร้าง Minimum Spanning Tree อย่างไร?",
+                "hint": "Prim's algorithm 'grows' its tree from a single point. | อัลกอริทึมของพริม 'ขยาย' ต้นไม้จากจุดเดียว",
+                "jF": [{
+                    "text": "By selecting an arbitrary starting vertex. | โดยการเลือกจุดยอดเริ่มต้นแบบสุ่ม",
+                    "vt": true,
+                    "Glb": "Prim's is a vertex-based algorithm that starts from a single node and grows the MST by adding the nearest vertex not yet in the tree. | อัลกอริทึมของพริมเป็นอัลกอริทึมที่อิงตามจุดยอดซึ่งเริ่มต้นจากโหนดเดียวและขยาย MST โดยการเพิ่มจุดยอดที่ใกล้ที่สุดที่ยังไม่ได้อยู่ในต้นไม้"
+                }, {
+                    "text": "By sorting all edges in the graph by weight. | โดยการเรียงลำดับเส้นเชื่อมทั้งหมดในกราฟตามน้ำหนัก",
+                    "vt": false,
+                    "Glb": "Sorting all edges first is the initial step of Kruskal's algorithm, not Prim's. | การเรียงลำดับเส้นเชื่อมทั้งหมดก่อนเป็นขั้นตอนเริ่มต้นของอัลกอริทึมของครูสกัล ไม่ใช่ของพริม"
+                }, {
+                    "text": "By selecting the edge with the lowest weight in the entire graph. | โดยการเลือกเส้นเชื่อมที่มีน้ำหนักน้อยที่สุดในกราฟทั้งหมด",
+                    "vt": false,
+                    "Glb": "This is the first step of Kruskal's algorithm, which is edge-based. | นี่เป็นขั้นตอนแรกของอัลกอริทึมของครูสกัลซึ่งอิงตามเส้นเชื่อม"
+                }, {
+                    "text": "By creating a forest of single-vertex trees. | โดยการสร้างป่าของต้นไม้ที่มีจุดยอดเดียว",
+                    "vt": false,
+                    "Glb": "Considering each vertex as its own tree is characteristic of the Disjoint Set Union structure used in Kruskal's algorithm. | การพิจารณาแต่ละจุดยอดเป็นต้นไม้ของตัวเองเป็นลักษณะเฉพาะของโครงสร้าง Disjoint Set Union ที่ใช้ในอัลกอริทึมของครูสกัล"
+                }]
+            }, {
+                "Aua": 0,
+                "question": "What is the primary concern for Kruskal's algorithm when considering whether to add an edge to the MST? | อะไรคือข้อกังวลหลักของอัลกอริทึมของครูสกัลเมื่อพิจารณาว่าจะเพิ่มเส้นเชื่อมเข้าไปใน MST หรือไม่?",
+                "hint": "The algorithm must maintain the defining property of a tree. | อัลกอริทึมต้องรักษาคุณสมบัติที่กำหนดของต้นไม้ไว้",
+                "jF": [{
+                    "text": "Whether adding the edge will form a cycle. | การเพิ่มเส้นเชื่อมจะทำให้เกิดวัฏจักรหรือไม่",
+                    "vt": true,
+                    "Glb": "Kruskal's algorithm iterates through sorted edges and adds an edge only if it connects two previously disconnected components, thus avoiding cycles. | อัลกอริทึมของครูสกัลจะวนซ้ำผ่านเส้นเชื่อมที่เรียงลำดับแล้วและเพิ่มเส้นเชื่อมก็ต่อเมื่อมันเชื่อมต่อสององค์ประกอบที่ไม่ได้เชื่อมต่อกันก่อนหน้านี้ ซึ่งจะช่วยหลีกเลี่ยงวัฏจักร"
+                }, {
+                    "text": "Whether the edge is connected to the starting vertex. | เส้นเชื่อมนั้นเชื่อมต่อกับจุดยอดเริ่มต้นหรือไม่",
+                    "vt": false,
+                    "Glb": "This is a consideration for Prim's algorithm; Kruskal's does not have a 'starting vertex' and can add edges anywhere in the graph. | นี่เป็นข้อควรพิจารณาสำหรับอัลกอริทึมของพริม อัลกอริทึมของครูสกัลไม่มี 'จุดยอดเริ่มต้น' และสามารถเพิ่มเส้นเชื่อมได้ทุกที่ในกราฟ"
+                }, {
+                    "text": "Whether the edge has the highest weight. | เส้นเชื่อมนั้นมีน้ำหนักมากที่สุดหรือไม่",
+                    "vt": false,
+                    "Glb": "Kruskal's algorithm considers edges in ascending order of weight, so it always looks at the lowest-weighted available edge. | อัลกอริทึมของครูสกัลพิจารณาเส้นเชื่อมตามลำดับน้ำหนักจากน้อยไปมาก ดังนั้นจึงมองหาเส้นเชื่อมที่มีน้ำหนักน้อยที่สุดที่มีอยู่เสมอ"
+                }, {
+                    "text": "Whether both vertices of the edge have been visited. | จุดยอดทั้งสองของเส้นเชื่อมถูกเยี่ยมชมแล้วหรือไม่",
+                    "vt": false,
+                    "Glb": "If both vertices were already part of the same component, adding the edge between them would create a cycle, which is what the algorithm avoids. | หากจุดยอดทั้งสองเป็นส่วนหนึ่งขององค์ประกอบเดียวกันอยู่แล้ว การเพิ่มเส้นเชื่อมระหว่างจุดยอดทั้งสองจะสร้างวัฏจักร ซึ่งเป็นสิ่งที่อัลกอริทึมหลีกเลี่ยง"
+                }]
+            }, {
+                "Aua": 0,
+                "question": "A connected graph has 7 vertices. How many edges will its spanning tree have? | กราฟที่เชื่อมต่อถึงกันมี 7 จุดยอด ต้นไม้แบบทอดข้ามของมันจะมีกี่เส้นเชื่อม?",
+                "hint": "There's a direct mathematical relationship between the number of vertices (V) and edges (E) in any tree. | มีความสัมพันธ์ทางคณิตศาสตร์โดยตรงระหว่างจำนวนจุดยอด (V) และเส้นเชื่อม (E) ในต้นไม้ทุกต้น",
+                "jF": [{
+                    "text": "6",
+                    "vt": true,
+                    "Glb": "Any tree, including a spanning tree, always has V-1 edges, where V is the number of vertices. So, 7 - 1 = 6. | ต้นไม้ทุกต้น รวมถึงต้นไม้แบบทอดข้าม จะมีเส้นเชื่อม V-1 เส้นเสมอ โดยที่ V คือจำนวนจุดยอด ดังนั้น 7 - 1 = 6"
+                }, {
+                    "text": "7",
+                    "vt": false,
+                    "Glb": "If a connected graph has V vertices and V edges, it is guaranteed to contain at least one cycle, so it cannot be a tree. | หากกราฟที่เชื่อมต่อถึงกันมี V จุดยอดและ V เส้นเชื่อม รับประกันได้ว่าจะมีวัฏจักรอย่างน้อยหนึ่งวัฏจักร ดังนั้นจึงไม่สามารถเป็นต้นไม้ได้"
+                }, {
+                    "text": "8",
+                    "vt": false,
+                    "Glb": "Having more edges than vertices in a connected graph ensures the presence of a cycle, meaning it cannot be a tree. | การมีเส้นเชื่อมมากกว่าจุดยอดในกราฟที่เชื่อมต่อถึงกันทำให้แน่ใจได้ว่ามีวัฏจักร ซึ่งหมายความว่าไม่สามารถเป็นต้นไม้ได้"
+                }, {
+                    "text": "It depends on the graph structure. | ขึ้นอยู่กับโครงสร้างของกราฟ",
+                    "vt": false,
+                    "Glb": "While the total number of edges in the original graph can vary, the number of edges in *any* of its spanning trees is fixed at V-1. | แม้ว่าจำนวนเส้นเชื่อมทั้งหมดในกราฟเดิมอาจแตกต่างกันไป แต่จำนวนเส้นเชื่อมในต้นไม้แบบทอดข้าม *ใดๆ* ของมันจะคงที่ที่ V-1"
+                }]
+            }, {
+                "Aua": 0,
+                "question": "True or False: A single graph can have multiple, different Minimum Spanning Trees. | จริงหรือเท็จ: กราฟหนึ่งกราฟสามารถมี Minimum Spanning Trees ที่แตกต่างกันได้หลายต้น",
+                "hint": "Consider what happens if two or more edges in the graph have the same weight. | ลองพิจารณาว่าจะเกิดอะไรขึ้นหากเส้นเชื่อมตั้งแต่สองเส้นขึ้นไปในกราฟมีน้ำหนักเท่ากัน",
+                "jF": [{
+                    "text": "True | จริง",
+                    "vt": true,
+                    "Glb": "If a graph has multiple edges with the same weight, it's possible to construct different spanning trees that all have the same minimum total weight. | หากกราฟมีเส้นเชื่อมหลายเส้นที่มีน้ำหนักเท่ากัน เป็นไปได้ที่จะสร้างต้นไม้แบบทอดข้ามที่แตกต่างกันซึ่งทั้งหมดมีน้ำหนักรวมน้อยที่สุดเท่ากัน"
+                }, {
+                    "text": "False | เท็จ",
+                    "vt": false,
+                    "Glb": "While the total weight of the MST is unique, the set of edges that form it is not necessarily unique. | แม้ว่าน้ำหนักรวมของ MST จะไม่ซ้ำกัน แต่ชุดของเส้นเชื่อมที่ประกอบเป็น MST นั้นไม่จำเป็นต้องไม่ซ้ำกัน"
+                }]
+            }, {
+                "Aua": 0,
+                "question": "Which data structure is most commonly used to efficiently check for cycles in Kruskal's algorithm? | โครงสร้างข้อมูลใดที่นิยมใช้มากที่สุดในการตรวจสอบวัฏจักรอย่างมีประสิทธิภาพในอัลกอริทึมของครูสกัล?",
+                "hint": "This data structure is specialized for tracking sets of elements partitioned into a number of disjoint (non-overlapping) subsets. | โครงสร้างข้อมูลนี้เชี่ยวชาญในการติดตามกลุ่มขององค์ประกอบที่แบ่งออกเป็นเซตย่อยที่ไม่คาบเกี่ยวกันจำนวนหนึ่ง",
+                "jF": [{
+                    "text": "Disjoint Set Union (DSU)",
+                    "vt": true,
+                    "Glb": "A DSU is ideal for managing components and quickly determining if two vertices belong to the same component, which would indicate a cycle. | DSU เหมาะอย่างยิ่งสำหรับการจัดการองค์ประกอบและพิจารณาอย่างรวดเร็วว่าจุดยอดสองจุดอยู่ในองค์ประกอบเดียวกันหรือไม่ ซึ่งจะบ่งชี้ถึงวัฏจักร"
+                }, {
+                    "text": "Priority Queue",
+                    "vt": false,
+                    "Glb": "A priority queue is typically used in Prim's algorithm to efficiently find the minimum weight edge connecting a visited vertex to an unvisited one. | โดยทั่วไปแล้วคิวลำดับความสำคัญจะใช้ในอัลกอริทึมของพริมเพื่อค้นหาเส้นเชื่อมที่มีน้ำหนักน้อยที่สุดที่เชื่อมต่อจุดยอดที่เยี่ยมชมแล้วกับจุดยอดที่ยังไม่ได้เยี่ยมชมอย่างมีประสิทธิภาพ"
+                }, {
+                    "text": "Stack",
+                    "vt": false,
+                    "Glb": "A stack is often used in Depth-First Search (DFS) traversals but is not the primary tool for cycle detection in Kruskal's. | สแต็กมักใช้ในการท่องไปแบบ Depth-First Search (DFS) แต่ไม่ใช่เครื่องมือหลักในการตรวจจับวัฏจักรในอัลกอริทึมของครูสกัล"
+                }, {
+                    "text": "Adjacency List",
+                    "vt": false,
+                    "Glb": "An adjacency list is a way to represent the graph itself, but it doesn't perform the cycle-checking logic required by the algorithm. | รายการประชิดเป็นวิธีการแทนกราฟ แต่ไม่ได้ดำเนินการตรรกะการตรวจสอบวัฏจักรที่อัลกอริทึมต้องการ"
+                }]
+            }, {
+                "Aua": 0,
+                "question": "For the tree in the presentation (root 1, with children 2 and 3, etc.), what is the In-order traversal result? | สำหรับต้นไม้ในงานนำเสนอ (ราก 1, มีลูก 2 และ 3, ฯลฯ) ผลลัพธ์ของการท่องไปแบบ In-order คืออะไร?",
+                "hint": "In-order traversal follows the pattern: Left, Root, Right. | การท่องไปแบบ In-order เป็นไปตามรูปแบบ: ซ้าย, ราก, ขวา",
+                "jF": [{
+                    "text": "4, 2, 5, 1, 3",
+                    "vt": true,
+                    "Glb": "The algorithm goes all the way left to 4, up to its root 2, to the right 5, then up to the main root 1, and finally to the right 3. | อัลกอริทึมจะไปทางซ้ายสุดถึง 4, ขึ้นไปยังราก 2, ไปทางขวา 5, จากนั้นขึ้นไปยังรากหลัก 1, และสุดท้ายไปทางขวา 3"
+                }, {
+                    "text": "1, 2, 4, 5, 3",
+                    "vt": false,
+                    "Glb": "This sequence represents a Pre-order ('Root, Left, Right') traversal. | ลำดับนี้แสดงถึงการท่องไปแบบ Pre-order ('ราก, ซ้าย, ขวา')"
+                }, {
+                    "text": "4, 5, 2, 3, 1",
+                    "vt": false,
+                    "Glb": "This sequence represents a Post-order ('Left, Right, Root') traversal. | ลำดับนี้แสดงถึงการท่องไปแบบ Post-order ('ซ้าย, ขวา, ราก')"
+                }, {
+                    "text": "1, 3, 2, 5, 4",
+                    "vt": false,
+                    "Glb": "This sequence does not follow any of the standard recursive traversal patterns. | ลำดับนี้ไม่เป็นไปตามรูปแบบการท่องไปแบบเรียกซ้ำมาตรฐานใดๆ"
+                }]
+            }]
+        };
+
+        // Standardize the JSON keys
+        const quizData = quizDataRaw.Qn.map(q => ({
+            question: q.question,
+            hint: q.hint,
+            answerOptions: q.jF.map(opt => ({
+                text: opt.text,
+                isCorrect: opt.vt,
+                rationale: opt.Glb
+            }))
+        }));
+
+        const quizContainer = document.getElementById('quiz-container');
+
+        quizData.forEach((questionData, questionIndex) => {
+            // Create question card
+            const questionCard = document.createElement('div');
+            questionCard.className = 'bg-white p-6 rounded-lg shadow-md';
+
+            // Question text
+            const questionText = document.createElement('h2');
+            questionText.className = 'text-xl font-semibold mb-2';
+            questionText.textContent = `Question ${questionIndex + 1}: ${questionData.question}`;
+            
+            // Hint
+            const hintText = document.createElement('p');
+            hintText.className = 'text-sm text-gray-500 mb-4';
+            hintText.textContent = `Hint: ${questionData.hint}`;
+
+            questionCard.appendChild(questionText);
+            questionCard.appendChild(hintText);
+            
+            // Options container
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'space-y-3';
+            optionsContainer.id = `q${questionIndex}-options`;
+
+            questionData.answerOptions.forEach(option => {
+                const optionWrapper = document.createElement('div');
+
+                const optionButton = document.createElement('div');
+                optionButton.className = 'quiz-option w-full text-left p-3 border-2 border-gray-200 rounded-md hover:bg-gray-100';
+                optionButton.textContent = option.text;
+                optionButton.dataset.correct = option.isCorrect;
+                
+                const rationaleText = document.createElement('p');
+                rationaleText.className = 'rationale text-gray-700';
+                rationaleText.textContent = option.rationale;
+                
+                optionButton.onclick = () => handleOptionClick(optionButton, questionIndex);
+
+                optionWrapper.appendChild(optionButton);
+                optionWrapper.appendChild(rationaleText);
+                optionsContainer.appendChild(optionWrapper);
+            });
+            
+            questionCard.appendChild(optionsContainer);
+            quizContainer.appendChild(questionCard);
+        });
+
+        function handleOptionClick(selectedOption, questionIndex) {
+            const isCorrect = selectedOption.dataset.correct === 'true';
+            const optionsContainer = document.getElementById(`q${questionIndex}-options`);
+            const allOptions = optionsContainer.querySelectorAll('.quiz-option');
+
+            // Disable all options for this question
+            allOptions.forEach(opt => {
+                opt.classList.add('disabled');
+                opt.onclick = null; // Remove click event
+            });
+            
+            // Style the selected option
+            selectedOption.classList.add(isCorrect ? 'correct' : 'incorrect');
+            
+            // Show rationale for the clicked option
+            selectedOption.nextElementSibling.classList.add('visible');
+
+            // If incorrect, also highlight the correct answer
+            if (!isCorrect) {
+                allOptions.forEach(opt => {
+                    if (opt.dataset.correct === 'true') {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+        }
+    </script>
+
+</body>
+</html>
+
