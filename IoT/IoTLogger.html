@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Logger Apps: A Comparison</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Sarabun:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Sarabun', 'Inter', sans-serif;
+            overscroll-behavior: none;
+        }
+        .slide {
+            display: none;
+            min-height: 100vh;
+            opacity: 0;
+            transition: opacity 0.7s ease-in-out;
+        }
+        .slide.active {
+            display: flex;
+            opacity: 1;
+        }
+        .nav-btn, .interactive-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-btn:hover, .interactive-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .eng-text {
+            opacity: 0.75;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+        }
+        .table-header {
+            background-color: #374151; /* gray-700 */
+        }
+        .table-cell {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #4B5563; /* gray-600 */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white overflow-hidden">
+
+    <main id="presentation-container">
+
+        <!-- Slide 1: Title -->
+        <section class="slide active flex-col justify-center items-center text-center p-8 bg-cover bg-center" style="background-image: linear-gradient(rgba(17, 24, 39, 0.8), rgba(17, 24, 39, 0.95)), url('https://placehold.co/1200x800/0E1018/FFFFFF?text=IoT+Apps');">
+            <div class="text-5xl md:text-6xl font-bold">
+                <div>เจาะลึกแอปพลิเคชัน IoT Logger</div>
+                <div class="text-4xl md:text-5xl eng-text mt-2">A Deep Dive into IoT Logger Apps</div>
+            </div>
+            <div class="text-2xl md:text-3xl mt-6 text-gray-300">
+                <div>การเปรียบเทียบ: Sensor Logger vs. IoT MQTT Panel</div>
+                <div class="text-xl md:text-2xl eng-text mt-1">A Comparison: Sensor Logger vs. IoT MQTT Panel</div>
+            </div>
+        </section>
+
+        <!-- Slide 2: What is an IoT Logger App? -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+            <div class="text-4xl md:text-5xl font-bold mb-4">
+                <div>แอปพลิเคชัน IoT Logger คืออะไร?</div>
+                <div class="text-3xl md:text-4xl eng-text">What is an IoT Logger App?</div>
+            </div>
+            <div class="text-lg md:text-xl text-gray-300 max-w-3xl mb-8">
+                <div>เป็นเครื่องมือทรงพลังที่เปลี่ยนสมาร์ทโฟนของคุณให้กลายเป็นอุปกรณ์ IoT แบบพกพาได้ทันที</div>
+                <div class="text-base md:text-lg eng-text mt-2">It's a powerful tool that instantly turns your smartphone into a portable IoT device.</div>
+            </div>
+            <div class="w-full max-w-3xl bg-gray-800 p-6 rounded-lg text-left space-y-4">
+                <div>
+                    <h3 class="font-bold text-xl text-teal-300">อ่าน (Read):</h3>
+                    <p class="text-gray-400">เข้าถึงข้อมูลดิบจากเซ็นเซอร์ภายในโทรศัพท์ (ความเร่ง, GPS, ความสว่าง, และอื่นๆ)<span class="block eng-text text-sm">Access raw data from the phone's internal sensors (accelerometer, GPS, light, etc.).</span></p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-xl text-teal-300">ส่งต่อ (Forward):</h3>
+                    <p class="text-gray-400">ส่งข้อมูลนั้นไปยังแพลตฟอร์ม IoT หรือเซิร์ฟเวอร์บนอินเทอร์เน็ตเพื่อการวิเคราะห์<span class="block eng-text text-sm">Send that data to an IoT platform or a server on the internet for analysis.</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Why Use One? -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+            <div class="text-4xl md:text-5xl font-bold mb-8">
+                <div>ทำไมจึงต้องใช้แอปประเภทนี้?</div>
+                <div class="text-3xl md:text-4xl eng-text">Why Use One?</div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl">
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="font-bold text-2xl mb-2">✅ ไม่ต้องใช้ฮาร์ดแวร์<span class="block eng-text text-xl">No Hardware Needed</span></h3>
+                    <p class="text-gray-400">คุณมีอุปกรณ์ IoT ที่เต็มไปด้วยเซ็นเซอร์อยู่ในกระเป๋าของคุณแล้ว<span class="block eng-text text-sm">You already have a sensor-packed IoT device in your pocket.</span></p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="font-bold text-2xl mb-2">✅ การสร้างต้นแบบที่รวดเร็ว<span class="block eng-text text-xl">Rapid Prototyping</span></h3>
+                    <p class="text-gray-400">ทดสอบแนวคิด IoT ของคุณได้ภายในไม่กี่นาที แทนที่จะเป็นวัน<span class="block eng-text text-sm">Test your IoT ideas in minutes, not days.</span></p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="font-bold text-2xl mb-2">✅ ต้นทุนต่ำ<span class="block eng-text text-xl">Low Cost</span></h3>
+                    <p class="text-gray-400">แอปส่วนใหญ่ฟรีหรือมีราคาถูกมาก เหมาะสำหรับผู้เริ่มต้น<span class="block eng-text text-sm">Most apps are free or very inexpensive, perfect for beginners.</span></p>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="font-bold text-2xl mb-2">✅ ความคล่องตัว<span class="block eng-text text-xl">Mobility</span></h3>
+                    <p class="text-gray-400">รวบรวมข้อมูลได้ทุกที่ที่สมาร์ทโฟนของคุณไปได้<span class="block eng-text text-sm">Collect data anywhere your smartphone can go.</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Today's Contenders -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+            <div class="text-4xl md:text-5xl font-bold mb-8">
+                <div>ผู้เข้าแข่งขันในวันนี้</div>
+                <div class="text-3xl md:text-4xl eng-text">Today's Contenders</div>
+            </div>
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl">
+                <div class="flex-1 bg-gray-800 p-8 rounded-lg">
+                    <h3 class="text-3xl font-bold">Sensor Logger (iOS)</h3>
+                    <p class="text-2xl text-blue-300 mt-4">📲 นักเก็บข้อมูล<span class="block eng-text text-xl">The Data Collector</span></p>
+                    <p class="mt-4 text-gray-400">เน้นการอ่านข้อมูลเซ็นเซอร์ทั้งหมดอย่างครอบคลุมแล้วส่งออกไป<span class="block eng-text text-sm mt-1">Focuses on comprehensively reading all sensor data and exporting it.</span></p>
+                </div>
+                <div class="flex-1 bg-gray-800 p-8 rounded-lg">
+                    <h3 class="text-3xl font-bold">IoT MQTT Panel</h3>
+                    <p class="text-2xl text-purple-300 mt-4">🕹️ แผงควบคุม<span class="block eng-text text-xl">The Control Panel</span></p>
+                    <p class="mt-4 text-gray-400">เน้นการสร้างแดชบอร์ดที่ปรับแต่งได้เพื่อแสดงผลข้อมูลและส่งคำสั่ง<span class="block eng-text text-sm mt-1">Focuses on creating custom dashboards to visualize data and send commands.</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Feature Comparison Table -->
+        <section class="slide flex-col justify-center items-center p-4 md:p-8">
+            <div class="text-3xl md:text-4xl font-bold text-center mb-8">
+                <div>ตารางเปรียบเทียบคุณสมบัติ</div>
+                <div class="text-2xl md:text-3xl eng-text">Feature Comparison Table</div>
+            </div>
+            <div class="w-full max-w-6xl overflow-x-auto bg-gray-800 rounded-lg">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr>
+                            <th class="table-header table-cell"><div>คุณสมบัติ</div><span class="eng-text text-sm">Feature</span></th>
+                            <th class="table-header table-cell">Sensor Logger (iOS)</th>
+                            <th class="table-header table-cell">IoT MQTT Panel</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="table-cell"><div><strong>ฟังก์ชันหลัก</strong></div><span class="eng-text text-sm">Primary Function</span></td><td class="table-cell"><div>บันทึกข้อมูลดิบ</div><span class="eng-text text-sm">Raw Data Logging</span></td><td class="table-cell"><div>ควบคุมและแสดงผล MQTT</div><span class="eng-text text-sm">MQTT Control & Visualization</span></td></tr>
+                        <tr><td class="table-cell"><div><strong>ความง่ายสำหรับผู้เริ่มต้น</strong></div><span class="eng-text text-sm">Beginner Friendliness</span></td><td class="table-cell">✅ ง่ายมาก<span class="block eng-text text-sm">Very Easy</span></td><td class="table-cell">⚠️ ปานกลาง<span class="block eng-text text-sm">Medium</span></td></tr>
+                        <tr><td class="table-cell"><div><strong>โปรโตคอลที่รองรับ</strong></div><span class="eng-text text-sm">Supported Protocols</span></td><td class="table-cell">HTTP(S) Post, CSV Export</td><td class="table-cell">MQTT</td></tr>
+                        <tr><td class="table-cell"><div><strong>การปรับแต่ง UI</strong></div><span class="eng-text text-sm">UI Customization</span></td><td class="table-cell">❌ ต่ำ<span class="block eng-text text-sm">Low</span></td><td class="table-cell">✅ สูงมาก<span class="block eng-text text-sm">Very High</span></td></tr>
+                        <tr><td class="table-cell"><div><strong>การสื่อสารสองทาง</strong></div><span class="eng-text text-sm">Two-way Communication</span></td><td class="table-cell">❌ ไม่<span class="block eng-text text-sm">No</span></td><td class="table-cell">✅ ใช่<span class="block eng-text text-sm">Yes</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Slide 6: Understanding Protocols -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+             <div class="text-4xl md:text-5xl font-bold mb-8">
+                <div>ทำความเข้าใจโปรโตคอล: วิธีที่แอปพูดคุย</div>
+                <div class="text-3xl md:text-4xl eng-text">Understanding Protocols: How Apps Talk</div>
+            </div>
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl">
+                <div class="flex-1 bg-gray-800 p-8 rounded-lg">
+                    <h3 class="text-3xl font-bold">HTTP / CSV</h3>
+                    <p class="text-2xl text-gray-400 mt-4">📤 การส่งจดหมาย<span class="block eng-text text-xl">Sending a Letter</span></p>
+                    <p class="mt-4 text-gray-300">เป็นการสื่อสารทางเดียวเพื่อส่งข้อมูลเป็นชุดๆ หรือบันทึกเพื่อใช้ภายหลัง<span class="block eng-text text-sm mt-1">One-way communication to send batches of data or save it for later.</span></p>
+                </div>
+                <div class="flex-1 bg-gray-800 p-8 rounded-lg">
+                    <h3 class="text-3xl font-bold">MQTT</h3>
+                    <p class="text-2xl text-gray-400 mt-4">💬 ห้องแชทสด<span class="block eng-text text-xl">A Live Chat Room</span></p>
+                    <p class="mt-4 text-gray-300">เหมาะสำหรับการสื่อสารสองทางแบบเรียลไทม์, มีประสิทธิภาพสูง และประหยัดข้อมูล<span class="block eng-text text-sm mt-1">Ideal for real-time, two-way, efficient, and low-data communication.</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: HTTP vs MQTT Table -->
+        <section class="slide flex-col justify-center items-center p-4 md:p-8">
+             <div class="text-3xl md:text-4xl font-bold text-center mb-8">
+                <div>ตารางเปรียบเทียบ: HTTP vs. MQTT สำหรับ IoT</div>
+                <div class="text-2xl md:text-3xl eng-text">Comparison: HTTP vs. MQTT for IoT</div>
+            </div>
+            <div class="w-full max-w-6xl overflow-x-auto bg-gray-800 rounded-lg">
+                <table class="w-full text-left">
+                     <thead>
+                        <tr>
+                            <th class="table-header table-cell"><div>คุณสมบัติ</div><span class="eng-text text-sm">Feature</span></th>
+                            <th class="table-header table-cell">HTTP</th>
+                            <th class="table-header table-cell">MQTT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="table-cell"><div><strong>รูปแบบการสื่อสาร</strong></div><span class="eng-text text-sm">Communication Model</span></td><td class="table-cell"><div>ร้องขอ-ตอบกลับ</div><span class="eng-text text-sm">Request-Response</span></td><td class="table-cell"><div>เผยแพร่-ติดตาม</div><span class="eng-text text-sm">Publish-Subscribe</span></td></tr>
+                        <tr><td class="table-cell"><div><strong>จุดประสงค์หลัก</strong></div><span class="eng-text text-sm">Primary Focus</span></td><td class="table-cell"><div>การดึงข้อมูล</div><span class="eng-text text-sm">Data Fetching</span></td><td class="table-cell"><div>การกระจายข้อมูล</div><span class="eng-text text-sm">Data Broadcasting</span></td></tr>
+                        <tr><td class="table-cell"><div><strong>ขนาดข้อความ</strong></div><span class="eng-text text-sm">Message Size</span></td><td class="table-cell"><div>ใหญ่กว่า</div><span class="eng-text text-sm">Larger</span></td><td class="table-cell"><div>เล็กมาก</div><span class="eng-text text-sm">Very Small</span></td></tr>
+                        <tr><td class="table-cell"><div><strong>การเชื่อมต่อ</strong></div><span class="eng-text text-sm">Connection</span></td><td class="table-cell"><div>ชั่วคราว</div><span class="eng-text text-sm">Temporary</span></td><td class="table-cell"><div>ต่อเนื่อง</div><span class="eng-text text-sm">Persistent</span></td></tr>
+                        <tr><td class="table-cell"><div><strong>การใช้พลังงาน/แบนด์วิดท์</strong></div><span class="eng-text text-sm">Power/Bandwidth</span></td><td class="table-cell"><div>สูงกว่า</div><span class="eng-text text-sm">Higher</span></td><td class="table-cell"><div>ต่ำมาก</div><span class="eng-text text-sm">Very Low</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Slide 8: Essential Terms -->
+        <section class="slide flex-col justify-center items-center p-8">
+            <div class="text-4xl md:text-5xl font-bold text-center mb-8">
+                <div>คำศัพท์สำคัญที่ควรรู้</div>
+                <div class="text-3xl md:text-4xl eng-text">Essential Terms to Understand</div>
+            </div>
+            <div class="w-full max-w-4xl bg-gray-800 p-6 rounded-lg text-left space-y-4">
+                <div>
+                    <h3 class="font-bold text-xl text-teal-300">แบนด์วิดท์ (Bandwidth)</h3>
+                    <p class="text-gray-400">ปริมาณข้อมูลสูงสุดที่ส่งได้ในหนึ่งหน่วยเวลา (เช่น 100 Mbps - เมกะบิตต่อวินาที)<span class="block eng-text text-sm">The max amount of data sent per unit of time (e.g., 100 Mbps - megabits per second).</span></p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-xl text-teal-300">หน่วยข้อมูล (Data Units)</h3>
+                    <p class="text-gray-400">ขนาดของข้อมูล: Byte, Kilobyte (KB), Megabyte (MB)<span class="block eng-text text-sm">The size of data: Byte, Kilobyte (KB), Megabyte (MB).</span></p>
+                </div>
+                <div>
+                    <h3 class="font-bold text-xl text-teal-300">ความถี่ (Frequency - Hz)</h3>
+                    <p class="text-gray-400">จำนวนครั้งที่เซ็นเซอร์วัดค่าในหนึ่งวินาที (เช่น 10 Hz = 10 ครั้ง/วินาที)<span class="block eng-text text-sm">Number of sensor readings per second (e.g., 10 Hz = 10 readings/sec).</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: UI/UX Comparison -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+             <div class="text-4xl md:text-5xl font-bold mb-8">
+                <div>เปรียบเทียบหน้าจอการใช้งาน (UI/UX)</div>
+                <div class="text-3xl md:text-4xl eng-text">A Look at the User Interface (UI/UX)</div>
+            </div>
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl">
+                <div class="flex-1 bg-gray-800 p-8 rounded-lg">
+                    <h3 class="text-3xl font-bold">Sensor Logger</h3>
+                    <p class="text-2xl text-gray-400 mt-4">⚙️ เหมือนกับหน้าจอตั้งค่า<span class="block eng-text text-xl">Like a Settings Screen</span></p>
+                    <p class="mt-4 text-gray-300">คุณจะเห็นรายการเซ็นเซอร์ทั้งหมดและเปิด/ปิดการบันทึก<span class="block eng-text text-sm mt-1">You see a list of all sensors and toggle their recording status.</span></p>
+                </div>
+                <div class="flex-1 bg-gray-800 p-8 rounded-lg">
+                    <h3 class="text-3xl font-bold">IoT MQTT Panel</h3>
+                    <p class="text-2xl text-gray-400 mt-4">🎛️ เหมือนกับรีโมทคอนโทรล<span class="block eng-text text-xl">Like a Remote Control</span></p>
+                    <p class="mt-4 text-gray-300">คุณเริ่มต้นจากหน้าจอว่างๆ แล้วสร้างแผงควบคุมของคุณเอง<span class="block eng-text text-sm mt-1">You start with a blank canvas and build your own control panel.</span></p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Slide 10: Use Cases -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+             <div class="text-4xl md:text-5xl font-bold mb-8">
+                <div>กรณีการใช้งานจริง</div>
+                <div class="text-3xl md:text-4xl eng-text">Practical Use Case Scenarios</div>
+            </div>
+            <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl">
+                <div class="flex-1 bg-gray-800 p-8 rounded-lg">
+                    <h3 class="text-2xl font-bold">โครงงานวิทยาศาสตร์</h3>
+                    <p class="eng-text text-xl">Science Project</p>
+                    <p class="mt-4 text-gray-400">"ฉันต้องการบันทึกข้อมูลความเร่งเพื่อวิเคราะห์ใน Excel"<span class="block eng-text text-sm mt-1">"I need to record acceleration data for analysis in Excel."</span></p>
+                    <p class="text-3xl mt-6">🏆 <span class="text-blue-300">Sensor Logger</span></p>
+                </div>
+                <div class="flex-1 bg-gray-800 p-8 rounded-lg">
+                    <h3 class="text-2xl font-bold">การควบคุมไฟอัจฉริยะ</h3>
+                    <p class="eng-text text-xl">Smart Light Control</p>
+                    <p class="mt-4 text-gray-400">"ฉันต้องการแอปสำหรับเปิด/ปิดไฟ MQTT ของฉัน"<span class="block eng-text text-sm mt-1">"I need an app to turn my MQTT light on/off."</span></p>
+                    <p class="text-3xl mt-6">🏆 <span class="text-purple-300">IoT MQTT Panel</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 11: Scenario 2 Deep Dive -->
+        <section class="slide flex-col justify-center items-center p-4 md:p-8">
+            <div class="text-3xl md:text-4xl font-bold text-center mb-8">
+                <div>เจาะลึกสถานการณ์ที่ 2: ส่วนประกอบที่จำเป็น</div>
+                <div class="text-2xl md:text-3xl eng-text">Scenario 2 Deep Dive: What's Needed</div>
+            </div>
+            <div class="w-full max-w-4xl text-center mb-4">
+                
+
+[Image of IoT control system diagram]
+
+            </div>
+            <div class="w-full max-w-4xl overflow-x-auto bg-gray-800 rounded-lg">
+                <table class="w-full text-left">
+                     <thead>
+                        <tr>
+                            <th class="table-header table-cell"><div>ฮาร์ดแวร์</div><span class="eng-text text-sm">Hardware</span></th>
+                            <th class="table-header table-cell"><div>ซอฟต์แวร์</div><span class="eng-text text-sm">Software</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="table-cell"><div>1. อุปกรณ์ไฟอัจฉริยะ: ESP32 + LED</div><span class="eng-text text-sm">1. Smart Light Device: ESP32 + LED</span></td>
+                            <td class="table-cell"><div>1. MQTT Broker: HiveMQ Cloud (ฟรี)</div><span class="eng-text text-sm">1. MQTT Broker: HiveMQ Cloud (Free)</span></td>
+                        </tr>
+                        <tr>
+                            <td class="table-cell"><div>2. ส่วนติดต่อผู้ใช้: สมาร์ทโฟน</div><span class="eng-text text-sm">2. User Interface: Smartphone</span></td>
+                            <td class="table-cell"><div>2. เฟิร์มแวร์: โค้ดบน ESP32 (Arduino IDE)</div><span class="eng-text text-sm">2. Firmware: Code on ESP32 (Arduino IDE)</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Slide 12: Workflow -->
+        <section class="slide flex-col justify-center items-center p-8">
+            <div class="text-4xl md:text-5xl font-bold text-center mb-8">
+                <div>ขั้นตอนการทำงาน: จากการกดปุ่มสู่แสงสว่าง</div>
+                <div class="text-3xl md:text-4xl eng-text">The Workflow: From Tap to Light</div>
+            </div>
+            <div class="w-full max-w-2xl space-y-4">
+                <div class="bg-gray-800 p-4 rounded-lg text-lg">1. 📱 ผู้ใช้กดปุ่ม 'ON' บน **IoT MQTT Panel**<span class="block eng-text text-sm">User taps 'ON' button in **IoT MQTT Panel**.</span></div>
+                <div class="text-center text-2xl">↓</div>
+                <div class="bg-gray-800 p-4 rounded-lg text-lg">2. 📤 แอปส่ง (Publish) ข้อความ "ON" ไปยัง Broker<span class="block eng-text text-sm">App publishes "ON" message to the Broker.</span></div>
+                 <div class="text-center text-2xl">↓</div>
+                <div class="bg-gray-800 p-4 rounded-lg text-lg">3. ☁️ Broker ส่งต่อข้อความไปยังผู้ติดตาม<span class="block eng-text text-sm">Broker forwards message to subscribers.</span></div>
+                 <div class="text-center text-2xl">↓</div>
+                <div class="bg-gray-800 p-4 rounded-lg text-lg">4. 📥 อุปกรณ์ (ESP32) รับ (Subscribe) ข้อความ "ON"<span class="block eng-text text-sm">Device (ESP32) receives "ON" message.</span></div>
+                 <div class="text-center text-2xl">↓</div>
+                <div class="bg-gray-800 p-4 rounded-lg text-lg">5. 💡 โค้ดบน ESP32 สั่งเปิดไฟ LED<span class="block eng-text text-sm">Code on ESP32 turns the LED on.</span></div>
+            </div>
+        </section>
+
+        <!-- Slide 13: Conclusion -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+             <div class="text-4xl md:text-5xl font-bold mb-8">
+                <div>สรุป: การเลือกเครื่องมือที่เหมาะสม</div>
+                <div class="text-3xl md:text-4xl eng-text">Conclusion: Choosing the Right Tool</div>
+            </div>
+             <div class="w-full max-w-4xl overflow-x-auto bg-gray-800 rounded-lg">
+                <table class="w-full text-left">
+                     <thead>
+                        <tr>
+                            <th class="table-header table-cell"><div>หากคุณต้องการ...</div><span class="eng-text text-sm">If you want to...</span></th>
+                            <th class="table-header table-cell"><div>ให้เลือก...</div><span class="eng-text text-sm">Choose...</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td class="table-cell"><div>รวบรวมข้อมูลดิบ</div><span class="eng-text text-sm">Collect Raw Data</span></td><td class="table-cell">📲 Sensor Logger</td></tr>
+                        <tr><td class="table-cell"><div>สร้างแผงควบคุม</div><span class="eng-text text-sm">Build a Control Panel</span></td><td class="table-cell">🕹️ IoT MQTT Panel</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Slide 14: Q&A -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+            <div class="text-5xl md:text-6xl font-bold">
+                <div>ถาม-ตอบ</div>
+                <div class="text-4xl md:text-5xl eng-text mt-2">Q&A</div>
+            </div>
+            <div class="text-3xl md:text-4xl mt-8 text-gray-300">
+                <div>ขอบคุณครับ/ค่ะ</div>
+                <div class="text-2xl md:text-3xl eng-text mt-1">Thank You!</div>
+            </div>
+        </section>
+
+        <!-- Slide 15: Credits & References -->
+        <section class="slide flex-col justify-center items-center text-center p-8">
+            <div class="text-4xl md:text-5xl font-bold">
+                <div>อ้างอิงและผู้จัดทำ</div>
+                <div class="text-3xl md:text-4xl eng-text mt-2">References & Credits</div>
+            </div>
+
+            <div class="text-left max-w-3xl w-full mt-10">
+                <h4 class="font-bold text-lg text-gray-300">
+                    <div>แหล่งข้อมูลอ้างอิง</div>
+                    <div class="text-base eng-text">Resourceful References</div>
+                </h4>
+                <ul class="list-disc list-inside text-sm text-gray-500 mt-2 space-y-2">
+                    <li>
+                        <div>เอกสารประกอบ MQTT Protocol</div>
+                        <div class="text-xs eng-text">Official MQTT Protocol Documentation (mqtt.org)</div>
+                    </li>
+                    <li>
+                        <div>เอกสารประกอบ HiveMQ MQTT Broker</div>
+                        <div class="text-xs eng-text">HiveMQ MQTT Broker Documentation</div>
+                    </li>
+                     <li>
+                        <div>คู่มือการใช้งานแอปพลิเคชัน Sensor Logger และ IoT MQTT Panel จาก App Store</div>
+                        <div class="text-xs eng-text">Sensor Logger & IoT MQTT Panel App Store Documentation</div>
+                    </li>
+                </ul>
+            </div>
+
+             <div class="mt-12 text-sm text-gray-500">
+                <div>สร้างโดย</div>
+                <div class="text-lg text-gray-400">Google Gemini</div>
+                <div class="text-xs eng-text mt-1">Created by Google Gemini</div>
+            </div>
+
+             <button id="restart-btn" class="interactive-btn mt-8 bg-blue-600 text-white font-bold py-3 px-8 rounded-full text-lg shadow-lg">
+                <div>เริ่มใหม่</div>
+                <div class="text-sm eng-text">Restart</div>
+            </button>
+        </section>
+
+
+    </main>
+
+    <!-- Navigation -->
+    <div class="fixed bottom-5 right-5 z-20 flex gap-3">
+        <button id="prev-btn" class="nav-btn bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-full shadow-lg">
+            <div>‹ ก่อนหน้า</div>
+            <div class="text-xs eng-text">Prev</div>
+        </button>
+        <button id="next-btn" class="nav-btn bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-full shadow-lg">
+            <div>ถัดไป ›</div>
+            <div class="text-xs eng-text">Next</div>
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            let currentSlide = 0;
+
+            const showSlide = (index) => {
+                if (index >= slides.length) index = 0; // Loop to start
+                if (index < 0) index = slides.length - 1; // Loop to end
+
+                slides[currentSlide].classList.remove('active');
+                slides[index].classList.add('active');
+                currentSlide = index;
+            };
+
+            const navigateSlides = (direction) => {
+                showSlide(currentSlide + direction);
+            };
+
+            // --- Event Listeners ---
+            document.getElementById('prev-btn').addEventListener('click', () => navigateSlides(-1));
+            document.getElementById('next-btn').addEventListener('click', () => navigateSlides(1));
+            
+            // Allow navigating with arrow keys
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') {
+                    navigateSlides(1);
+                } else if (e.key === 'ArrowLeft') {
+                    navigateSlides(-1);
+                }
+            });
+
+            // Specific button listeners
+            document.querySelector('.slide.active').addEventListener('click', (e) => {
+                 if (e.target.tagName !== 'BUTTON') navigateSlides(1);
+            });
+            document.getElementById('restart-btn').addEventListener('click', (e) => {
+                e.stopPropagation(); // prevent slide advance
+                showSlide(0)
+            });
+
+
+            // Initial State
+            showSlide(0);
+        });
+    </script>
+</body>
+</html>
+
