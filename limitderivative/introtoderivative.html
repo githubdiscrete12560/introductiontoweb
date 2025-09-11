@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทนำเรื่องอนุพันธ์ (Introduction to Derivatives)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The application transforms the linear slide deck into an interactive, scrollable story. It is structured into thematic sections: 1. The Core Problem (static intro), 2. Interactive Secant-to-Tangent Explorer (the core intuition-builder), 3. Formal Definition, 4. Interactive "Slope-Finder" Demo (application of the derivative), and 5. Summary. This task-oriented, exploratory structure was chosen over a simple slideshow to foster active learning and build a deeper, more intuitive understanding of the limit concept, which is central to derivatives. -->
+    <!-- Visualization & Content Choices: 1. Core Problem: Static Chart.js line graph of a curve (Goal: Inform) to visually establish the context of non-constant slope. 2. Secant-to-Tangent: Interactive Chart.js canvas with a slider. (Goal: Explain change/relationship). User drags a slider to move point Q towards P, visually demonstrating the secant line becoming the tangent. This directly teaches the limit concept. 3. Slope-Finder: Interactive Chart.js canvas where user clicks a point. (Goal: Compare/Inform). The app draws the tangent and calculates its slope using the derived function f'(x)=2x. This connects the abstract formula to a concrete geometric output. All math formulas are rendered with MathJax. Text from slides is adapted into explanatory paragraphs for each section. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        h1, h2, h3 {
+            font-family: 'Georgia', serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .accent-color { color: #2E5A88; }
+        .bg-accent { background-color: #2E5A88; }
+        .border-accent { border-color: #2E5A88; }
+        .slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #2E5A88;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        input[type='range']::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #2E5A88;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        input[type='range']::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #2E5A88;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        .lang-en {
+            @apply text-sm text-gray-500 mt-1;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Sarabun:wght@400;700&family=Georgia&display=swap" rel="stylesheet">
+</head>
+<body class="antialiased">
+    <header class="text-center py-8 md:py-12 bg-white border-b">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800">บทนำเรื่องอนุพันธ์ฉบับเข้าใจง่าย</h1>
+        <p class="mt-4 text-lg md:text-xl text-gray-600">An Intuitive Introduction to Derivatives: Understanding Instantaneous Change</p>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12 space-y-16">
+        
+        <section id="problem" class="text-center">
+            <h2 class="text-3xl font-bold mb-4">ปัญหาของเส้นโค้ง</h2>
+            <p class="max-w-3xl mx-auto text-lg leading-relaxed mb-2">
+                สำหรับเส้นตรง การหา "ความชัน" นั้นเป็นเรื่องง่าย แต่สำหรับเส้นโค้งล่ะ? ความชันของมันเปลี่ยนแปลงอยู่ตลอดเวลา อนุพันธ์คือเครื่องมือทางคณิตศาสตร์ที่เราใช้เพื่อหาอัตราการเปลี่ยนแปลงที่แม่นยำ หรือก็คือความชันที่แท้จริง ณ จุดใดจุดหนึ่งบนเส้นโค้ง ส่วนนี้จะแนะนำให้รู้จักกับความท้าทายที่อนุพันธ์ถูกออกแบบมาเพื่อแก้ไข
+            </p>
+            <p class="max-w-3xl mx-auto lang-en">
+                For a straight line, finding the "steepness" or slope is simple. But what about a curve? Its steepness is constantly changing. A derivative is the mathematical tool we use to find the precise rate of change—the exact slope—at any single point on a curve. This section introduces the challenge that derivatives were designed to solve.
+            </p>
+            <div class="chart-container mt-8 h-64 md:h-80">
+                <canvas id="curveChart"></canvas>
+            </div>
+        </section>
+
+        <section id="solution" class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-center mb-4">จากการประมาณค่าสู่ความแม่นยำ</h2>
+            <p class="max-w-3xl mx-auto text-lg leading-relaxed text-center mb-2">
+                เพื่อหาความชัน ณ จุดเดียว **P** เราสามารถเริ่มต้นด้วยการประมาณค่า เราเลือกจุดที่สอง **Q** แล้วลากเส้นตรง (<span class="font-bold accent-color">เส้นตัดโค้ง</span>) ผ่านทั้งสองจุด ความชันของเส้นนี้คือค่าประมาณ เมื่อเราเลื่อนจุด **Q** เข้าใกล้จุด **P** มากขึ้นเรื่อยๆ ค่าประมาณนี้ก็จะดีขึ้นเรื่อยๆ เครื่องมือด้านล่างนี้ให้คุณทำเช่นนั้นได้ สังเกตว่าเส้นตัดโค้งจะกลายเป็น <span class="font-bold accent-color">เส้นสัมผัส</span>—เส้นที่สัมผัสเส้นโค้ง ณ จุด **P** เพียงจุดเดียว—เมื่อระยะห่างระหว่างจุด `h` เข้าใกล้ศูนย์ ความชันของเส้นสัมผัสนี้ก็คืออนุพันธ์นั่นเอง
+            </p>
+            <p class="max-w-3xl mx-auto lang-en text-center mb-8">
+                To find the slope at a single point **P**, we can start by approximating. We pick a second point, **Q**, and draw a straight line (a <span class="font-bold accent-color">secant line</span>) through them. The slope of this line is an estimate. As we slide **Q** closer and closer to **P**, this estimate gets better. The interactive below lets you do exactly that. Watch how the secant line transforms into a <span class="font-bold accent-color">tangent line</span>—a line that just touches the curve at point **P**—as the distance between the points, `h`, approaches zero. The slope of this tangent line is the derivative.
+            </p>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="chart-container h-80 md:h-96">
+                    <canvas id="secantTangentChart"></canvas>
+                </div>
+                <div class="text-center space-y-4">
+                    <label for="hSlider" class="block font-bold text-lg">เลื่อนจุด Q เข้าใกล้ P</label>
+                    <p class="lang-en -mt-2 mb-2">Move Point Q closer to P</p>
+                    <input id="hSlider" type="range" min="0.01" max="2" step="0.01" value="2" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    <div class="p-4 bg-gray-50 rounded-lg text-left text-lg">
+                        <p>ระยะห่าง (h): <span id="hValue" class="font-bold accent-color">2.00</span></p>
+                        <p>ความชันเส้นตัด: <span id="slopeValue" class="font-bold accent-color">4.00</span></p>
+                        <p class="mt-2 text-sm text-gray-500">เมื่อ h → 0, ความชันของเส้นตัดจะเข้าใกล้ความชันจริง ณ จุด P</p>
+                         <p class="lang-en -mt-1">As h → 0, the secant slope approaches the true slope at P.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="definition">
+            <h2 class="text-3xl font-bold text-center mb-4">นิยามอย่างเป็นทางการ</h2>
+            <p class="max-w-3xl mx-auto text-lg leading-relaxed text-center mb-2">
+                กระบวนการที่เราได้สำรวจไปเมื่อครู่นี้ สามารถแสดงในทางคณิตศาสตร์ได้โดยใช้ **ลิมิต** เราแสดงความชันของเส้นตัดด้วยสูตร แล้วใช้ลิมิตเพื่อหาค่าที่มันเข้าใกล้เมื่อระยะห่าง `h` เล็กลงจนเข้าใกล้อนันต์ สิ่งนี้ทำให้เราได้นิยามอย่างเป็นทางการของอนุพันธ์ ซึ่งเขียนเป็น \(f'(x)\)
+            </p>
+            <p class="max-w-3xl mx-auto lang-en text-center mb-8">
+                The visual process you just explored is captured mathematically using a **limit**. We express the slope of the secant line with a formula and then use a limit to find what value it approaches as the distance `h` gets infinitesimally small. This gives us the formal definition of the derivative, written as \(f'(x)\).
+            </p>
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg text-center">
+                <p class="text-xl mb-2">อนุพันธ์ของฟังก์ชัน \(f(x)\) ณ จุด \(x\) คือ:</p>
+                <p class="lang-en mb-4">The derivative of a function \(f(x)\) at a point \(x\) is:</p>
+                <p class="text-2xl">
+                \[ f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h} \]
+                </p>
+            </div>
+        </section>
+
+        <section id="application" class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-center mb-4">"เครื่องจักรหาความชัน"</h2>
+            <p class="max-w-3xl mx-auto text-lg leading-relaxed text-center mb-2">
+                โดยการใช้นิยามลิมิตกับฟังก์ชันอย่าง \(f(x) = x^2\) เราจะได้ฟังก์ชันใหม่คือ \(f'(x) = 2x\) ฟังก์ชันใหม่นี้เป็นเครื่องมือที่ทรงพลัง—เปรียบเสมือน "เครื่องจักรหาความชัน" สำหรับเส้นโค้งเดิมของเรา ไม่ว่าคุณจะใส่ค่า x ใดๆ เข้าไป มันจะให้ความชันของเส้นสัมผัส ณ จุดนั้นทันที ลองใช้แถบเลื่อนด้านล่างเพื่อเลือกจุดบนเส้นโค้งและดูการทำงานของอนุพันธ์
+            </p>
+             <p class="max-w-3xl mx-auto lang-en text-center mb-8">
+                By applying the limit definition to a function like \(f(x) = x^2\), we get a new function: \(f'(x) = 2x\). This new function is a powerful tool—a "slope-finding machine" for our original curve. For any x-value you input, it instantly gives you the slope of the tangent line at that point. Use the slider below to pick a point on the curve and see the derivative in action.
+            </p>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="chart-container h-80 md:h-96">
+                    <canvas id="derivativeChart"></canvas>
+                </div>
+                <div class="text-center space-y-4">
+                     <label for="xSlider" class="block font-bold text-lg">เลือกจุด 'x' บนเส้นโค้ง</label>
+                     <p class="lang-en -mt-2 mb-2">Select a point 'x' on the curve</p>
+                    <input id="xSlider" type="range" min="-2.5" max="2.5" step="0.05" value="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    <div class="p-4 bg-gray-50 rounded-lg text-left text-lg">
+                        <p>ณ x = <span id="xValue" class="font-bold accent-color">1.00</span></p>
+                        <p>ความชันคือ \(f'(x) = 2x\)</p>
+                        <p>ความชัน = <span id="derivativeValue" class="font-bold accent-color">2.00</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="summary">
+            <h2 class="text-3xl font-bold text-center mb-6">สรุปและสัญลักษณ์</h2>
+            <p class="lang-en text-center -mt-6 mb-6">Summary & Notation</p>
+            <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-2xl font-bold mb-3">แนวคิดหลัก</h3>
+                    <p class="lang-en -mt-3 mb-3">Core Intuition</p>
+                    <ul class="list-disc list-inside space-y-2 text-lg">
+                        <li>อนุพันธ์วัด <strong>อัตราการเปลี่ยนแปลง ณ ขณะใดขณะหนึ่ง</strong> (instantaneous rate of change)</li>
+                        <li>ในทางเรขาคณิต มันคือ <strong>ความชันของเส้นสัมผัส</strong> (slope of the tangent line) กับเส้นโค้ง</li>
+                        <li>เราหาได้โดยการใช้ <strong>ลิมิต</strong> ของความชันของเส้นตัดเมื่อจุดสองจุดเข้าใกล้กัน</li>
+                        <li>ผลลัพธ์ \(f'(x)\) คือฟังก์ชันใหม่สำหรับหาความชันบนเส้นโค้งเดิม \(f(x)\)</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow">
+                    <h3 class="text-2xl font-bold mb-3">สัญลักษณ์ที่ใช้กันทั่วไป</h3>
+                     <p class="lang-en -mt-3 mb-3">Common Notations</p>
+                    <div class="space-y-3 text-lg">
+                        <p><strong>สัญลักษณ์ไพรม์ (Prime):</strong> \(f'(x)\) หรือ \(y'\)</p>
+                        <p><strong>สัญลักษณ์ของไลบ์นิซ (Leibniz):</strong> \(\frac{dy}{dx}\)</p>
+                        <p><strong>สัญลักษณ์ตัวดำเนินการ (Operator):</strong> \(\frac{d}{dx}f(x)\)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center py-8 bg-gray-100 border-t mt-12">
+        <div class="container mx-auto px-4">
+            <p class="text-gray-600 mb-4">สร้างโดย Google Gemini (Created by Google Gemini)</p>
+            <div class="border-t pt-4">
+                <h3 class="font-bold text-lg mb-2">แหล่งข้อมูลเพิ่มเติม (For Further Study)</h3>
+                <ul class="space-y-1 text-gray-700">
+                    <li><a href="https://www.khanacademy.org/math/differential-calculus/dc-diff-topic" target="_blank" class="hover:text-accent-color">Khan Academy: Derivatives Introduction</a></li>
+                    <li><a href="https://tutorial.math.lamar.edu/classes/calci/definitionofthederivative.aspx" target="_blank" class="hover:text-accent-color">Paul's Online Math Notes: The Definition of the Derivative</a></li>
+                    <li><a href="https://www.youtube.com/watch?v=9vKqVkMQffo" target="_blank" class="hover:text-accent-color">3Blue1Brown: Essence of Calculus, Chapter 2</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const curveFunction = x => x * x;
+            const derivativeFunction = x => 2 * x;
+            
+            const generateData = (func, range, steps) => {
+                const data = [];
+                const stepSize = (range[1] - range[0]) / steps;
+                for (let x = range[0]; x <= range[1]; x += stepSize) {
+                    data.push({x: x, y: func(x)});
+                }
+                return data;
+            };
+            
+            const curveData = generateData(curveFunction, [-3, 3], 100);
+
+            const chartOptions = {
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        min: -3,
+                        max: 3,
+                        grid: { color: '#eee' }
+                    },
+                    y: {
+                        min: 0,
+                        max: 9,
+                        grid: { color: '#eee' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                },
+                animation: { duration: 0 }
+            };
+
+            const pointStyles = {
+                pointRadius: 6,
+                pointHoverRadius: 8,
+            };
+
+            new Chart(document.getElementById('curveChart'), {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'f(x) = x²',
+                        data: curveData,
+                        borderColor: '#2E5A88',
+                        borderWidth: 3,
+                        pointRadius: 0,
+                        tension: 0.1
+                    }]
+                },
+                options: chartOptions
+            });
+
+            const secantTangentCtx = document.getElementById('secantTangentChart').getContext('2d');
+            const hSlider = document.getElementById('hSlider');
+            const hValueSpan = document.getElementById('hValue');
+            const slopeValueSpan = document.getElementById('slopeValue');
+
+            const p_x = 1;
+            const p_y = curveFunction(p_x);
+            let h = parseFloat(hSlider.value);
+            
+            const secantTangentChart = new Chart(secantTangentCtx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'f(x) = x²',
+                        data: curveData,
+                        borderColor: '#cccccc',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.1
+                    }, {
+                        label: 'Point P',
+                        data: [{ x: p_x, y: p_y }],
+                        backgroundColor: '#D9534F',
+                        ...pointStyles
+                    }, {
+                        label: 'Point Q',
+                        data: [{ x: p_x + h, y: curveFunction(p_x + h) }],
+                        backgroundColor: '#2E5A88',
+                        ...pointStyles
+                    }, {
+                        label: 'Secant/Tangent Line',
+                        type: 'line',
+                        data: [],
+                        borderColor: '#2E5A88',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                    }]
+                },
+                options: chartOptions
+            });
+            
+            function updateSecantChart() {
+                h = parseFloat(hSlider.value);
+                const q_x = p_x + h;
+                const q_y = curveFunction(q_x);
+
+                const slope = (q_y - p_y) / (q_x - p_x);
+
+                hValueSpan.textContent = h.toFixed(2);
+                slopeValueSpan.textContent = slope.toFixed(2);
+                
+                secantTangentChart.data.datasets[2].data = [{ x: q_x, y: q_y }];
+                
+                const line_x_min = -3;
+                const line_x_max = 3;
+                const line_y_min = slope * (line_x_min - p_x) + p_y;
+                const line_y_max = slope * (line_x_max - p_x) + p_y;
+
+                secantTangentChart.data.datasets[3].data = [
+                    { x: line_x_min, y: line_y_min },
+                    { x: line_x_max, y: line_y_max }
+                ];
+                
+                secantTangentChart.update();
+            }
+
+            hSlider.addEventListener('input', updateSecantChart);
+            updateSecantChart();
+
+
+            const derivativeCtx = document.getElementById('derivativeChart').getContext('2d');
+            const xSlider = document.getElementById('xSlider');
+            const xValueSpan = document.getElementById('xValue');
+            const derivativeValueSpan = document.getElementById('derivativeValue');
+
+            let current_x = parseFloat(xSlider.value);
+            
+            const derivativeChart = new Chart(derivativeCtx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'f(x) = x²',
+                        data: curveData,
+                        borderColor: '#cccccc',
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0.1
+                    }, {
+                        label: 'Selected Point',
+                        data: [{ x: current_x, y: curveFunction(current_x) }],
+                        backgroundColor: '#D9534F',
+                        ...pointStyles
+                    }, {
+                        label: 'Tangent Line',
+                        type: 'line',
+                        data: [],
+                        borderColor: '#2E5A88',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                    }]
+                },
+                options: chartOptions
+            });
+
+            function updateDerivativeChart() {
+                current_x = parseFloat(xSlider.value);
+                const current_y = curveFunction(current_x);
+                const slope = derivativeFunction(current_x);
+
+                xValueSpan.textContent = current_x.toFixed(2);
+                derivativeValueSpan.textContent = slope.toFixed(2);
+
+                derivativeChart.data.datasets[1].data = [{ x: current_x, y: current_y }];
+                
+                const line_x_min = -3;
+                const line_x_max = 3;
+                const line_y_min = slope * (line_x_min - current_x) + current_y;
+                const line_y_max = slope * (line_x_max - current_x) + current_y;
+
+                derivativeChart.data.datasets[2].data = [
+                    { x: line_x_min, y: line_y_min },
+                    { x: line_x_max, y: line_y_max }
+                ];
+                
+                derivativeChart.update();
+            }
+
+            xSlider.addEventListener('input', updateDerivativeChart);
+            updateDerivativeChart();
+        });
+    </script>
+</body>
+</html>
+

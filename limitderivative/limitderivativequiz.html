@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบแคลคูลัส: ลิมิตและอนุพันธ์ (Calculus Quizzes: Limits & Derivatives)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        h1, h2, h3 {
+            font-family: 'Georgia', serif;
+        }
+        .quiz-container {
+            transition: all 0.3s ease-in-out;
+        }
+        .answer-option {
+            transition: background-color 0.2s, border-color 0.2s;
+            cursor: pointer;
+        }
+        .answer-option:hover {
+            background-color: #e9ecef;
+        }
+        .answer-option.selected {
+            background-color: #d0eaff;
+            border-color: #0077b6;
+        }
+        .answer-option.correct {
+            background-color: #d1e7dd;
+            border-color: #198754;
+        }
+        .answer-option.incorrect {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+        }
+        .rationale {
+            display: none;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+        }
+        .rationale.correct {
+            background-color: #e8f5e9;
+        }
+        .rationale.incorrect {
+            background-color: #fdecea;
+        }
+        .quiz-start-screen h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        .quiz-start-screen p {
+            margin-bottom: 2rem;
+        }
+        .lang-en {
+            @apply text-sm text-gray-500 mt-1;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&family=Inter:wght@400;700&family=Georgia&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body class="antialiased">
+
+    <header class="text-center py-8 md:py-12 bg-white border-b">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800">แบบทดสอบแคลคูลัส</h1>
+        <p class="mt-4 text-lg md:text-xl text-gray-600">ทดสอบความรู้ของคุณเรื่องลิมิตและอนุพันธ์ (Test Your Knowledge on Limits and Derivatives)</p>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12 space-y-12">
+        
+        <!-- Limits Quiz Container -->
+        <section id="limitsQuizContainer" class="bg-white p-6 md:p-8 rounded-lg shadow-lg quiz-container">
+            <div id="limitsQuizStart" class="quiz-start-screen text-center">
+                <h2>แบบทดสอบ: ความรู้เบื้องต้นเรื่องลิมิต</h2>
+                <p class="lang-en -mt-3">Quiz: Introduction to Limits</p>
+                <p>แบบทดสอบสั้นๆ เพื่อทดสอบความเข้าใจของคุณเกี่ยวกับแนวคิดพื้นฐานของลิมิต</p>
+                <p class="lang-en -mt-6">A short quiz to test your understanding of the fundamental concepts of limits.</p>
+                <button onclick="startQuiz('limits')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+                    เริ่มทำแบบทดสอบ
+                    <span class="block text-xs font-normal">(Start Quiz)</span>
+                </button>
+            </div>
+            <div id="limitsQuizContent" class="hidden"></div>
+        </section>
+
+        <!-- Derivatives Quiz Container -->
+        <section id="derivativesQuizContainer" class="bg-white p-6 md:p-8 rounded-lg shadow-lg quiz-container">
+             <div id="derivativesQuizStart" class="quiz-start-screen text-center">
+                <h2>แบบทดสอบ: ความรู้เบื้องต้นเรื่องอนุพันธ์</h2>
+                <p class="lang-en -mt-3">Quiz: Introduction to Derivatives</p>
+                <p>แบบทดสอบสั้นๆ เพื่อทดสอบความเข้าใจของคุณเกี่ยวกับแนวคิดพื้นฐานของอนุพันธ์</p>
+                <p class="lang-en -mt-6">A short quiz to test your understanding of the fundamental concepts of derivatives.</p>
+                <button onclick="startQuiz('derivatives')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg">
+                    เริ่มทำแบบทดสอบ
+                    <span class="block text-xs font-normal">(Start Quiz)</span>
+                </button>
+            </div>
+            <div id="derivativesQuizContent" class="hidden"></div>
+        </section>
+
+    </main>
+
+    <footer class="text-center py-6 bg-gray-100 border-t mt-12">
+        <p class="text-gray-600">สร้างโดย Google Gemini (Created by Google Gemini)</p>
+    </footer>
+
+    <script>
+        const quizzes = {
+            limits: {
+                title: {
+                    th: "ความรู้เบื้องต้นเรื่องลิมิต",
+                    en: "Introduction to Limits"
+                },
+                data: {
+                  "questions": [
+                    {
+                      "question": {
+                          "th": "แนวคิดหลักที่ลิมิตอธิบายในแคลคูลัสคืออะไร?",
+                          "en": "What is the primary concept that a limit describes in calculus?"
+                      },
+                      "hint": {
+                          "th": "ลองคิดดูว่าลิมิตสนใจค่าของฟังก์ชัน ณ จุดใดจุดหนึ่ง หรือพฤติกรรมของฟังก์ชันรอบๆ จุดนั้น",
+                          "en": "Think about whether a limit is concerned with a function's value at a specific point or its behavior around that point."
+                      },
+                      "answerOptions": [
+                        { "text": { "th": "ค่าที่ฟังก์ชันเข้าใกล้เมื่อตัวแปรต้นเข้าใกล้จุดใดจุดหนึ่งอย่างยิ่งยวด", "en": "The value a function approaches as the input gets infinitely close to a certain point." }, "rationale": { "th": "สิ่งนี้จับใจความสำคัญของลิมิต โดยเน้นที่พฤติกรรมการ 'เข้าใกล้' ของผลลัพธ์ของฟังก์ชัน", "en": "This captures the essence of a limit, focusing on the 'approaching' behavior of the function's output." }, "isCorrect": true },
+                        { "text": { "th": "ค่าที่แท้จริงของฟังก์ชัน ณ จุดใดจุดหนึ่ง", "en": "The exact value of a function at a specific point." }, "rationale": { "th": "นี่คือสิ่งที่คุณหาได้จากการแทนค่าโดยตรง f(c) ซึ่งอาจแตกต่างจากลิมิต โดยเฉพาะอย่างยิ่งหากมีช่องโหว่ในกราฟ", "en": "This is what you find by direct substitution, f(c), which can be different from the limit, especially if there's a hole in the graph." }, "isCorrect": false },
+                        { "text": { "th": "ค่าสูงสุดหรือต่ำสุดโดยรวมของฟังก์ชัน", "en": "The overall maximum or minimum value of a function." }, "rationale": { "th": "แม้ว่าลิมิตจะสามารถใช้หาค่าสูงสุดและต่ำสุดได้ แต่ตัวลิมิตเองอธิบายพฤติกรรมเฉพาะที่ ไม่จำเป็นต้องเป็นค่าสุดขีดทั่วทั้งฟังก์ชัน", "en": "While limits can be used to find maxima and minima, the limit itself describes local behavior, not necessarily the global extremes of the function." }, "isCorrect": false },
+                        { "text": { "th": "พื้นที่ทั้งหมดใต้เส้นโค้งของฟังก์ชัน", "en": "The total area under the curve of a function." }, "rationale": { "th": "แนวคิดนี้เกี่ยวข้องกับอินทิกรัล ซึ่งสร้างขึ้นจากแนวคิดของลิมิต แต่มันไม่ใช่คำจำกัดความของลิมิต", "en": "This concept relates to integrals, which are built upon the idea of limits, but it is not the definition of a limit itself." }, "isCorrect": false }
+                      ]
+                    },
+                    {
+                      "question": { "th": "จงหาค่าลิมิตต่อไปนี้: $$ \\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2} $$", "en": "Evaluate the following limit: $$ \\lim_{x \\to 2} \\frac{x^2 - 4}{x - 2} $$" },
+                      "hint": { "th": "การแทนค่าโดยตรงจะให้รูปแบบที่ไม่กำหนด (0/0) ลองพยายามทำให้นิพจน์ง่ายลงในทางพีชคณิตก่อน", "en": "Direct substitution results in an undefined form (0/0). Try to simplify the expression algebraically first." },
+                      "answerOptions": [
+                        { "text": { "th": "4", "en": "4" }, "rationale": { "th": "โดยการแยกตัวประกอบตัวเศษเป็น (x-2)(x+2) และตัดพจน์ (x-2) ออก นิพจน์จะง่ายลงเป็น (x+2) จากนั้นแทนค่า x=2 จะได้ผลลัพธ์", "en": "By factoring the numerator into (x-2)(x+2) and canceling the (x-2) term, the expression simplifies to (x+2). Substituting x=2 then gives the result." }, "isCorrect": true },
+                        { "text": { "th": "-4", "en": "-4" }, "rationale": { "th": "นี่คือค่าคงที่ในตัวเศษ ไม่ใช่ค่าของลิมิตหลังจากการทำให้นิพจน์ง่ายลง", "en": "This is the constant term in the numerator, not the value of the limit after simplification." }, "isCorrect": false },
+                        { "text": { "th": "2", "en": "2" }, "rationale": { "th": "นี่คือค่าที่ x กำลังเข้าใกล้ แต่ไม่ใช่ค่าที่ฟังก์ชันโดยรวมกำลังเข้าใกล้", "en": "This is the value that x is approaching, but it is not the value the overall function is approaching." }, "isCorrect": false },
+                        { "text": { "th": "ไม่นิยาม", "en": "Undefined" }, "rationale": { "th": "แม้ว่าฟังก์ชันดั้งเดิมจะไม่นิยามที่ x=2 แต่ลิมิตมีอยู่เนื่องจากสามารถกำจัดช่องโหว่ได้โดยการทำให้นิพจน์ง่ายลง", "en": "While the original function is undefined at x=2, the limit exists because the hole can be removed through algebraic simplification." }, "isCorrect": false }
+                      ]
+                    },
+                    {
+                      "question": { "th": "ถ้ากราฟของฟังก์ชันมี 'การกระโดด' ที่ x = 3 จะสรุปเกี่ยวกับ $$ \\lim_{x \\to 3} f(x) $$ ได้ว่าอย่างไร?", "en": "If a function's graph has a 'jump' at x = 3, what can be concluded about $$ \\lim_{x \\to 3} f(x) $$?" },
+                      "hint": { "th": "เพื่อให้ลิมิตมีอยู่ ฟังก์ชันต้องเข้าใกล้ค่าเดียวกันทั้งจากด้านซ้ายและด้านขวา", "en": "For a limit to exist, the function must approach the same value from both the left and the right." },
+                      "answerOptions": [
+                        { "text": { "th": "ลิมิตไม่มีอยู่", "en": "The limit does not exist." }, "rationale": { "th": "การกระโดดหมายความว่าฟังก์ชันเข้าใกล้ค่าที่แตกต่างกันจากด้านซ้ายและด้านขวา ดังนั้นจึงไม่เข้าใกล้ค่าเดียว", "en": "A jump means the function approaches different values from the left and the right, so they do not agree on a single value." }, "isCorrect": true },
+                        { "text": { "th": "ลิมิตคือค่าเฉลี่ยของค่าทั้งสอง", "en": "The limit is the average of the two values." }, "rationale": { "th": "ลิมิตต้องเป็นค่าเดียวที่เฉพาะเจาะจงที่เข้าใกล้จากทั้งสองด้าน ไม่สามารถเป็นค่าเฉลี่ยของค่าที่แตกต่างกันสองค่าได้", "en": "The limit must be a single, specific value that is approached from both sides; it cannot be an average of two different values." }, "isCorrect": false },
+                        { "text": { "th": "ลิมิตเท่ากับค่าจากด้านขวา", "en": "The limit is equal to the value from the right side." }, "rationale": { "th": "ลิมิตด้านขวามีอยู่ แต่ลิมิตสองด้านโดยรวมต้องการให้ลิมิตด้านซ้ายเหมือนกัน", "en": "The right-hand limit exists, but the overall two-sided limit requires the left-hand limit to be the same." }, "isCorrect": false },
+                        { "text": { "th": "ลิมิตคือ 0", "en": "The limit is 0." }, "rationale": { "th": "ความไม่ต่อเนื่องแบบกระโดดไม่ได้หมายความว่าลิมิตเป็นศูนย์โดยอัตโนมัติ แต่หมายความว่าฟังก์ชันเข้าใกล้ค่าสองค่าที่แตกต่างกัน", "en": "A jump discontinuity does not automatically mean the limit is zero; it means the function approaches two different non-zero or zero values." }, "isCorrect": false }
+                      ]
+                    },
+                    {
+                      "question": { "th": "สถานการณ์ใดต่อไปนี้อธิบายถึงสถานการณ์ที่ลิมิตไม่มีอยู่?", "en": "Which of the following scenarios describes a situation where a limit does NOT exist?" },
+                      "hint": { "th": "ลิมิตไม่มีอยู่ถ้าฟังก์ชันไม่เข้าใกล้จำนวนจำกัดเพียงค่าเดียว", "en": "A limit fails to exist if the function doesn't approach a single, finite number." },
+                      "answerOptions": [
+                        { "text": { "th": "ฟังก์ชันที่เข้าใกล้อนันต์เมื่อ x เข้าใกล้จุดใดจุดหนึ่ง (เส้นกำกับแนวตั้ง)", "en": "A function that approaches infinity as x approaches a certain point (a vertical asymptote)." }, "rationale": { "th": "เนื่องจากอนันต์ไม่ใช่จำนวนจำกัด ฟังก์ชันจึงไม่เข้าใกล้ค่าที่เฉพาะเจาะจง ซึ่งหมายความว่าลิมิตไม่มีอยู่", "en": "Because infinity is not a finite number, the function does not approach a specific value, meaning the limit does not exist." }, "isCorrect": true },
+                        { "text": { "th": "ฟังก์ชันที่มี 'ช่องโหว่' ที่ x = c แต่เข้าใกล้ค่า y เดียวกันจากทั้งสองด้าน", "en": "A function with a 'hole' at x = c, but which approaches the same y-value from both sides." }, "rationale": { "th": "นี่คือความไม่ต่อเนื่องที่สามารถกำจัดได้ และลิมิตมีอยู่เนื่องจากฟังก์ชันเข้าใกล้ค่าเดียวแม้ว่าจะมีช่องโหว่ก็ตาม", "en": "This is a removable discontinuity, and the limit exists because the function approaches a single value despite the hole." }, "isCorrect": false },
+                        { "text": { "th": "ฟังก์ชันต่อเนื่องที่จุด x = c", "en": "A continuous function at a point x = c." }, "rationale": { "th": "สำหรับฟังก์ชันต่อเนื่อง ลิมิตที่จุดใดจุดหนึ่งคือค่าของฟังก์ชันที่จุดนั้น ดังนั้นลิมิตจึงมีอยู่อย่างแน่นอน", "en": "For a continuous function, the limit at a point is simply the function's value at that point, so the limit certainly exists." }, "isCorrect": false },
+                        { "text": { "th": "ฟังก์ชันที่ลิมิตเท่ากับศูนย์", "en": "A function where the limit equals zero." }, "rationale": { "th": "ศูนย์เป็นจำนวนจำกัด ดังนั้นถ้าฟังก์ชันเข้าใกล้ศูนย์ ลิมิตจะมีอยู่และเท่ากับศูนย์", "en": "Zero is a finite number, so if a function approaches zero, the limit exists and is equal to zero." }, "isCorrect": false }
+                      ]
+                    }
+                  ]
+                }
+            },
+            derivatives: {
+                 title: {
+                    th: "ความรู้เบื้องต้นเรื่องอนุพันธ์",
+                    en: "Introduction to Derivatives"
+                },
+                data: {
+                  "questions": [
+                    {
+                      "question": { "th": "ตามแนวคิดพื้นฐานของอนุพันธ์ อนุพันธ์ใช้วัดอะไร?", "en": "According to the fundamental concept of derivatives, what does a derivative measure?" },
+                      "hint": { "th": "ลองคิดดูว่าคุณกำลังวัดการเปลี่ยนแปลงในช่วงเวลาที่ยาวนาน หรือ ณ ชั่วขณะใดขณะหนึ่ง", "en": "Think about whether you are measuring change over a long period or at a single, specific moment." },
+                      "answerOptions": [
+                        { "text": { "th": "อัตราการเปลี่ยนแปลง ณ ขณะใดขณะหนึ่ง ณ จุดใดจุดหนึ่ง", "en": "The instantaneous rate of change at a specific point." }, "rationale": { "th": "สิ่งนี้สอดคล้องกับแนวคิดหลักที่ว่าอนุพันธ์ระบุอัตราการเปลี่ยนแปลง ณ ชั่วขณะหนึ่ง เหมือนกับความเร็วของรถยนต์ในขณะนี้", "en": "This aligns with the core idea that a derivative pinpoints the rate of change at a single moment, like the speed of a car right now." }, "isCorrect": true },
+                        { "text": { "th": "อัตราการเปลี่ยนแปลงเฉลี่ยในช่วงเวลาหนึ่ง", "en": "The average rate of change over an interval." }, "rationale": { "th": "สิ่งนี้อธิบายความชันของเส้นตัดระหว่างสองจุด ซึ่งใช้ในการประมาณค่าอนุพันธ์ แต่ไม่ใช่ตัวอนุพันธ์เอง", "en": "This describes the slope of a secant line between two points, which is used to approximate the derivative but is not the derivative itself." }, "isCorrect": false },
+                        { "text": { "th": "การเปลี่ยนแปลงทั้งหมดของฟังก์ชันตั้งแต่ต้นจนจบ", "en": "The total change in a function from beginning to end." }, "rationale": { "th": "สิ่งนี้วัดความแตกต่างสุทธิของค่าฟังก์ชันในช่วงโดเมน ไม่ใช่อัตราการเปลี่ยนแปลง", "en": "This measures the net difference in a function's value over its domain, not the rate at which it changes." }, "isCorrect": false },
+                        { "text": { "th": "จุดสูงสุดของฟังก์ชันบนกราฟ", "en": "The highest point of a function on a graph." }, "rationale": { "th": "แม้ว่าอนุพันธ์จะสามารถใช้หาค่าสูงสุดของฟังก์ชันได้ (ที่ซึ่งอัตราการเปลี่ยนแปลงเป็นศูนย์) แต่นิยามหลักของมันไม่ใช่จุดสูงสุด", "en": "While a derivative can be used to find the maximum value of a function (where the rate of change is zero), its primary definition is not the maximum point itself." }, "isCorrect": false }
+                      ]
+                    },
+                    {
+                      "question": { "th": "ในทางเรขาคณิต อนุพันธ์ของฟังก์ชัน ณ จุดใดจุดหนึ่งแทนอะไร?", "en": "Geometrically, the derivative of a function at a specific point represents what?" },
+                      "hint": { "th": "ลองจินตนาการว่าซูมเข้าไปที่เส้นโค้ง ณ จุดเดียวจนดูเหมือนเส้นตรง คุณสมบัติของเส้นนั้นคืออะไร?", "en": "Imagine zooming in on a curve at a single point until it looks like a straight line. What is the property of that line?" },
+                      "answerOptions": [
+                        { "text": { "th": "ความชันของเส้นสัมผัสที่จุดนั้น", "en": "The slope of the tangent line at that point." }, "rationale": { "th": "เส้นสัมผัสจะสัมผัสกับเส้นโค้ง ณ จุดเดียวและความชันของมันแทนอัตราการเปลี่ยนแปลง ณ ขณะนั้นของฟังก์ชันที่จุดนั้น", "en": "The tangent line touches the curve at a single point and its slope represents the instantaneous rate of change of the function at that exact point." }, "isCorrect": true },
+                        { "text": { "th": "ความชันของเส้นตัดผ่านจุดนั้น", "en": "The slope of the secant line through that point." }, "rationale": { "th": "เส้นตัดเชื่อมต่อสองจุดบนเส้นโค้งและความชันของมันให้อัตราการเปลี่ยนแปลงเฉลี่ยระหว่างสองจุดนั้น ไม่ใช่อัตรา ณ ขณะใดขณะหนึ่ง", "en": "A secant line connects two points on a curve and its slope gives the average rate of change between them, not the instantaneous rate at one of them." }, "isCorrect": false },
+                        { "text": { "th": "พื้นที่ใต้เส้นโค้งจนถึงจุดนั้น", "en": "The area under the curve up to that point." }, "rationale": { "th": "แนวคิดนี้เกี่ยวข้องกับการอินทิเกรต ซึ่งเป็นการดำเนินการผกผันของการหาอนุพันธ์", "en": "This concept is related to integration, which is the inverse operation of differentiation." }, "isCorrect": false },
+                        { "text": { "th": "พิกัด y ของจุดนั้น", "en": "The y-coordinate of the point." }, "rationale": { "th": "พิกัด y คือค่าของฟังก์ชันที่จุดนั้น f(x) ไม่ใช่อัตราที่ฟังก์ชันกำลังเปลี่ยนแปลง", "en": "The y-coordinate is the value of the function at that point, f(x), not the rate at which the function is changing." }, "isCorrect": false }
+                      ]
+                    },
+                    {
+                      "question": { "th": "จงหาอนุพันธ์ของฟังก์ชัน $$f(x) = 3x^2$$", "en": "Find the derivative of the function $$f(x) = 3x^2$$." },
+                      "hint": { "th": "ใช้กฎกำลัง ซึ่งระบุว่าอนุพันธ์ของ $$ax^n$$ คือ $$anx^{n-1}$$", "en": "Use the power rule, which states that the derivative of $$ax^n$$ is $$anx^{n-1}$$." },
+                      "answerOptions": [
+                        { "text": { "th": "$$6x$$", "en": "$$6x$$" }, "rationale": { "th": "เมื่อใช้กฎกำลัง คุณคูณสัมประสิทธิ์ (3) ด้วยเลขชี้กำลัง (2) ได้ 6 และลดเลขชี้กำลังลง 1 (จาก 2 เป็น 1) ทำให้ได้ 6x", "en": "Applying the power rule, you multiply the coefficient (3) by the power (2) to get 6, and reduce the power by 1 (from 2 to 1), resulting in 6x." }, "isCorrect": true },
+                        { "text": { "th": "$$3x$$", "en": "$$3x$$" }, "rationale": { "th": "ผลลัพธ์นี้ใช้กฎกำลังไม่ถูกต้อง อาจลืมคูณด้วยเลขชี้กำลังเดิม", "en": "This result incorrectly applies the power rule, perhaps by forgetting to multiply by the original exponent." }, "isCorrect": false },
+                        { "text": { "th": "$$x^3$$", "en": "$$x^3$$" }, "rationale": { "th": "นี่ดูเหมือนผลลัพธ์ของการอินทิเกรต (ปฏิยานุพันธ์) ไม่ใช่การหาอนุพันธ์", "en": "This looks like the result of integration (the antiderivative), not differentiation." }, "isCorrect": false },
+                        { "text": { "th": "$$6$$", "en": "$$6$$" }, "rationale": { "th": "นี่จะเป็นอนุพันธ์ของ 6x ซึ่งเป็นอนุพันธ์อันดับสองของฟังก์ชันดั้งเดิม", "en": "This would be the derivative of 6x, which is the second derivative of the original function." }, "isCorrect": false }
+                      ]
+                    },
+                     {
+                      "question": { "th": "ถ้าฟังก์ชัน $$s(t) = t^2$$ อธิบายตำแหน่ง ความเร็ว ณ ขณะใดขณะหนึ่งที่ t = 3 วินาที คือเท่าไร? อนุพันธ์ของ $$t^2$$ คือ $$2t$$", "en": "If the function $$s(t) = t^2$$ describes position, what is its instantaneous velocity at t = 3 seconds? The derivative of $$t^2$$ is $$2t$$." },
+                      "hint": { "th": "ความเร็วคืออัตราการเปลี่ยนแปลงของตำแหน่ง ณ ขณะใดขณะหนึ่ง ขั้นแรก หาฟังก์ชันอนุพันธ์ จากนั้นประเมินค่าที่เวลาที่กำหนด", "en": "Velocity is the instantaneous rate of change of position. First, find the derivative function, then evaluate it at the given time." },
+                      "answerOptions": [
+                        { "text": { "th": "6 เมตร/วินาที", "en": "6 m/s" }, "rationale": { "th": "อนุพันธ์ของฟังก์ชันตำแหน่ง s'(t) = 2t ให้ค่าความเร็ว การแทนค่า t=3 จะได้ 2(3) = 6", "en": "The derivative of the position function, s'(t) = 2t, gives the velocity. Plugging in t=3 gives 2(3) = 6." }, "isCorrect": true },
+                        { "text": { "th": "9 เมตร/วินาที", "en": "9 m/s" }, "rationale": { "th": "นี่คือตำแหน่งของอนุภาคที่ t=3, s(3) = 3^2 = 9 ไม่ใช่ความเร็ว ณ ขณะนั้น", "en": "This is the particle's position at t=3, s(3) = 3^2 = 9, not its velocity at that instant." }, "isCorrect": false },
+                        { "text": { "th": "3 เมตร/วินาที", "en": "3 m/s" }, "rationale": { "th": "นี่คือเวลา ไม่ใช่ความเร็วที่คำนวณได้ ณ เวลานั้น", "en": "This is the time, not the calculated velocity at that time." }, "isCorrect": false },
+                        { "text": { "th": "2 เมตร/วินาที", "en": "2 m/s" }, "rationale": { "th": "ค่านี้มาจากสัมประสิทธิ์ในฟังก์ชันอนุพันธ์ แต่ไม่ได้คำนึงถึงเวลาที่เฉพาะเจาะจง t=3", "en": "This value comes from the coefficient in the derivative function, but it does not account for the specific time t=3." }, "isCorrect": false }
+                      ]
+                    }
+                  ]
+                }
+            }
+        };
+
+        function startQuiz(quizName) {
+            document.getElementById(`${quizName}QuizStart`).classList.add('hidden');
+            const quizContent = document.getElementById(`${quizName}QuizContent`);
+            quizContent.classList.remove('hidden');
+            renderQuiz(quizName);
+        }
+
+        function renderQuiz(quizName) {
+            const quiz = quizzes[quizName];
+            const quizContent = document.getElementById(`${quizName}QuizContent`);
+            
+            let quizHtml = `<h2 class="text-3xl font-bold text-center mb-2">${quiz.title.th}</h2>`;
+            quizHtml += `<h3 class="text-xl text-gray-500 font-serif text-center mb-8">${quiz.title.en}</h3>`;
+
+            quiz.data.questions.forEach((q, qIndex) => {
+                quizHtml += `
+                    <div class="mb-8" id="q-${quizName}-${qIndex}">
+                        <p class="text-lg font-semibold mb-1">${qIndex + 1}. ${q.question.th}</p>
+                        <p class="lang-en -mt-1">${q.question.en}</p>
+                        <p class="text-sm text-gray-500 my-4"><em>คำใบ้: ${q.hint.th}</em><br><em class="lang-en">Hint: ${q.hint.en}</em></p>
+                        <div class="space-y-3" id="options-${quizName}-${qIndex}">
+                `;
+                q.answerOptions.forEach((opt, oIndex) => {
+                    let optionTextHtml = '';
+                    if (opt.text.th === opt.text.en) {
+                        optionTextHtml = `<p>${opt.text.th}</p>`;
+                    } else {
+                        optionTextHtml = `<p>${opt.text.th}</p><p class="lang-en">${opt.text.en}</p>`;
+                    }
+                    quizHtml += `
+                        <div class="answer-option border p-4 rounded-lg" onclick="selectAnswer('${quizName}', ${qIndex}, ${oIndex})">
+                           ${optionTextHtml}
+                           <div class="rationale">
+                                <p>${opt.rationale.th}</p>
+                                <p class="lang-en">${opt.rationale.en}</p>
+                           </div>
+                        </div>
+                    `;
+                });
+                quizHtml += `</div></div>`;
+            });
+
+            quizHtml += `
+                <div class="text-center mt-8">
+                    <button id="submit-${quizName}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg" onclick="submitQuiz('${quizName}')">
+                        ส่งคำตอบ
+                        <span class="block text-xs font-normal">(Submit Answers)</span>
+                    </button>
+                    <div id="results-${quizName}" class="mt-6 text-2xl font-bold"></div>
+                </div>
+            `;
+            quizContent.innerHTML = quizHtml;
+            if (window.MathJax) {
+                window.MathJax.typeset();
+            }
+        }
+        
+        function selectAnswer(quizName, qIndex, oIndex) {
+            const optionsContainer = document.getElementById(`options-${quizName}-${qIndex}`);
+            if (optionsContainer.classList.contains('answered')) return;
+
+            const options = optionsContainer.getElementsByClassName('answer-option');
+            for (let i = 0; i < options.length; i++) {
+                options[i].classList.remove('selected');
+            }
+            options[oIndex].classList.add('selected');
+            quizzes[quizName].data.questions[qIndex].selectedAnswer = oIndex;
+        }
+
+        function submitQuiz(quizName) {
+            const quiz = quizzes[quizName].data;
+            let score = 0;
+            quiz.questions.forEach((q, qIndex) => {
+                const optionsContainer = document.getElementById(`options-${quizName}-${qIndex}`);
+                optionsContainer.classList.add('answered');
+                const options = optionsContainer.getElementsByClassName('answer-option');
+                const selectedIndex = q.selectedAnswer;
+                
+                if (selectedIndex === undefined) { 
+                     for (let i = 0; i < options.length; i++) {
+                        if(q.answerOptions[i].isCorrect) {
+                            options[i].classList.add('correct');
+                        }
+                     }
+                } else {
+                    const selectedOption = q.answerOptions[selectedIndex];
+                    const selectedOptionEl = options[selectedIndex];
+                    const rationaleEl = selectedOptionEl.querySelector('.rationale');
+
+                    if (selectedOption.isCorrect) {
+                        score++;
+                        selectedOptionEl.classList.add('correct');
+                        rationaleEl.classList.add('correct');
+                    } else {
+                        selectedOptionEl.classList.add('incorrect');
+                        rationaleEl.classList.add('incorrect');
+                         for (let i = 0; i < options.length; i++) {
+                            if(q.answerOptions[i].isCorrect) {
+                                options[i].classList.add('correct');
+                                options[i].querySelector('.rationale').classList.add('correct');
+                                options[i].querySelector('.rationale').style.display = 'block';
+                            }
+                        }
+                    }
+                    rationaleEl.style.display = 'block';
+                }
+            });
+
+            const resultsEl = document.getElementById(`results-${quizName}`);
+            resultsEl.innerHTML = `<p>คุณได้ ${score} จาก ${quiz.questions.length} คะแนน!</p><p class="lang-en">You scored ${score} out of ${quiz.questions.length}!</p>`;
+            document.getElementById(`submit-${quizName}`).disabled = true;
+        }
+
+    </script>
+</body>
+</html>
+
+
+

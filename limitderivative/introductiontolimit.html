@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>บทนำเรื่องลิมิต (Introduction to Limits)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+    <!-- Chosen Palette: Calm Neutrals -->
+    <!-- Application Structure Plan: This SPA is designed as an interactive narrative that builds the concept of a limit step-by-step. The structure is: 1. The Core Question (visualizing a function with a 'hole'), 2. The Interactive Explorer (the main learning tool where users approach the hole from both sides), 3. The Formal Definition (connecting the interaction to mathematical notation), 4. When Limits Fail (interactive examples of discontinuities), and 5. Why Limits Matter (summary). This task-oriented, exploratory flow was chosen to build deep intuition by letting users 'discover' the limit themselves, which is more effective than a passive slideshow. -->
+    <!-- Visualization & Content Choices: 1. The Core Question: Chart.js canvas showing f(x)=(x^2-4)/(x-2) to visually present the problem of a 'hole' (Goal: Inform). 2. Interactive Explorer: A Chart.js canvas with interactive controls (sliders/buttons). Users move points along the graph towards the hole, seeing the y-value approach a specific number in real-time. (Goal: Explain Change/Relationship). This directly teaches the concept of approaching a value from both sides. 3. When Limits Fail: A single Chart.js canvas where users click buttons to load different datasets showing a jump, an asymptote, and an oscillation (Goal: Compare/Inform). This clarifies the conditions for a limit's existence. All math is rendered with MathJax. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        h1, h2, h3 {
+            font-family: 'Georgia', serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .accent-color { color: #0077b6; }
+        .bg-accent { background-color: #0077b6; }
+        .border-accent { border-color: #0077b6; }
+        .btn {
+            @apply px-4 py-2 rounded-md font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2;
+        }
+        .btn-primary {
+            @apply bg-accent hover:bg-blue-700 focus:ring-blue-500;
+        }
+        .btn-secondary {
+            @apply bg-gray-500 hover:bg-gray-600 focus:ring-gray-400;
+        }
+        .btn-active {
+            @apply ring-2 ring-offset-2 ring-blue-500;
+        }
+        .lang-en {
+            @apply text-sm text-gray-500 mt-1;
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Sarabun:wght@400;700&family=Georgia&display=swap" rel="stylesheet">
+    <style>
+        body {
+             font-family: 'Sarabun', sans-serif;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="text-center py-8 md:py-12 bg-white border-b">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800">บทนำเรื่องลิมิตฉบับเข้าใจง่าย</h1>
+        <p class="mt-4 text-lg md:text-xl text-gray-600">An Intuitive Introduction to Limits</p>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 md:py-12 space-y-16">
+
+        <section id="the-problem" class="text-center">
+            <h2 class="text-3xl font-bold mb-4">คำถามสำคัญ: ฟังก์ชันกำลัง "เข้าใกล้" อะไร?</h2>
+            <h3 class="text-xl text-gray-600 mb-4">The Core Question: What is the Function "Approaching"?</h3>
+            <p class="max-w-3xl mx-auto text-lg leading-relaxed mb-2">
+                ในทางคณิตศาสตร์ เรามักจะไม่สามารถแทนค่าตัวเลขเข้าไปตรงๆ เพื่อหาคำตอบได้ ลองพิจารณาฟังก์ชันที่แสดงด้านล่างนี้ ซึ่งดูปกติในทุกจุดยกเว้นที่จุดเดียวคือ "รู" ที่ \(x = 2\) ซึ่งเป็นจุดที่ฟังก์ชันไม่นิยาม ลิมิตจะถามคำถามที่ลึกซึ้งกว่านั้น: ขณะที่เราเข้าใกล้ \(x = 2\) จากทั้งสองฝั่งอย่างไม่สิ้นสุด ค่า y ค่าเดียวที่ฟังก์ชันกำลังมุ่งหน้าไปหาคืออะไร?
+            </p>
+            <p class="max-w-3xl mx-auto text-md leading-relaxed text-gray-500 mb-8">
+                In mathematics, we often can't simply plug in a number to get an answer. Consider the function shown below. It's perfectly well-behaved everywhere except for a single "hole" at \(x = 2\), where it is undefined. A limit asks a more subtle question: as we get *infinitely close* to \(x = 2\) from either side, what is the single y-value that the function is heading towards?
+            </p>
+            <div class="chart-container">
+                <canvas id="holeChart"></canvas>
+            </div>
+        </section>
+        
+        <section id="interactive-explorer" class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-center mb-4">สำรวจ: การเข้าใกล้ลิมิต</h2>
+            <h3 class="text-xl text-gray-600 text-center mb-4">Explore: Approaching the Limit</h3>
+            <p class="max-w-3xl mx-auto text-lg leading-relaxed text-center mb-2">
+                นี่คือแนวคิดหลักของลิมิต เราไม่สนใจค่า *ที่* \(x=2\) แต่เราสนใจว่าฟังก์ชันเข้าใกล้อะไรเมื่อเราขยับเข้าไปใกล้ขึ้นเรื่อยๆ ลองใช้แถบเลื่อนด้านล่างเพื่อ "เดิน" ไปตามฟังก์ชันจากทั้งฝั่งซ้ายและขวาพร้อมกัน สังเกตว่าทั้งสองจุดเข้าใกล้ค่า y เดียวกันมากขึ้นเรื่อยๆ แม้ว่าจะไม่สามารถไปถึงรูนั้นได้เลยก็ตาม
+            </p>
+            <p class="max-w-3xl mx-auto text-md leading-relaxed text-gray-500 text-center mb-8">
+                 This is the core idea of a limit. We don't care about the value *at* \(x=2\), but what the function approaches as we get closer. Use the slider below to "walk" along the function from both the left and right sides simultaneously. Notice how both points get closer and closer to the same y-value, even though they can never reach the hole.
+            </p>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="chart-container h-80 md:h-96">
+                    <canvas id="limitExplorerChart"></canvas>
+                </div>
+                <div class="text-center space-y-4">
+                    <label for="approachSlider" class="block font-bold text-lg">เข้าใกล้ x = 2 (Approach x = 2)</label>
+                    <input id="approachSlider" type="range" min="0.01" max="1" step="0.01" value="1" class="w-full">
+                    <div class="grid grid-cols-2 gap-4 text-left">
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-bold text-red-600">จากฝั่งซ้าย (From the Left)</h3>
+                            <p>x = <span id="xLeft" class="font-mono">...</span></p>
+                            <p>y → <span id="yLeft" class="font-mono">...</span></p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                            <h3 class="font-bold text-blue-600">จากฝั่งขวา (From the Right)</h3>
+                            <p>x = <span id="xRight" class="font-mono">...</span></p>
+                            <p>y → <span id="yRight" class="font-mono">...</span></p>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-4 bg-blue-50 border-l-4 border-accent rounded-r-lg text-lg">
+                        <p>เมื่อ x เข้าใกล้ 2 จากทั้งสองฝั่ง, y จะเข้าใกล้ <strong class="accent-color">4</strong>.</p>
+                        <p class="lang-en">As x approaches 2 from both sides, y approaches <strong class="accent-color">4</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="definition">
+            <h2 class="text-3xl font-bold text-center mb-4">สัญลักษณ์ทางการ</h2>
+            <h3 class="text-xl text-gray-600 text-center mb-4">The Formal Notation</h3>
+            <p class="max-w-3xl mx-auto text-lg leading-relaxed text-center mb-2">
+                กระบวนการที่เราได้สำรวจไปเมื่อครู่นี้ สามารถแสดงอย่างเป็นทางการได้โดยใช้สัญลักษณ์ลิมิต ซึ่งเป็นวิธีที่กระชับในการอธิบายพฤติกรรมของฟังก์ชัน \(f(x)\) เมื่อค่า \(x\) ที่ป้อนเข้าไปนั้นเข้าใกล้ค่าใดค่าหนึ่ง \(c\) อย่างยิ่งยวด
+            </p>
+             <p class="max-w-3xl mx-auto text-md leading-relaxed text-gray-500 text-center mb-8">
+                The intuitive process you just explored is expressed formally using limit notation. This notation is a concise way to describe the behavior of a function \(f(x)\) as its input \(x\) gets arbitrarily close to some value \(c\).
+            </p>
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow-lg text-center">
+                <p class="text-xl mb-4">เราเขียนว่า "ลิมิตของ \(f(x)\) เมื่อ \(x\) เข้าใกล้ \(c\) คือ \(L\)" ได้ดังนี้:</p>
+                <p class="lang-en mb-4">We write "The limit of \(f(x)\) as \(x\) approaches \(c\) is \(L\)" as:</p>
+                <p class="text-2xl">
+                \[ \lim_{x \to c} f(x) = L \]
+                </p>
+                 <p class="mt-6 text-xl">สำหรับตัวอย่างของเรา จะเขียนได้เป็น: (For our example, this would be:)</p>
+                 <p class="text-2xl mt-2">\[ \lim_{x \to 2} \frac{x^2 - 4}{x - 2} = 4 \]</p>
+            </div>
+        </section>
+
+        <section id="non-existence" class="bg-white p-6 md:p-8 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-center mb-4">เมื่อไหร่ลิมิตถึงไม่มีค่า?</h2>
+            <h3 class="text-xl text-gray-600 text-center mb-4">When Do Limits Not Exist?</h3>
+            <p class="max-w-3xl mx-auto text-lg leading-relaxed text-center mb-2">
+                ลิมิตจะหาค่าได้ก็ต่อเมื่อฟังก์ชันเข้าใกล้ค่าที่แน่นอนและมีขอบเขตค่าเดียวจากทั้งสองฝั่งเท่านั้น คลิกที่ปุ่มด้านล่างเพื่อดู 3 กรณีทั่วไปที่ทำให้ลิมิตไม่มีค่า
+            </p>
+            <p class="max-w-3xl mx-auto text-md leading-relaxed text-gray-500 text-center mb-8">
+                A limit only exists if the function approaches a single, finite value from both sides. Click the buttons below to see the three common ways a limit can fail to exist.
+            </p>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                 <div class="chart-container h-80 md:h-96">
+                    <canvas id="nonExistentLimitChart"></canvas>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex justify-center space-x-3">
+                        <button id="btnJump" class="btn btn-primary btn-active">กราฟกระโดด (Jump)</button>
+                        <button id="btnAsymptote" class="btn btn-primary">เส้นกำกับ (Asymptote)</button>
+                        <button id="btnOscillation" class="btn btn-primary">การแกว่งกวัด (Oscillation)</button>
+                    </div>
+                    <div id="limitFailDescription" class="p-4 bg-gray-50 rounded-lg text-lg min-h-[150px]">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="summary" class="text-center">
+            <h2 class="text-3xl font-bold mb-6">ทำไมลิมิตถึงสำคัญ?</h2>
+            <h3 class="text-xl text-gray-600 text-center mb-4">Why Limits Matter</h3>
+            <p class="max-w-3xl mx-auto text-lg leading-relaxed mb-2">
+                ลิมิตเป็นรากฐานที่สำคัญของแคลคูลัสและเป็นหนึ่งในแนวคิดพื้นฐานที่สุดในคณิตศาสตร์ขั้นสูง เป็นกลไกที่ทำให้ทุกอย่างทำงานได้ ช่วยให้เราสามารถกำหนดแนวคิดของการเปลี่ยนแปลง ณ ขณะใดขณะหนึ่งและผลรวมที่ไม่สิ้นสุดได้อย่างเป็นทางการ
+            </p>
+             <p class="max-w-3xl mx-auto text-md leading-relaxed text-gray-500 mb-8">
+                Limits are the bedrock of calculus and one of the most fundamental ideas in higher mathematics. They are the engine that makes everything else work, allowing us to formalize the ideas of instantaneous change and infinite sums.
+            </p>
+            <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow">
+                 <ul class="list-none space-y-4 text-lg text-left">
+                    <li class="flex items-start"><span class="accent-color font-bold text-2xl mr-3">&#x2192;</span><div><strong>อนุพันธ์ (Derivatives):</strong> นิยามของอนุพันธ์ (อัตราการเปลี่ยนแปลง ณ ขณะใดขณะหนึ่ง) คือลิมิต ซึ่งเป็นการกำหนดแนวคิดของเส้นตัด (secant line) ที่ "เข้าใกล้อย่างไม่สิ้นสุด" กับเส้นสัมผัส (tangent line)</div></li>
+                    <li class="flex items-start"><span class="accent-color font-bold text-2xl mr-3">&#x2192;</span><div><strong>ปริพันธ์ (Integrals):</strong> แนวคิดของการหาพื้นที่ใต้โค้งก็ถูกนิยามโดยใช้ลิมิตเช่นกัน โดยเราจะบวกพื้นที่ของสี่เหลี่ยมผืนผ้าที่บางอย่างไม่สิ้นสุดจำนวนอนันต์เข้าด้วยกัน</div></li>
+                     <li class="flex items-start"><span class="accent-color font-bold text-2xl mr-3">&#x2192;</span><div><strong>แนวคิดหลัก (Core Idea):</strong> การทำความเข้าใจลิมิตเป็นขั้นตอนแรกที่สำคัญที่สุดในการทำความเข้าใจแคลคูลัสทั้งหมด ช่วยให้เราสามารถจัดการกับสิ่งที่เล็กอย่างไม่สิ้นสุดและใหญ่โตอย่างไม่สิ้นสุดด้วยความแม่นยำทางคณิตศาสตร์</div></li>
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center py-6 bg-gray-100 border-t mt-12">
+        <p class="text-gray-600">ประสบการณ์การเรียนรู้เชิงโต้ตอบ (Interactive learning experience)</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const func = x => (x*x - 4) / (x - 2);
+
+            const generateHoleData = () => {
+                const data = [];
+                for (let x = -1; x <= 5; x += 0.1) {
+                    if (Math.abs(x - 2) < 0.05) {
+                        data.push({x: x, y: NaN});
+                    } else {
+                        data.push({x: x, y: x + 2}); 
+                    }
+                }
+                return data;
+            };
+
+            const chartRange = { minX: -1, maxX: 5, minY: 0, maxY: 8 };
+
+            const baseChartOptions = {
+                maintainAspectRatio: false,
+                scales: {
+                    x: { type: 'linear', min: chartRange.minX, max: chartRange.maxX },
+                    y: { min: chartRange.minY, max: chartRange.maxY }
+                },
+                plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                animation: { duration: 0 }
+            };
+
+            const pointStyles = {
+                pointRadius: 6,
+                pointHoverRadius: 8
+            };
+
+            new Chart(document.getElementById('holeChart'), {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'f(x)',
+                        data: generateHoleData(),
+                        borderColor: '#0077b6',
+                        borderWidth: 3,
+                        spanGaps: false,
+                    }]
+                },
+                options: baseChartOptions
+            });
+
+            const limitExplorerChartCtx = document.getElementById('limitExplorerChart').getContext('2d');
+            const slider = document.getElementById('approachSlider');
+            const xLeftEl = document.getElementById('xLeft');
+            const yLeftEl = document.getElementById('yLeft');
+            const xRightEl = document.getElementById('xRight');
+            const yRightEl = document.getElementById('yRight');
+            
+            const limitExplorerChart = new Chart(limitExplorerChartCtx, {
+                type: 'line',
+                data: {
+                    datasets: [{
+                        label: 'f(x)',
+                        data: generateHoleData(),
+                        borderColor: '#adb5bd',
+                        borderWidth: 2
+                    },{
+                        label: 'Left Point',
+                        data: [],
+                        backgroundColor: '#e63946',
+                        ...pointStyles
+                    },{
+                        label: 'Right Point',
+                        data: [],
+                        backgroundColor: '#0077b6',
+                        ...pointStyles
+                    }]
+                },
+                options: baseChartOptions
+            });
+            
+            function updateLimitExplorer() {
+                const h = parseFloat(slider.value);
+                const xLeft = 2 - h;
+                const yLeft = xLeft + 2;
+                const xRight = 2 + h;
+                const yRight = xRight + 2;
+
+                xLeftEl.textContent = xLeft.toFixed(3);
+                yLeftEl.textContent = yLeft.toFixed(3);
+                xRightEl.textContent = xRight.toFixed(3);
+                yRightEl.textContent = yRight.toFixed(3);
+
+                limitExplorerChart.data.datasets[1].data = [{x: xLeft, y: yLeft}];
+                limitExplorerChart.data.datasets[2].data = [{x: xRight, y: yRight}];
+                limitExplorerChart.update();
+            }
+
+            slider.addEventListener('input', updateLimitExplorer);
+            updateLimitExplorer();
+
+
+            const nonExistentLimitChartCtx = document.getElementById('nonExistentLimitChart').getContext('2d');
+            const btnJump = document.getElementById('btnJump');
+            const btnAsymptote = document.getElementById('btnAsymptote');
+            const btnOscillation = document.getElementById('btnOscillation');
+            const failDescEl = document.getElementById('limitFailDescription');
+            
+            const descriptions = {
+                jump: `<h3 class="font-bold accent-color mb-2">กราฟกระโดด (Jump Discontinuity)</h3><p>ฟังก์ชันเข้าใกล้ค่า y ที่แตกต่างกันจากฝั่งซ้ายและฝั่งขวา เนื่องจากทั้งสองฝั่งไม่ "ตกลง" ที่ค่าเดียวกัน จึงไม่มีลิมิตเดียว</p><p class="lang-en">The function approaches a different y-value from the left side than from the right side. Since the two sides do not "agree," there is no single limit.</p>`,
+                asymptote: `<h3 class="font-bold accent-color mb-2">เส้นกำกับแนวดิ่ง (Vertical Asymptote)</h3><p>ค่าของฟังก์ชันเพิ่มขึ้นหรือลดลงอย่างไม่มีขอบเขตเมื่อ x เข้าใกล้จุดนั้นๆ เนื่องจากไม่ได้เข้าใกล้ค่าที่มีขอบเขต ลิมิตจึงไม่มีอยู่</p><p class="lang-en">The function's value increases or decreases without bound as x approaches the point. Since it does not approach a finite number, the limit does not exist.</p>`,
+                oscillation: `<h3 class="font-bold accent-color mb-2">การแกว่งกวัด (Oscillation)</h3><p>ฟังก์ชันแกว่งไปมาเร็วขึ้นเรื่อยๆ เมื่อเข้าใกล้จุดนั้น และไม่เคยเข้าใกล้ค่าใดค่าหนึ่งเลย ดังนั้นจึงไม่มีลิมิต</p><p class="lang-en">The function oscillates more and more rapidly as it nears the point, never settling down to a single value. Therefore, no limit exists.</p>`,
+            };
+            
+            const nonExistentData = {
+                jump: () => {
+                    const data = [];
+                    for(let x=-2; x < 1; x+=0.1) data.push({x: x, y: x+2});
+                    data.push({x:1, y:NaN});
+                    for(let x=1; x <= 4; x+=0.1) data.push({x: x, y: x+3});
+                    return { data, options: { y: { min: 0, max: 8 } }};
+                },
+                asymptote: () => {
+                    const data = [];
+                    for(let x=-2; x <= 2; x+=0.02) {
+                        if(Math.abs(x - 0) > 0.01) data.push({x:x, y: 1/x});
+                        else data.push({x:x, y: NaN});
+                    }
+                    return { data, options: { y: { min: -10, max: 10 } } };
+                },
+                oscillation: () => {
+                    const data = [];
+                    for(let x=-2; x <= 2; x+=0.005) {
+                         if(Math.abs(x - 0) > 0.01) data.push({x:x, y: 5 * Math.sin(1/x)});
+                    }
+                    return { data, options: { y: { min: -6, max: 6 } } };
+                }
+            };
+
+            const nonExistentLimitChart = new Chart(nonExistentLimitChartCtx, {
+                type: 'line',
+                data: { datasets: [{ data: [], borderColor: '#0077b6', borderWidth: 2 }] },
+                options: { ...baseChartOptions, scales: { x: {min: -2, max: 2} } }
+            });
+
+            const buttons = [btnJump, btnAsymptote, btnOscillation];
+            function setActiveButton(activeBtn) {
+                buttons.forEach(btn => {
+                    btn.classList.remove('btn-active');
+                });
+                activeBtn.classList.add('btn-active');
+            }
+
+            function updateFailChart(type) {
+                const {data, options} = nonExistentData[type]();
+                nonExistentLimitChart.data.datasets[0].data = data;
+                if (options && options.y) {
+                    nonExistentLimitChart.options.scales.y.min = options.y.min;
+                    nonExistentLimitChart.options.scales.y.max = options.y.max;
+                }
+                nonExistentLimitChart.update();
+                failDescEl.innerHTML = descriptions[type];
+            }
+
+            btnJump.addEventListener('click', () => { updateFailChart('jump'); setActiveButton(btnJump); });
+            btnAsymptote.addEventListener('click', () => { updateFailChart('asymptote'); setActiveButton(btnAsymptote); });
+            btnOscillation.addEventListener('click', () => { updateFailChart('oscillation'); setActiveButton(btnOscillation); });
+            
+            updateFailChart('jump');
+        });
+    </script>
+</body>
+</html>
+

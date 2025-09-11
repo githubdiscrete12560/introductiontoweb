@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limit Intuition Explorer</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- MathJax for LaTeX rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        .container {
+            max-width: 900px;
+        }
+        canvas {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: block;
+            touch-action: none; /* Prevents default touch actions */
+        }
+        .text-gradient {
+            background-image: linear-gradient(to right, #4c51bf, #6b46c1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8 flex items-center justify-center min-h-screen">
+
+    <div class="container mx-auto p-6 bg-white rounded-2xl shadow-xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl sm:text-5xl font-bold mb-2 text-gradient">Exploring the Limit</h1>
+            <p class="text-lg text-gray-600">
+                An interactive visualization of how a function's value approaches a limit.
+            </p>
+        </header>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">The Scenario</h2>
+            <p class="text-gray-700 leading-relaxed mb-4">
+                Consider the function $$f(x) = \frac{x^2 - 1}{x - 1}$$. If you try to plug in $$x=1$$, you get an undefined result of $$\frac{0}{0}$$. However, we can still understand what the function's value gets *close to* as $$x$$ gets close to $$1$$.
+            </p>
+            <p class="text-gray-700 leading-relaxed">
+                By factoring the numerator as $$(x-1)(x+1)$$, we see that $$f(x) = x+1$$ for all $$x \neq 1$$. This means the graph is a straight line with a single hole at $$x=1$$. Let's explore this idea visually.
+            </p>
+        </section>
+
+        <div class="flex flex-col items-center gap-6">
+            <canvas id="limitCanvas" width="800" height="600" class="w-full h-auto max-w-full rounded-xl"></canvas>
+
+            <div class="w-full flex flex-col items-center">
+                <label for="xSlider" class="text-lg font-medium text-gray-700 mb-2">
+                    Move the slider to see x get closer to 1.
+                </label>
+                <input type="range" id="xSlider" min="-0.999" max="2.999" value="2" step="0.001" class="w-full h-2 bg-purple-200 rounded-full appearance-none cursor-pointer">
+            </div>
+
+            <div class="w-full bg-gray-100 rounded-lg p-4 shadow-inner mt-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-gray-700 font-medium">Current x value:</span>
+                    <span id="xValue" class="text-purple-600 font-bold text-lg"></span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-700 font-medium">Value of f(x):</span>
+                    <span id="fxValue" class="text-purple-600 font-bold text-lg"></span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Set up global variables for Firebase
+        let appId = 'default-app-id';
+        let firebaseConfig = {};
+        let initialAuthToken = undefined;
+
+        try {
+            appId = __app_id;
+        } catch (e) {
+            console.warn('__app_id is not defined. Using default.');
+        }
+
+        try {
+            if (typeof __firebase_config !== 'undefined') {
+                firebaseConfig = JSON.parse(__firebase_config);
+            }
+        } catch (e) {
+            console.error('Failed to parse __firebase_config.');
+        }
+
+        try {
+            if (typeof __initial_auth_token !== 'undefined') {
+                initialAuthToken = __initial_auth_token;
+            }
+        } catch (e) {
+            console.warn('__initial_auth_token is not defined. Using undefined.');
+        }
+        
+        // Canvas and context
+        const canvas = document.getElementById('limitCanvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        // Function to resize the canvas
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            width = container.clientWidth;
+            height = container.clientHeight > 800 ? 800 : container.clientHeight;
+            canvas.width = width;
+            canvas.height = height;
+            drawGraph();
+        }
+
+        // Add event listener for window resize
+        window.addEventListener('resize', resizeCanvas);
+
+        // Function to draw the graph and dynamic elements
+        function drawGraph() {
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+
+            // Graph properties
+            const xRange = 4;
+            const yRange = 6; // Expanded y-range to show y=3
+            const xOffset = width / xRange;
+            const yOffset = height / yRange;
+            const originX = width / 2;
+            const originY = height / 2;
+
+            // Draw axes
+            ctx.strokeStyle = '#e5e7eb';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, originY);
+            ctx.lineTo(width, originY);
+            ctx.moveTo(originX, 0);
+            ctx.lineTo(originX, height);
+            ctx.stroke();
+
+            // Draw function graph (y = x + 1)
+            ctx.strokeStyle = '#4c51bf';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            for (let x = -width / 2; x <= width / 2; x++) {
+                const xCoord = x;
+                const yCoord = x + 1;
+                const canvasX = originX + xCoord * xOffset;
+                const canvasY = originY - yCoord * yOffset;
+                if (x === -width / 2) {
+                    ctx.moveTo(canvasX, canvasY);
+                } else {
+                    ctx.lineTo(canvasX, canvasY);
+                }
+            }
+            ctx.stroke();
+
+            // Draw the "hole" at x=1, y=2
+            const holeX = originX + 1 * xOffset;
+            const holeY = originY - 2 * yOffset;
+            ctx.fillStyle = '#ffffff'; // White fill
+            ctx.strokeStyle = '#4c51bf';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(holeX, holeY, 6, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.stroke();
+
+            // Get slider value
+            const slider = document.getElementById('xSlider');
+            const x = parseFloat(slider.value);
+            const fx = x + 1;
+
+            // Draw a vertical line from the x-axis to the point on the graph
+            const pointX = originX + x * xOffset;
+            const pointY = originY - fx * yOffset;
+
+            // Dotted vertical line
+            ctx.strokeStyle = '#a855f7';
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(pointX, originY);
+            ctx.lineTo(pointX, pointY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Dotted horizontal line
+            ctx.strokeStyle = '#a855f7';
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(originX, pointY);
+            ctx.lineTo(pointX, pointY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw the point on the graph
+            ctx.fillStyle = '#6b46c1';
+            ctx.beginPath();
+            ctx.arc(pointX, pointY, 5, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Draw point labels
+            ctx.fillStyle = '#1f2937';
+            ctx.font = '14px Inter';
+            ctx.textAlign = 'center';
+            ctx.fillText(`x = ${x.toFixed(3)}`, pointX, originY + 20);
+            ctx.fillText(`y = ${fx.toFixed(3)}`, originX - 25, pointY + 5);
+
+            // Update text displays
+            document.getElementById('xValue').textContent = x.toFixed(3);
+            document.getElementById('fxValue').textContent = fx.toFixed(3);
+        }
+
+        // Add event listener for slider input
+        const slider = document.getElementById('xSlider');
+        slider.addEventListener('input', drawGraph);
+
+        // Initial draw and resize
+        resizeCanvas();
+
+        // Handle touch events on the canvas for mobile interaction
+        let isDragging = false;
+        let lastTouchX = 0;
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastTouchX = e.clientX;
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const deltaX = e.clientX - lastTouchX;
+            const currentVal = parseFloat(slider.value);
+            const newVal = currentVal + (deltaX / canvas.width) * (slider.max - slider.min);
+            
+            // Clamp value within bounds
+            slider.value = Math.max(slider.min, Math.min(slider.max, newVal));
+            lastTouchX = e.clientX;
+            drawGraph();
+        });
+
+        canvas.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            lastTouchX = e.touches[0].clientX;
+            e.preventDefault(); // Prevent scrolling
+        });
+
+        canvas.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const deltaX = e.touches[0].clientX - lastTouchX;
+            const currentVal = parseFloat(slider.value);
+            const newVal = currentVal + (deltaX / canvas.width) * (slider.max - slider.min);
+
+            // Clamp value within bounds
+            slider.value = Math.max(slider.min, Math.min(slider.max, newVal));
+            lastTouchX = e.touches[0].clientX;
+            drawGraph();
+            e.preventDefault(); // Prevent scrolling
+        });
+
+    </script>
+</body>
+</html>
